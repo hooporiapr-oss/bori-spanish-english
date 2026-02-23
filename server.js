@@ -70,7 +70,7 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
     messages.push({ role: 'user', content: message.trim() });
 
     const langContext = lang === 'es'
-      ? '\n\n[LANGUAGE CONTEXT: The user is using the Spanish interface. They may be learning English. Respond primarily in Puerto Rican Spanish, introducing English naturally. Be encouraging and patient.]'
+      ? '\n\n[CRITICAL LANGUAGE INSTRUCTION: The user has selected ESPAÑOL mode. You MUST respond in Spanish. ALL of your responses must be primarily in Puerto Rican Spanish. Only use English words when teaching English vocabulary. Your conversational language, greetings, explanations, and questions must ALL be in Spanish. Do NOT default to English. You are speaking Spanish right now.]'
       : '\n\n[LANGUAGE CONTEXT: The user is using the English interface. They may be learning Spanish. Respond primarily in English, introducing Spanish naturally. Be encouraging and patient.]';
 
     res.setHeader('Content-Type', 'text/event-stream');
