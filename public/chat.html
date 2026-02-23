@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Talk to Hey Bori — your private digital assistant for learning Spanish and English. Puerto Rico is Spanish USA.">
+  <title>Hey Bori — Chat | Learn Spanish & English</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --body:'Nunito',system-ui,sans-serif;
+      --bg:#FFFDF8;
+      --white:#FFFFFF;
+      --dark:#1A1A1A;
+      --text:#2A2A2A;
+      --text-2:#5A5A5A;
+      --text-3:#999999;
+      --border:#EDE8DF;
+      --warm:#F8F4ED;
+      --sun:#F5A623;
+      --sun-dark:#D4880F;
+      --sun-light:rgba(245,166,35,0.1);
+      --green:#2A9D6E;
+    }
+    html,body{height:100%;overflow:hidden}
+    body{font-family:var(--body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+    /* ═══ LAYOUT ═══ */
+    .app{display:flex;flex-direction:column;height:100dvh;max-width:700px;margin:0 auto}
+
+    /* ═══ HEADER ═══ */
+    .hdr{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0}
+    .hdr-back{text-decoration:none;font-size:22px;color:var(--text-2);padding:4px 8px;border-radius:8px;transition:background .2s}
+    .hdr-back:hover{background:var(--warm)}
+    .hdr-av{width:38px;height:38px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;color:var(--white);font-weight:900}
+    .hdr-info{flex:1}
+    .hdr-name{font-size:16px;font-weight:800;color:var(--dark)}
+    .hdr-name .hey{color:var(--sun)}
+    .hdr-sub{font-size:12px;color:var(--text-3);font-weight:600}
+    .hdr-lang{display:flex;border-radius:50px;overflow:hidden;border:2px solid var(--border);background:var(--white)}
+    .hdr-lang-btn{padding:5px 12px;font-size:12px;font-weight:800;border:none;cursor:pointer;background:transparent;color:var(--text-3);transition:all .2s;font-family:var(--body)}
+    .hdr-lang-btn.active{background:var(--sun);color:var(--white)}
+
+    /* ═══ CHAT ═══ */
+    .chat{flex:1;overflow-y:auto;padding:20px 18px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+
+    /* Welcome */
+    .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:40px 20px;gap:16px}
+    .w-av{width:72px;height:72px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--white);font-weight:900}
+    .w-title{font-size:22px;font-weight:800;color:var(--dark)}
+    .w-title .hey{color:var(--sun)}
+    .w-desc{font-size:15px;color:var(--text-2);max-width:380px;line-height:1.6}
+    .w-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+    .w-chip{padding:8px 16px;border-radius:50px;background:var(--white);border:1px solid var(--border);font-size:13px;color:var(--text-2);cursor:pointer;transition:all .2s;font-family:var(--body);font-weight:600}
+    .w-chip:hover{border-color:var(--sun);color:var(--sun);background:var(--sun-light)}
+
+    /* Messages */
+    .row{display:flex;gap:10px;align-items:flex-start;max-width:88%}
+    .row-bori{align-self:flex-start}
+    .row-user{align-self:flex-end;flex-direction:row-reverse}
+    .av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px}
+    .av-bori{background:var(--sun);color:var(--white);font-weight:900;font-size:12px}
+    .av-user{background:var(--green);color:var(--white);font-size:14px}
+    .bub{padding:12px 16px;border-radius:18px;font-size:14.5px;line-height:1.6;word-wrap:break-word;white-space:pre-wrap}
+    .bub-bori{background:var(--warm);color:var(--text);border-bottom-left-radius:6px}
+    .bub-user{background:var(--sun);color:var(--white);border-bottom-right-radius:6px;font-weight:600}
+    .bub-err{background:#FFF0F0;color:#C0392B;border-bottom-left-radius:6px}
+
+    /* Typing dots */
+    .dots{display:flex;gap:10px;align-items:flex-start;align-self:flex-start}
+    .dots .av{width:30px;height:30px;border-radius:50%;background:var(--sun);color:var(--white);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px}
+    .dots-bub{padding:12px 18px;border-radius:18px;background:var(--warm);border-bottom-left-radius:6px;display:flex;gap:5px;align-items:center}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--text-3);animation:dotPulse 1.2s infinite}
+    .dot:nth-child(2){animation-delay:.2s}
+    .dot:nth-child(3){animation-delay:.4s}
+    @keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+
+    /* ═══ INPUT ═══ */
+    .input-bar{display:flex;align-items:flex-end;gap:10px;padding:14px 18px;background:var(--white);border-top:1px solid var(--border);flex-shrink:0}
+    .input-bar textarea{flex:1;border:1.5px solid var(--border);border-radius:22px;padding:11px 18px;font-size:15px;font-family:var(--body);resize:none;outline:none;max-height:120px;line-height:1.4;color:var(--text);background:var(--bg);transition:border .2s}
+    .input-bar textarea::placeholder{color:var(--text-3)}
+    .input-bar textarea:focus{border-color:var(--sun)}
+    .send-btn{width:44px;height:44px;border-radius:50%;background:var(--sun);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+    .send-btn:hover:not(:disabled){background:var(--sun-dark);transform:scale(1.05)}
+    .send-btn:disabled{opacity:.4;cursor:default}
+    .send-btn svg{width:20px;height:20px;fill:var(--white)}
+
+    /* ═══ SAFE AREA ═══ */
+    @supports(padding-bottom:env(safe-area-inset-bottom)){
+      .input-bar{padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ HEADER ═══ -->
+  <div class="app">
+    <div class="hdr">
+      <a href="/" class="hdr-back" title="Back">←</a>
+      <div class="hdr-av">B</div>
+      <div class="hdr-info">
+        <div class="hdr-name"><span class="hey">Hey</span> Bori</div>
+        <div class="hdr-sub" id="hdr-sub" data-en="Your language companion" data-es="Tu companero de idioma">Your language companion</div>
+      </div>
+      <div class="hdr-lang">
+        <button class="hdr-lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+        <button class="hdr-lang-btn" id="btn-es" onclick="setLang('es')">ES</button>
+      </div>
+    </div>
+
+    <!-- ═══ CHAT AREA ═══ -->
+    <div class="chat" id="chat">
+      <div class="welcome" id="welcome">
+        <div class="w-av">B</div>
+        <div class="w-title"><span class="hey">Hey</span> Bori</div>
+        <div class="w-desc" id="w-desc" data-en="Your private digital assistant for learning Spanish and English with confidence. Just start talking!" data-es="Tu asistente digital privado para aprender espanol e ingles con confianza. Solo empieza a hablar!">Your private digital assistant for learning Spanish and English with confidence. Just start talking!</div>
+        <div class="w-chips" id="w-chips">
+          <div class="w-chip" onclick="chipTap(this)" data-en="Teach me basic greetings" data-es="Enseñame saludos basicos en ingles">Teach me basic greetings</div>
+          <div class="w-chip" onclick="chipTap(this)" data-en="How do I order food in Spanish?" data-es="Como pido comida en ingles?">How do I order food in Spanish?</div>
+          <div class="w-chip" onclick="chipTap(this)" data-en="What's Puerto Rican slang?" data-es="Enseñame slang en ingles">What's Puerto Rican slang?</div>
+          <div class="w-chip" onclick="chipTap(this)" data-en="Practice a conversation with me" data-es="Practica una conversacion conmigo">Practice a conversation with me</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ INPUT ═══ -->
+    <div class="input-bar">
+      <textarea id="inp" rows="1" placeholder="Type a message..." data-en="Type a message..." data-es="Escribe un mensaje..."></textarea>
+      <button class="send-btn" id="sendBtn" onclick="doSend()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ SCRIPT ═══ -->
+  <script>
+    var chat=document.getElementById('chat');
+    var inp=document.getElementById('inp');
+    var sendBtn=document.getElementById('sendBtn');
+    var hist=[];
+    var busy=false;
+    var lang='en';
+
+    // Auto-resize textarea
+    inp.addEventListener('input',function(){
+      this.style.height='auto';
+      this.style.height=Math.min(this.scrollHeight,120)+'px';
+    });
+
+    // Enter to send
+    inp.addEventListener('keydown',function(e){
+      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}
+    });
+
+    // Language toggle
+    function setLang(l){
+      lang=l;
+      document.getElementById('btn-en').className='hdr-lang-btn'+(l==='en'?' active':'');
+      document.getElementById('btn-es').className='hdr-lang-btn'+(l==='es'?' active':'');
+
+      var els=document.querySelectorAll('[data-'+l+']');
+      for(var i=0;i<els.length;i++){
+        var el=els[i];
+        var val=el.getAttribute('data-'+l);
+        if(val){
+          if(el.tagName==='TEXTAREA'){
+            el.placeholder=val;
+          }else{
+            el.textContent=val;
+          }
+        }
+      }
+    }
+
+    // Chip tap
+    function chipTap(el){
+      inp.value=el.textContent;
+      doSend();
+    }
+
+    // Clear welcome
+    function clearWelcome(){
+      var w=document.getElementById('welcome');
+      if(w)w.remove();
+    }
+
+    // Add bubble
+    function addBub(who,text,isErr){
+      clearWelcome();
+      var r=document.createElement('div');
+      r.className='row row-'+who;
+      var a=document.createElement('div');
+      a.className='av av-'+who;
+      if(who==='bori'){a.textContent='B';}
+      else{a.textContent='👤';}
+      var b=document.createElement('div');
+      b.className='bub bub-'+who;
+      if(isErr)b.className='bub bub-err';
+      b.textContent=text;
+      r.appendChild(a);r.appendChild(b);
+      chat.appendChild(r);
+      chat.scrollTop=chat.scrollHeight;
+    }
+
+    // Typing dots
+    function addDots(){
+      var d=document.createElement('div');
+      d.className='dots';d.id='dots';
+      d.innerHTML='<div class="av">B</div><div class="dots-bub"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+      chat.appendChild(d);
+      chat.scrollTop=chat.scrollHeight;
+    }
+    function killDots(){
+      var d=document.getElementById('dots');
+      if(d)d.remove();
+    }
+
+    // Send message with streaming
+    window.doSend=async function(){
+      var text=inp.value.trim();
+      if(!text||busy)return;
+
+      busy=true;
+      sendBtn.disabled=true;
+      inp.value='';
+      inp.style.height='auto';
+
+      addBub('user',text);
+      hist.push({role:'user',content:text});
+      addDots();
+
+      try{
+        var ctrl=new AbortController();
+        var tmout=setTimeout(function(){ctrl.abort();},45000);
+
+        var res=await fetch('/api/chat',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({message:text,history:hist.slice(-20),lang:lang}),
+          signal:ctrl.signal
+        });
+
+        clearTimeout(tmout);
+        killDots();
+
+        if(!res.ok||!res.body){
+          var errEN='Had a timeout. Try again.';
+          var errES='Se fue el tiempo. Intenta de nuevo.';
+          addBub('bori',lang==='es'?errES:errEN,true);
+          busy=false;sendBtn.disabled=false;return;
+        }
+
+        // Streaming bubble
+        clearWelcome();
+        var r=document.createElement('div');
+        r.className='row row-bori';
+        var a=document.createElement('div');
+        a.className='av av-bori';
+        a.textContent='B';
+        var b=document.createElement('div');
+        b.className='bub bub-bori';
+        b.textContent='';
+        r.appendChild(a);r.appendChild(b);
+        chat.appendChild(r);
+
+        var fullReply='';
+        var reader=res.body.getReader();
+        var decoder=new TextDecoder();
+        var buffer='';
+
+        while(true){
+          var result=await reader.read();
+          if(result.done)break;
+          buffer+=decoder.decode(result.value,{stream:true});
+
+          var lines=buffer.split('\n');
+          buffer=lines.pop()||'';
+
+          for(var i=0;i<lines.length;i++){
+            var line=lines[i].trim();
+            if(!line.startsWith('data: '))continue;
+            try{
+              var evt=JSON.parse(line.slice(6));
+              if(evt.type==='text'){
+                fullReply+=evt.text;
+                b.textContent=fullReply;
+                chat.scrollTop=chat.scrollHeight;
+              }else if(evt.type==='error'&&!fullReply){
+                b.className='bub bub-err';
+                b.textContent=evt.error||'Something went wrong.';
+              }
+            }catch(pe){}
+          }
+        }
+
+        if(!fullReply){
+          b.className='bub bub-err';
+          b.textContent=lang==='es'?'No recibi respuesta. Intenta de nuevo.':'No response received. Try again.';
+        }
+
+        hist.push({role:'assistant',content:fullReply});
+        if(hist.length>40)hist=hist.slice(-40);
+
+      }catch(e){
+        killDots();
+        if(e.name==='AbortError'){
+          addBub('bori',lang==='es'?'Se agoto el tiempo. Intenta de nuevo.':'Request timed out. Try again.',true);
+        }else{
+          addBub('bori',lang==='es'?'Problema de conexion. Intenta de nuevo.':'Connection issue. Try again.',true);
+        }
+      }
+
+      busy=false;
+      sendBtn.disabled=false;
+      inp.focus();
+    };
+  </script>
+
+</body>
+</html>
