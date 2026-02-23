@@ -1,21 +1,15 @@
-const express = require('express');
-const path = require('path');
-const helmet = require('helmet');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Security headers (relaxed for inline styles/scripts)
-app.use(helmet({ contentSecurityPolicy: false }));
-
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Catch-all → index
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.listen(PORT, () => {
-  console.log(`[Hey Bori] Language landing live on port ${PORT}`);
-});
+{
+  "name": "bori-spanish-english",
+  "version": "1.0.0",
+  "description": "Learn Spanish and English with Hey Bori — Puerto Rico is Spanish USA",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "helmet": "^8.0.0"
+  },
+  "author": "GoStar Digital LLC",
+  "license": "UNLICENSED"
+}
