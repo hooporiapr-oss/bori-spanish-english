@@ -55,8 +55,10 @@
     .nav-link:hover{color:var(--dark)}
 
     /* Language toggle */
+    .lang-wrap{display:flex;flex-direction:column;align-items:center;gap:3px}
+    .lang-label{font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px}
     .lang-toggle{display:flex;border-radius:50px;overflow:hidden;border:2px solid var(--border);background:var(--white)}
-    .lang-btn{padding:6px 14px;font-size:13px;font-weight:800;border:none;cursor:pointer;background:transparent;color:var(--text-2);transition:all .2s;font-family:var(--body)}
+    .lang-btn{padding:6px 12px;font-size:12px;font-weight:800;border:none;cursor:pointer;background:transparent;color:var(--text-2);transition:all .2s;font-family:var(--body)}
     .lang-btn.active{background:var(--sun);color:var(--white)}
 
     .nav-cta{padding:10px 24px;border-radius:50px;background:var(--sun);color:var(--white);font-size:14px;font-weight:800;text-decoration:none;transition:all .2s;border:none;cursor:pointer}
@@ -167,9 +169,12 @@
       <div class="nav-links">
         <a href="#learn" class="nav-link" data-en="How It Works" data-es="Como Funciona">How It Works</a>
         <a href="#who" class="nav-link" data-en="Who It's For" data-es="Para Quien">Who It's For</a>
-        <div class="lang-toggle">
-          <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
-          <button class="lang-btn" id="btn-es" onclick="setLang('es')">ES</button>
+        <div class="lang-wrap">
+          <div class="lang-label" id="langLabel" data-en="Pick Your Language" data-es="Escoge Tu Idioma">Pick Your Language</div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" id="btn-en" onclick="setLang('en')">English</button>
+            <button class="lang-btn" id="btn-es" onclick="setLang('es')">Español</button>
+          </div>
         </div>
         <a href="/chat" class="nav-cta" data-en="Start Learning" data-es="Empieza Ya">Start Learning</a>
       </div>
