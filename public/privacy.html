@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Hey Bori</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',sans-serif;background:#FFFDF8;color:#2A2A2A;line-height:1.75;-webkit-font-smoothing:antialiased}
+    .top-bar{display:flex;align-items:center;justify-content:space-between;max-width:700px;margin:0 auto;padding:20px 24px 0}
+    .top-bar a{font-size:15px;font-weight:700;color:#FF6B35;text-decoration:none}
+    .top-bar a:hover{text-decoration:underline}
+    .lang-wrap{display:flex;flex-direction:column;align-items:center;gap:3px}
+    .lang-label{font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.5px}
+    .lang-toggle{display:flex;border-radius:50px;overflow:hidden;border:2px solid #EDE8DF;background:#fff}
+    .lang-btn{padding:6px 12px;font-size:12px;font-weight:800;border:none;cursor:pointer;background:transparent;color:#999;transition:all .2s;font-family:'Nunito',sans-serif}
+    .lang-btn.active{background:#FF6B35;color:#fff}
+    .wrap{max-width:700px;margin:0 auto;padding:40px 24px 80px}
+    h1{font-size:28px;font-weight:900;color:#1A1A1A;margin-bottom:8px}
+    .updated{font-size:13px;color:#999;margin-bottom:32px}
+    h2{font-size:18px;font-weight:800;color:#1A1A1A;margin:28px 0 10px}
+    p{font-size:15px;color:#5A5A5A;margin-bottom:14px}
+    footer{max-width:700px;margin:0 auto;padding:24px;text-align:center;border-top:1px solid #EDE8DF}
+    footer p{font-size:12px;color:#999}
+    footer a{color:#E55A25;text-decoration:none;font-weight:700}
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <a href="/">← Back</a>
+    <div class="lang-wrap">
+      <div class="lang-label" data-en="Pick Your Language" data-es="Escoge Tu Idioma">Pick Your Language</div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-en" onclick="setLang('en')">English</button>
+        <button class="lang-btn" id="btn-es" onclick="setLang('es')">Español</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <h1 data-en="Privacy Policy" data-es="Politica de Privacidad">Privacy Policy</h1>
+    <p class="updated">Last updated: February 23, 2026</p>
+
+    <h2 data-en="Who We Are" data-es="Quienes Somos">Who We Are</h2>
+    <p data-en="Hey Bori is a product of GoStar Digital LLC, a company based in San Juan, Puerto Rico. We are committed to protecting your privacy and being transparent about how we handle your information." data-es="Hey Bori es un producto de GoStar Digital LLC, una compania basada en San Juan, Puerto Rico. Estamos comprometidos a proteger tu privacidad y ser transparentes sobre como manejamos tu informacion.">Hey Bori is a product of GoStar Digital LLC, a company based in San Juan, Puerto Rico. We are committed to protecting your privacy and being transparent about how we handle your information.</p>
+
+    <h2 data-en="What We Collect" data-es="Que Recopilamos">What We Collect</h2>
+    <p data-en="Hey Bori is designed to be simple and private. We do not require you to create an account to use the free tier. When you use Hey Bori, your conversation messages are sent to our server to generate responses. We do not store your conversations on our servers after the session ends." data-es="Hey Bori esta disenado para ser simple y privado. No necesitas crear una cuenta para usar el nivel gratis. Cuando usas Hey Bori, tus mensajes se envian a nuestro servidor para generar respuestas. No guardamos tus conversaciones en nuestros servidores despues de que termina la sesion.">Hey Bori is designed to be simple and private. We do not require you to create an account to use the free tier. When you use Hey Bori, your conversation messages are sent to our server to generate responses. We do not store your conversations on our servers after the session ends.</p>
+    <p data-en="We may collect basic, anonymous usage data such as page visits and message counts to improve the service. We do not collect your name, email address, or any personally identifiable information unless you voluntarily provide it." data-es="Podemos recopilar datos de uso basicos y anonimos como visitas a la pagina y conteo de mensajes para mejorar el servicio. No recopilamos tu nombre, correo electronico, ni informacion personal identificable a menos que la proporciones voluntariamente.">We may collect basic, anonymous usage data such as page visits and message counts to improve the service. We do not collect your name, email address, or any personally identifiable information unless you voluntarily provide it.</p>
+
+    <h2 data-en="How We Use Your Information" data-es="Como Usamos Tu Informacion">How We Use Your Information</h2>
+    <p data-en="Any information we collect is used solely to provide and improve the Hey Bori service. We do not sell, rent, or share your information with third parties for marketing purposes." data-es="Cualquier informacion que recopilemos se usa unicamente para proveer y mejorar el servicio de Hey Bori. No vendemos, alquilamos ni compartimos tu informacion con terceros con fines de mercadeo.">Any information we collect is used solely to provide and improve the Hey Bori service. We do not sell, rent, or share your information with third parties for marketing purposes.</p>
+
+    <h2 data-en="Cookies and Local Storage" data-es="Cookies y Almacenamiento Local">Cookies and Local Storage</h2>
+    <p data-en="Hey Bori uses your browser's local storage to track your daily message count for the free tier. This data stays on your device and is not sent to our servers." data-es="Hey Bori usa el almacenamiento local de tu navegador para rastrear tu conteo diario de mensajes del nivel gratis. Estos datos se quedan en tu dispositivo y no se envian a nuestros servidores.">Hey Bori uses your browser's local storage to track your daily message count for the free tier. This data stays on your device and is not sent to our servers.</p>
+
+    <h2 data-en="Third-Party Services" data-es="Servicios de Terceros">Third-Party Services</h2>
+    <p data-en="Hey Bori uses Anthropic's Claude API to power conversations. Messages you send are processed through Anthropic's API to generate responses. Please refer to Anthropic's privacy policy for information on how they handle data." data-es="Hey Bori usa la API de Claude de Anthropic para potenciar las conversaciones. Los mensajes que envias se procesan a traves de la API de Anthropic para generar respuestas. Consulta la politica de privacidad de Anthropic para informacion sobre como manejan los datos.">Hey Bori uses Anthropic's Claude API to power conversations. Messages you send are processed through Anthropic's API to generate responses. Please refer to Anthropic's privacy policy for information on how they handle data.</p>
+
+    <h2 data-en="Children's Privacy" data-es="Privacidad de Menores">Children's Privacy</h2>
+    <p data-en="Hey Bori is a general language learning tool. We do not knowingly collect personal information from children under 13. If you believe a child has provided us with personal information, please contact us and we will promptly delete it." data-es="Hey Bori es una herramienta general de aprendizaje de idiomas. No recopilamos intencionalmente informacion personal de menores de 13 anos. Si crees que un menor nos ha proporcionado informacion personal, contactanos y la eliminaremos de inmediato.">Hey Bori is a general language learning tool. We do not knowingly collect personal information from children under 13. If you believe a child has provided us with personal information, please contact us and we will promptly delete it.</p>
+
+    <h2 data-en="Your Rights" data-es="Tus Derechos">Your Rights</h2>
+    <p data-en="Since we do not store your conversations or require accounts for the free tier, there is minimal personal data to manage. If you have any questions about your data, please contact us." data-es="Como no almacenamos tus conversaciones ni requerimos cuentas para el nivel gratis, hay minimos datos personales que manejar. Si tienes preguntas sobre tus datos, contactanos.">Since we do not store your conversations or require accounts for the free tier, there is minimal personal data to manage. If you have any questions about your data, please contact us.</p>
+
+    <h2 data-en="Changes to This Policy" data-es="Cambios a Esta Politica">Changes to This Policy</h2>
+    <p data-en="We may update this privacy policy from time to time. Any changes will be posted on this page with an updated date." data-es="Podemos actualizar esta politica de privacidad de vez en cuando. Cualquier cambio se publicara en esta pagina con una fecha actualizada.">We may update this privacy policy from time to time. Any changes will be posted on this page with an updated date.</p>
+
+    <h2 data-en="Contact" data-es="Contacto">Contact</h2>
+    <p data-en="If you have questions about this privacy policy, contact GoStar Digital LLC at San Juan, Puerto Rico." data-es="Si tienes preguntas sobre esta politica de privacidad, contacta a GoStar Digital LLC en San Juan, Puerto Rico.">If you have questions about this privacy policy, contact GoStar Digital LLC at San Juan, Puerto Rico.</p>
+  </div>
+
+  <footer>
+    <p>© 2026 <a href="https://gostardigital.com">GoStar Digital LLC</a>. All Rights Reserved. · "Puerto Rico is Spanish USA"™</p>
+  </footer>
+
+  <script>
+    var lang='en';
+    function setLang(l){
+      lang=l;
+      document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');
+      document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');
+      var els=document.querySelectorAll('[data-'+l+']');
+      for(var i=0;i<els.length;i++){
+        var el=els[i],val=el.getAttribute('data-'+l);
+        if(val&&!el.classList.contains('lang-btn'))el.textContent=val;
+      }
+    }
+  </script>
+</body>
+</html>
