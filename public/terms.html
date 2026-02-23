@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Use — Hey Bori</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',sans-serif;background:#FFFDF8;color:#2A2A2A;line-height:1.75;-webkit-font-smoothing:antialiased}
+    .top-bar{display:flex;align-items:center;justify-content:space-between;max-width:700px;margin:0 auto;padding:20px 24px 0}
+    .top-bar a{font-size:15px;font-weight:700;color:#FF6B35;text-decoration:none}
+    .top-bar a:hover{text-decoration:underline}
+    .lang-wrap{display:flex;flex-direction:column;align-items:center;gap:3px}
+    .lang-label{font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.5px}
+    .lang-toggle{display:flex;border-radius:50px;overflow:hidden;border:2px solid #EDE8DF;background:#fff}
+    .lang-btn{padding:6px 12px;font-size:12px;font-weight:800;border:none;cursor:pointer;background:transparent;color:#999;transition:all .2s;font-family:'Nunito',sans-serif}
+    .lang-btn.active{background:#FF6B35;color:#fff}
+    .wrap{max-width:700px;margin:0 auto;padding:40px 24px 80px}
+    h1{font-size:28px;font-weight:900;color:#1A1A1A;margin-bottom:8px}
+    .updated{font-size:13px;color:#999;margin-bottom:32px}
+    h2{font-size:18px;font-weight:800;color:#1A1A1A;margin:28px 0 10px}
+    p{font-size:15px;color:#5A5A5A;margin-bottom:14px}
+    footer{max-width:700px;margin:0 auto;padding:24px;text-align:center;border-top:1px solid #EDE8DF}
+    footer p{font-size:12px;color:#999}
+    footer a{color:#E55A25;text-decoration:none;font-weight:700}
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <a href="/">← Back</a>
+    <div class="lang-wrap">
+      <div class="lang-label" data-en="Pick Your Language" data-es="Escoge Tu Idioma">Pick Your Language</div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-en" onclick="setLang('en')">English</button>
+        <button class="lang-btn" id="btn-es" onclick="setLang('es')">Español</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <h1 data-en="Terms of Use" data-es="Terminos de Uso">Terms of Use</h1>
+    <p class="updated">Last updated: February 23, 2026</p>
+
+    <h2 data-en="Acceptance of Terms" data-es="Aceptacion de Terminos">Acceptance of Terms</h2>
+    <p data-en='By accessing and using Hey Bori ("the Service"), you agree to be bound by these Terms of Use. If you do not agree to these terms, please do not use the Service. Hey Bori is a product of GoStar Digital LLC, based in San Juan, Puerto Rico.' data-es='Al acceder y usar Hey Bori ("el Servicio"), aceptas estar sujeto a estos Terminos de Uso. Si no estas de acuerdo con estos terminos, por favor no uses el Servicio. Hey Bori es un producto de GoStar Digital LLC, basada en San Juan, Puerto Rico.'>By accessing and using Hey Bori ("the Service"), you agree to be bound by these Terms of Use. If you do not agree to these terms, please do not use the Service. Hey Bori is a product of GoStar Digital LLC, based in San Juan, Puerto Rico.</p>
+
+    <h2 data-en="Description of Service" data-es="Descripcion del Servicio">Description of Service</h2>
+    <p data-en="Hey Bori is an AI-powered language learning companion designed to help users practice and explore Spanish and English through natural conversation. The Service is provided for educational and entertainment purposes only." data-es="Hey Bori es un companero de aprendizaje de idiomas impulsado por inteligencia artificial, disenado para ayudar a los usuarios a practicar y explorar espanol e ingles a traves de conversacion natural. El Servicio se provee solo con fines educativos y de entretenimiento.">Hey Bori is an AI-powered language learning companion designed to help users practice and explore Spanish and English through natural conversation. The Service is provided for educational and entertainment purposes only.</p>
+
+    <h2 data-en="Not Professional Advice" data-es="No Es Consejo Profesional">Not Professional Advice</h2>
+    <p data-en="Hey Bori is a language learning tool. It does not provide medical, legal, financial, or any other form of professional advice. You should not rely on Hey Bori for decisions that require licensed professional guidance. Always consult qualified professionals for medical, legal, or financial matters." data-es="Hey Bori es una herramienta de aprendizaje de idiomas. No provee consejos medicos, legales, financieros, ni ninguna otra forma de consejo profesional. No debes depender de Hey Bori para decisiones que requieran orientacion profesional licenciada. Siempre consulta profesionales cualificados para asuntos medicos, legales o financieros.">Hey Bori is a language learning tool. It does not provide medical, legal, financial, or any other form of professional advice. You should not rely on Hey Bori for decisions that require licensed professional guidance. Always consult qualified professionals for medical, legal, or financial matters.</p>
+
+    <h2 data-en="Free Tier and Usage Limits" data-es="Nivel Gratis y Limites de Uso">Free Tier and Usage Limits</h2>
+    <p data-en="The free tier of Hey Bori allows up to 10 messages per day, resetting at midnight. GoStar Digital LLC reserves the right to modify usage limits, pricing, and features at any time." data-es="El nivel gratis de Hey Bori permite hasta 10 mensajes por dia, reiniciandose a medianoche. GoStar Digital LLC se reserva el derecho de modificar limites de uso, precios y funciones en cualquier momento.">The free tier of Hey Bori allows up to 10 messages per day, resetting at midnight. GoStar Digital LLC reserves the right to modify usage limits, pricing, and features at any time.</p>
+
+    <h2 data-en="Acceptable Use" data-es="Uso Aceptable">Acceptable Use</h2>
+    <p data-en="You agree to use Hey Bori for lawful purposes only. You may not use the Service to generate harmful, abusive, hateful, or illegal content. GoStar Digital LLC reserves the right to restrict access to users who violate these terms." data-es="Aceptas usar Hey Bori solo para propositos legales. No puedes usar el Servicio para generar contenido danino, abusivo, de odio o ilegal. GoStar Digital LLC se reserva el derecho de restringir el acceso a usuarios que violen estos terminos.">You agree to use Hey Bori for lawful purposes only. You may not use the Service to generate harmful, abusive, hateful, or illegal content. GoStar Digital LLC reserves the right to restrict access to users who violate these terms.</p>
+
+    <h2 data-en="Intellectual Property" data-es="Propiedad Intelectual">Intellectual Property</h2>
+    <p data-en='Hey Bori, the Hey Bori name, logo, design, and all associated content are the intellectual property of GoStar Digital LLC. "Puerto Rico is Spanish USA" is a trademark of GoStar Digital LLC. You may not copy, reproduce, or distribute any part of the Service without written permission.' data-es='Hey Bori, el nombre Hey Bori, logo, diseno y todo el contenido asociado son propiedad intelectual de GoStar Digital LLC. "Puerto Rico is Spanish USA" es una marca registrada de GoStar Digital LLC. No puedes copiar, reproducir ni distribuir ninguna parte del Servicio sin permiso escrito.'>Hey Bori, the Hey Bori name, logo, design, and all associated content are the intellectual property of GoStar Digital LLC. "Puerto Rico is Spanish USA" is a trademark of GoStar Digital LLC. You may not copy, reproduce, or distribute any part of the Service without written permission.</p>
+
+    <h2 data-en="AI-Generated Content" data-es="Contenido Generado por IA">AI-Generated Content</h2>
+    <p data-en="Hey Bori uses artificial intelligence to generate responses. While we strive for accuracy, AI-generated content may contain errors. GoStar Digital LLC is not responsible for the accuracy, completeness, or reliability of any information provided by Hey Bori. Language learners should verify important information with qualified sources." data-es="Hey Bori usa inteligencia artificial para generar respuestas. Aunque nos esforzamos por la precision, el contenido generado por IA puede contener errores. GoStar Digital LLC no es responsable de la precision, integridad o confiabilidad de cualquier informacion proporcionada por Hey Bori. Los estudiantes de idiomas deben verificar informacion importante con fuentes cualificadas.">Hey Bori uses artificial intelligence to generate responses. While we strive for accuracy, AI-generated content may contain errors. GoStar Digital LLC is not responsible for the accuracy, completeness, or reliability of any information provided by Hey Bori. Language learners should verify important information with qualified sources.</p>
+
+    <h2 data-en="Limitation of Liability" data-es="Limitacion de Responsabilidad">Limitation of Liability</h2>
+    <p data-en='Hey Bori is provided "as is" without warranties of any kind. GoStar Digital LLC shall not be liable for any damages arising from your use of the Service, including but not limited to direct, indirect, incidental, or consequential damages.' data-es='Hey Bori se provee "tal cual" sin garantias de ningun tipo. GoStar Digital LLC no sera responsable de ningun dano que surja de tu uso del Servicio, incluyendo pero no limitado a danos directos, indirectos, incidentales o consecuentes.'>Hey Bori is provided "as is" without warranties of any kind. GoStar Digital LLC shall not be liable for any damages arising from your use of the Service, including but not limited to direct, indirect, incidental, or consequential damages.</p>
+
+    <h2 data-en="Availability" data-es="Disponibilidad">Availability</h2>
+    <p data-en="We strive to keep Hey Bori available 24/7, but we do not guarantee uninterrupted service. The Service may be temporarily unavailable due to maintenance, updates, or circumstances beyond our control." data-es="Nos esforzamos por mantener Hey Bori disponible 24/7, pero no garantizamos servicio ininterrumpido. El Servicio puede estar temporalmente no disponible debido a mantenimiento, actualizaciones o circunstancias fuera de nuestro control.">We strive to keep Hey Bori available 24/7, but we do not guarantee uninterrupted service. The Service may be temporarily unavailable due to maintenance, updates, or circumstances beyond our control.</p>
+
+    <h2 data-en="Changes to Terms" data-es="Cambios a los Terminos">Changes to Terms</h2>
+    <p data-en="GoStar Digital LLC reserves the right to modify these Terms of Use at any time. Changes will be posted on this page with an updated date. Continued use of the Service after changes constitutes acceptance of the new terms." data-es="GoStar Digital LLC se reserva el derecho de modificar estos Terminos de Uso en cualquier momento. Los cambios se publicaran en esta pagina con una fecha actualizada. El uso continuo del Servicio despues de los cambios constituye aceptacion de los nuevos terminos.">GoStar Digital LLC reserves the right to modify these Terms of Use at any time. Changes will be posted on this page with an updated date. Continued use of the Service after changes constitutes acceptance of the new terms.</p>
+
+    <h2 data-en="Governing Law" data-es="Ley Aplicable">Governing Law</h2>
+    <p data-en="These Terms of Use are governed by the laws of the Commonwealth of Puerto Rico and applicable federal laws of the United States of America." data-es="Estos Terminos de Uso se rigen por las leyes del Estado Libre Asociado de Puerto Rico y las leyes federales aplicables de los Estados Unidos de America.">These Terms of Use are governed by the laws of the Commonwealth of Puerto Rico and applicable federal laws of the United States of America.</p>
+
+    <h2 data-en="Contact" data-es="Contacto">Contact</h2>
+    <p data-en="If you have questions about these terms, contact GoStar Digital LLC at San Juan, Puerto Rico." data-es="Si tienes preguntas sobre estos terminos, contacta a GoStar Digital LLC en San Juan, Puerto Rico.">If you have questions about these terms, contact GoStar Digital LLC at San Juan, Puerto Rico.</p>
+  </div>
+
+  <footer>
+    <p>© 2026 <a href="https://gostardigital.com">GoStar Digital LLC</a>. All Rights Reserved. · "Puerto Rico is Spanish USA"™</p>
+  </footer>
+
+  <script>
+    var lang='en';
+    function setLang(l){
+      lang=l;
+      document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');
+      document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');
+      var els=document.querySelectorAll('[data-'+l+']');
+      for(var i=0;i<els.length;i++){
+        var el=els[i],val=el.getAttribute('data-'+l);
+        if(val&&!el.classList.contains('lang-btn'))el.textContent=val;
+      }
+    }
+  </script>
+</body>
+</html>
