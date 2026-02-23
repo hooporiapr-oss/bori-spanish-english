@@ -9,6 +9,9 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust Render's proxy
+app.set('trust proxy', 1);
+
 // ═══ ANTHROPIC CLIENT ═══
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -94,11 +97,15 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
 
     stream.on('error', (err) => {
       console.error('[Hey Bori Stream Error]', err.message || err);
-      res.write(`data: ${JSON.stringify({ type: 'error', error: 'Something went wrong. Try again.' })}\n\n`);
-      res.end();
+      if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Something went wrong. Try again.' })}\n\n`);
+        res.end();
+      }
     });
 
-    req.on('close', () => { stream.abort(); });
+    req.on('close', () => {
+      try { stream.abort(); } catch(e) {}
+    });
 
   } catch (err) {
     console.error('[Hey Bori Error]', err.message || err);
