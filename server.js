@@ -170,8 +170,8 @@ app.post('/api/voice/stt', async (req, res) => {
       try {
         const audioBuffer = Buffer.concat(chunks);
 
-        if (audioBuffer.length < 100) {
-          return res.status(400).json({ error: 'Audio too short.' });
+        if (audioBuffer.length < 500) {
+          return res.status(400).json({ error: 'Audio too short. Try speaking a bit longer.' });
         }
 
         console.log('[ElevenLabs STT] Received audio:', audioBuffer.length, 'bytes, content-type:', req.headers['content-type']);
@@ -217,15 +217,32 @@ app.post('/api/voice/stt', async (req, res) => {
           `${ELEVENLABS_MODEL_STT}\r\n`
         ));
 
-        // Language code part
-        const lang = req.headers['x-lang'] || '';
-        if (lang === 'es' || lang === 'en') {
-          formParts.push(Buffer.from(
-            `--${boundary}\r\n` +
-            `Content-Disposition: form-data; name="language_code"\r\n\r\n` +
-            `${lang}\r\n`
-          ));
-        }
+        // Language code - ALWAYS send it based on user's toggle
+        const lang = req.headers['x-lang'] || 'en';
+        const langCode = lang === 'es' ? 'spa' : 'eng';
+        formParts.push(Buffer.from(
+          `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="language_code"\r\n\r\n` +
+          `${langCode}\r\n`
+        ));
+
+        // Tag audio events OFF for cleaner transcription
+        formParts.push(Buffer.from(
+          `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="tag_audio_events"\r\n\r\n` +
+          `false\r\n`
+        ));
+
+        // Keyterm prompting - bias towards common phrases
+        const keyterms = lang === 'es'
+          ? 'Hey Bori,hola,buenos días,buenas tardes,buenas noches,¿cómo estás?,gracias,por favor,ayúdame,enséñame,traduce,¿qué significa?,Puerto Rico,español,inglés'
+          : 'Hey Bori,hello,good morning,good afternoon,good evening,how are you,thank you,please,help me,teach me,translate,what does it mean,Puerto Rico,Spanish,English';
+
+        formParts.push(Buffer.from(
+          `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="biased_keywords"\r\n\r\n` +
+          `${keyterms}\r\n`
+        ));
 
         // Close boundary
         formParts.push(Buffer.from(`--${boundary}--\r\n`));
