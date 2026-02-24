@@ -242,7 +242,7 @@
           <li><span class="ck">✓</span><span data-en="Priority speed" data-es="Velocidad prioritaria">Priority speed</span></li>
           <li><span class="ck">✓</span><span data-en="All games unlocked" data-es="Todos los juegos desbloqueados">All games unlocked</span></li>
         </ul>
-        <button class="plan-btn plan-btn-plus" data-en="Join Bori Plus" data-es="Únete a Bori Plus">Join Bori Plus</button>
+        <button class="plan-btn plan-btn-plus" onclick="joinBoriPlus()" data-en="Join Bori Plus" data-es="Únete a Bori Plus">Join Bori Plus</button>
       </div>
     </div>
 
@@ -322,6 +322,28 @@
       else{navigator.clipboard.writeText(shareText).then(function(){
         var btn=document.querySelector('.coco-share');btn.textContent='✓ Copied!';setTimeout(function(){btn.innerHTML='<span>↗ SHARE</span>';},2000);
       }).catch(function(){});}
+    }
+
+    // STRIPE CHECKOUT
+    function joinBoriPlus(){
+      var btn=document.querySelector('.plan-btn-plus');
+      var origText=btn.textContent;
+      btn.textContent=lang==='es'?'Cargando...':'Loading...';
+      btn.disabled=true;
+      fetch('/api/stripe/checkout',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({lang:lang})
+      })
+      .then(function(r){return r.json();})
+      .then(function(data){
+        if(data.url){window.location.href=data.url;}
+        else{btn.textContent=origText;btn.disabled=false;alert(lang==='es'?'Error. Intenta de nuevo.':'Error. Try again.');}
+      })
+      .catch(function(){
+        btn.textContent=origText;btn.disabled=false;
+        alert(lang==='es'?'Error de conexión. Intenta de nuevo.':'Connection error. Try again.');
+      });
     }
   </script>
 </body>
