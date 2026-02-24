@@ -366,8 +366,8 @@ app.get('/api/fortune', async (req, res) => {
   try {
     const lang = req.query.lang || 'en';
     const prompt = lang === 'es'
-      ? 'Dame una fortuna positiva, corta y motivacional en español boricua (1-2 oraciones). Solo la fortuna, nada más. Estilo: como un coco sabio de Puerto Rico.'
-      : 'Give me a short, positive, motivational fortune in English (1-2 sentences). Just the fortune, nothing else. Style: like a wise coconut from Puerto Rico.';
+      ? 'Dame una fortuna positiva, corta y motivacional en español boricua (1-2 oraciones). Solo la fortuna, nada más. Estilo: como un coco sabio de Puerto Rico. NUNCA uses "mi amor", "cariño", "corazón", "mi vida", "mi cielo", "mi reina", "mi rey", "nena", "nene" ni ningún término romántico o íntimo. Habla como un amigo sabio.'
+      : 'Give me a short, positive, motivational fortune in English (1-2 sentences). Just the fortune, nothing else. Style: like a wise coconut from Puerto Rico. NEVER use "my love", "sweetheart", "honey", "darling", "babe", "dear" or any romantic/intimate terms. Speak like a wise friend.';
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
