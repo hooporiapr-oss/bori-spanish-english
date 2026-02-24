@@ -174,15 +174,29 @@ app.post('/api/voice/stt', async (req, res) => {
           return res.status(400).json({ error: 'Audio too short.' });
         }
 
+        console.log('[ElevenLabs STT] Received audio:', audioBuffer.length, 'bytes, content-type:', req.headers['content-type']);
+
         // Create form data for ElevenLabs STT
         const boundary = '----ElevenLabsBoundary' + Date.now();
-        const contentType = req.headers['content-type'] || 'audio/webm';
+        const rawContentType = (req.headers['content-type'] || '').split(';')[0].trim();
 
-        // Determine file extension from content type
-        let ext = 'webm';
-        if (contentType.includes('mp4')) ext = 'mp4';
-        else if (contentType.includes('ogg')) ext = 'ogg';
-        else if (contentType.includes('wav')) ext = 'wav';
+        // Map content type to proper file extension for ElevenLabs
+        const extMap = {
+          'audio/mp4': 'm4a',
+          'audio/m4a': 'm4a',
+          'audio/aac': 'aac',
+          'audio/mpeg': 'mp3',
+          'audio/webm': 'webm',
+          'audio/ogg': 'ogg',
+          'audio/wav': 'wav',
+          'audio/x-m4a': 'm4a',
+        };
+        const ext = extMap[rawContentType] || 'm4a';
+
+        // Use a clean content type for the multipart form
+        const cleanContentType = rawContentType || 'audio/mp4';
+
+        console.log('[ElevenLabs STT] Detected format:', cleanContentType, '-> extension:', ext);
 
         // Build multipart form data manually
         const formParts = [];
@@ -191,7 +205,7 @@ app.post('/api/voice/stt', async (req, res) => {
         formParts.push(Buffer.from(
           `--${boundary}\r\n` +
           `Content-Disposition: form-data; name="file"; filename="audio.${ext}"\r\n` +
-          `Content-Type: ${contentType}\r\n\r\n`
+          `Content-Type: ${cleanContentType}\r\n\r\n`
         ));
         formParts.push(audioBuffer);
         formParts.push(Buffer.from('\r\n'));
@@ -203,7 +217,7 @@ app.post('/api/voice/stt', async (req, res) => {
           `${ELEVENLABS_MODEL_STT}\r\n`
         ));
 
-        // Language code part (auto-detect if not specified)
+        // Language code part
         const lang = req.headers['x-lang'] || '';
         if (lang === 'es' || lang === 'en') {
           formParts.push(Buffer.from(
@@ -234,6 +248,7 @@ app.post('/api/voice/stt', async (req, res) => {
         }
 
         const data = await sttRes.json();
+        console.log('[ElevenLabs STT] Transcribed:', data.text?.substring(0, 100));
         res.json({
           text: data.text || '',
           language: data.language_code || '',
