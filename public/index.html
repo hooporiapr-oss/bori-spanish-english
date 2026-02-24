@@ -3,41 +3,126 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Learn Spanish and English with Hey Bori — your private digital assistant for language. Puerto Rico is Spanish USA.">
+  <meta name="description" content="Hey Bori — Your Private Bilingual Spanish and English Digital Assistant. Puerto Rico is Spanish USA.">
   <meta property="og:title" content="Hey Bori — Learn Spanish & English">
-  <meta property="og:description" content="Your private digital assistant for learning Spanish and English with confidence. Puerto Rico is Spanish USA.">
+  <meta property="og:description" content="Your Private Bilingual Spanish and English Digital Assistant. Puerto Rico is Spanish USA.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://heybori.com">
-  <title>Hey Bori — Learn Spanish & English</title>
+  <title>Hey Bori — Your Bilingual Digital Assistant 🇵🇷</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    :root{--body:'Nunito',sans-serif;--bg:#FFFDF8;--white:#FFF;--dark:#1A1A1A;--text:#2A2A2A;--text-2:#5A5A5A;--text-3:#999;--border:#EDE8DF;--sun:#FF6B35;--sun-dark:#E55A25}
-    html,body{height:100%}
+    :root{--body:'Nunito',sans-serif;--bg:#FFFDF8;--white:#FFF;--dark:#1A1A1A;--text:#2A2A2A;--text-2:#5A5A5A;--text-3:#999;--border:#EDE8DF;--warm:#F8F4ED;--sun:#FF6B35;--sun-dark:#E55A25;--green:#2A9D6E;--coco-bg:rgba(139,90,43,0.06);--coco-border:rgba(139,90,43,0.18)}
+    html{scroll-behavior:smooth}
     body{font-family:var(--body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 
-    .page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:40px 24px;text-align:center}
+    .page{display:flex;flex-direction:column;align-items:center;max-width:480px;margin:0 auto;padding:40px 24px 48px;text-align:center}
 
-    .logo{width:180px;height:180px;margin-bottom:16px}
+    /* LOGO */
+    .logo{width:160px;height:160px;margin-bottom:14px}
     .logo img{width:100%;height:100%;object-fit:contain}
 
-    .tagline{font-size:clamp(17px,4.5vw,22px);color:var(--text-2);max-width:360px;line-height:1.6;margin-bottom:10px}
+    /* STATEMENT */
+    .statement{font-size:clamp(18px,5vw,22px);font-weight:900;color:var(--dark);max-width:360px;line-height:1.45;margin-bottom:10px}
 
-    .badge{display:inline-block;padding:6px 18px;border-radius:50px;background:#0050A0;color:var(--white);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px}
+    /* BADGE */
+    .badge{display:inline-block;padding:6px 18px;border-radius:50px;background:#0050A0;color:var(--white);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
 
-    .free-info{font-size:15px;color:var(--text-3);margin-bottom:24px;font-weight:700}
+    /* FORTUNE COCO */
+    .coco{width:100%;background:linear-gradient(135deg,var(--coco-bg),rgba(245,166,35,0.04));border:1.5px solid var(--coco-border);border-radius:20px;padding:24px 20px;margin-bottom:24px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden;transition:border-color .3s;min-height:110px}
+    .coco:active:not(.cracked){border-color:rgba(139,90,43,0.35)}
+    .coco>*:not(.coco-crumbs):not(.coco-share){pointer-events:none}
+    .coco-whole{transition:all .3s}
+    .coco-nut{font-size:52px;display:block;margin-bottom:6px;animation:cocoRock 3s ease-in-out infinite}
+    @keyframes cocoRock{0%,100%{transform:rotate(0)}15%{transform:rotate(-4deg)}30%{transform:rotate(3deg)}45%{transform:rotate(-2deg)}60%{transform:rotate(1deg)}}
+    .coco-label{font-size:12px;font-weight:900;letter-spacing:2px;color:rgba(139,90,43,0.7);text-transform:uppercase}
+    .coco-tap{font-size:11px;color:var(--text-3);font-weight:700;margin-top:4px;animation:tapGlow 2s ease-in-out infinite}
+    @keyframes tapGlow{0%,100%{opacity:.4}50%{opacity:1}}
+    .coco.cracking .coco-whole{animation:cocoCrack .5s cubic-bezier(.36,.07,.19,.97) forwards}
+    @keyframes cocoCrack{0%{transform:scale(1) rotate(0)}20%{transform:scale(1.15) rotate(-8deg)}40%{transform:scale(1.25) rotate(6deg)}60%{transform:scale(1.1) rotate(-3deg)}80%{transform:scale(1.3) rotate(4deg)}100%{transform:scale(0) rotate(10deg);opacity:0}}
+    .coco-crumbs{position:absolute;top:45%;left:50%;z-index:3;pointer-events:none;display:none}
+    .coco.cracked .coco-crumbs{display:block}
+    .coco-crumb{position:absolute;font-size:14px;opacity:0;animation:shellFly .9s cubic-bezier(.22,1,.36,1) forwards}
+    .coco-crumb:nth-child(1){animation-delay:0s}.coco-crumb:nth-child(2){animation-delay:.04s}.coco-crumb:nth-child(3){animation-delay:.08s}.coco-crumb:nth-child(4){animation-delay:.12s}.coco-crumb:nth-child(5){animation-delay:.06s}.coco-crumb:nth-child(6){animation-delay:.1s}
+    @keyframes shellFly{0%{transform:translate(0,0) scale(1) rotate(0);opacity:1}100%{transform:translate(var(--fx),var(--fy)) scale(0) rotate(var(--fr));opacity:0}}
+    .coco-fortune{display:none;position:relative;z-index:1}
+    .coco.cracked .coco-whole{display:none}
+    .coco.cracked .coco-fortune{display:block;animation:fortuneRise .7s cubic-bezier(.22,1,.36,1) forwards}
+    @keyframes fortuneRise{0%{opacity:0;transform:translateY(20px) scale(.9)}100%{opacity:1;transform:translateY(0) scale(1)}}
+    .coco-fortune-label{font-size:10px;font-weight:800;letter-spacing:2px;color:rgba(139,90,43,0.5);margin-bottom:6px;text-transform:uppercase}
+    .coco-fortune-icon{font-size:24px;display:block;margin-bottom:6px}
+    .coco-text{font-size:16px;font-weight:700;color:var(--dark);line-height:1.6;margin-bottom:12px;font-style:italic}
+    .coco-share{display:inline-flex;align-items:center;gap:5px;padding:6px 16px;border:1.5px solid var(--coco-border);border-radius:50px;background:transparent;color:rgba(139,90,43,0.6);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;pointer-events:auto!important;position:relative;z-index:5;font-family:var(--body)}
+    .coco-share:active{transform:scale(.95);background:rgba(139,90,43,0.06)}
+    .coco-loading{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--text-3);font-size:13px}
+    .coco-spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--sun);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .coco.cracked{border-color:rgba(139,90,43,0.25);box-shadow:0 4px 20px rgba(139,90,43,0.06)}
+
+    /* FREE INFO */
+    .free-info{font-size:15px;color:var(--text-3);margin-bottom:20px;font-weight:700}
     .free-info span{color:var(--sun);font-weight:900}
 
-    .cta{display:inline-block;padding:18px 52px;border-radius:50px;background:var(--sun);color:var(--white);font-size:19px;font-weight:900;text-decoration:none;transition:all .25s;font-family:var(--body);letter-spacing:.3px;margin-bottom:24px}
+    /* CTA */
+    .cta{display:inline-block;padding:18px 56px;border-radius:50px;background:var(--sun);color:var(--white);font-size:19px;font-weight:900;text-decoration:none;transition:all .25s;font-family:var(--body);letter-spacing:.3px;margin-bottom:28px}
     .cta:hover{background:var(--sun-dark);transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,107,53,0.3)}
 
-    .lang-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:28px}
+    /* PRICING */
+    .pricing-divider{width:60px;height:1.5px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:0 auto 20px;border:none}
+    .pricing-wrap{width:100%;display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+    .plan{width:100%;border:1.5px solid var(--border);border-radius:18px;padding:20px;text-align:center;background:var(--white);transition:all .2s}
+    .plan.featured{border-color:var(--sun);box-shadow:0 4px 20px rgba(255,107,53,0.1);position:relative}
+    .plan-tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--sun);color:var(--white);font-size:9px;font-weight:900;letter-spacing:1.5px;padding:3px 14px;border-radius:20px;text-transform:uppercase}
+    .plan-name{font-size:18px;font-weight:900;color:var(--dark);margin-bottom:2px}
+    .plan-price{font-size:32px;font-weight:900;color:var(--dark);margin-bottom:2px}
+    .plan-price span{font-size:14px;font-weight:600;color:var(--text-3)}
+    .plan-desc{font-size:13px;color:var(--text-3);margin-bottom:12px;font-weight:600}
+    .plan-features{list-style:none;text-align:left;margin-bottom:14px}
+    .plan-features li{font-size:13px;color:var(--text-2);padding:4px 0;font-weight:600;display:flex;align-items:center;gap:8px}
+    .plan-features .ck{color:var(--green);font-size:12px}
+    .plan-features .lock{color:var(--text-3);font-size:12px;opacity:.4}
+    .plan-btn{display:block;width:100%;padding:14px;border-radius:50px;font-size:15px;font-weight:800;font-family:var(--body);text-decoration:none;text-align:center;transition:all .2s;border:none;cursor:pointer}
+    .plan-btn-free{background:var(--warm);color:var(--text-2);border:1.5px solid var(--border)}
+    .plan-btn-free:hover{border-color:var(--sun);color:var(--sun)}
+    .plan-btn-plus{background:var(--sun);color:var(--white)}
+    .plan-btn-plus:hover{background:var(--sun-dark)}
+
+    /* TOGGLE */
+    .lang-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:24px}
     .lang-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px}
     .lang-toggle{display:flex;border-radius:50px;overflow:hidden;border:2px solid var(--border);background:var(--white)}
     .lang-btn{padding:7px 16px;font-size:13px;font-weight:800;border:none;cursor:pointer;background:transparent;color:var(--text-3);transition:all .2s;font-family:var(--body)}
     .lang-btn.active{background:var(--sun);color:var(--white)}
 
+    /* HAMBURGER */
+    .burger{position:fixed;top:16px;right:16px;z-index:99;width:44px;height:44px;border-radius:50%;background:var(--white);border:1.5px solid var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(0,0,0,0.06);transition:all .2s}
+    .burger:active{transform:scale(.95)}
+    .burger-line{width:18px;height:2.5px;background:var(--sun);border-radius:2px;transition:all .3s}
+    .burger.open .burger-line:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+    .burger.open .burger-line:nth-child(2){opacity:0}
+    .burger.open .burger-line:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+    .menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;opacity:0;pointer-events:none;transition:opacity .3s}
+    .menu-overlay.open{opacity:1;pointer-events:auto}
+    .menu{position:fixed;top:0;right:-300px;width:280px;height:100%;background:var(--white);z-index:101;transition:right .3s cubic-bezier(.22,1,.36,1);box-shadow:-4px 0 24px rgba(0,0,0,0.1);display:flex;flex-direction:column;padding:28px 0;overflow-y:auto}
+    .menu.open{right:0}
+    .menu-header{padding:0 24px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+    .menu-header img{width:40px;height:40px;object-fit:contain}
+    .menu-header-text{flex:1}
+    .menu-header-title{font-size:18px;font-weight:900;color:var(--dark)}.menu-header-title .hey{color:var(--sun)}
+    .menu-header-sub{font-size:11px;color:var(--text-3);font-weight:600}
+    .menu-section{padding:18px 24px 8px;font-size:10px;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:1.5px}
+    .menu-link{display:flex;align-items:center;gap:14px;padding:14px 24px;text-decoration:none;color:var(--text);font-size:16px;font-weight:700;transition:background .15s;-webkit-tap-highlight-color:transparent}
+    .menu-link:active{background:var(--warm)}
+    .menu-link-icon{font-size:22px;width:30px;text-align:center}
+    .menu-link-arrow{color:var(--text-3);font-size:14px;margin-left:auto}
+    .menu-spacer{flex:1}
+    .menu-footer{padding:16px 24px;border-top:1px solid var(--border)}
+    .menu-footer a{font-size:12px;color:var(--text-3);text-decoration:none;font-weight:600;margin-right:14px}
+    .menu-footer a:active{color:var(--sun)}
+    .menu-footer p{font-size:10px;color:var(--text-3);margin-top:8px;opacity:.5}
+
+    /* FOOTER */
     footer{text-align:center}
     footer p{font-size:11px;color:var(--text-3);margin-bottom:3px}
     footer .tm{font-size:10px;color:var(--text-3);margin-bottom:6px}
@@ -48,17 +133,112 @@
 </head>
 <body>
 
+  <!-- HAMBURGER -->
+  <button class="burger" id="burger" onclick="toggleMenu()">
+    <div class="burger-line"></div>
+    <div class="burger-line"></div>
+    <div class="burger-line"></div>
+  </button>
+  <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+  <div class="menu" id="menu">
+    <div class="menu-header">
+      <img src="/icon.png" alt="Hey Bori">
+      <div class="menu-header-text">
+        <div class="menu-header-title"><span class="hey">Hey</span> Bori</div>
+        <div class="menu-header-sub" data-en="Your Digital Assistant" data-es="Tu Asistente Digital">Your Digital Assistant</div>
+      </div>
+    </div>
+    <div class="menu-section" data-en="MAIN" data-es="PRINCIPAL">MAIN</div>
+    <a href="/" class="menu-link"><span class="menu-link-icon">🏠</span>Home<span class="menu-link-arrow">›</span></a>
+    <a href="/chat" class="menu-link"><span class="menu-link-icon">💬</span>Chat<span class="menu-link-arrow">›</span></a>
+    <div class="menu-section" data-en="CULTURAL GAMES" data-es="JUEGOS CULTURALES">CULTURAL GAMES</div>
+    <a href="/the-conga.html" class="menu-link"><span class="menu-link-icon">🥁</span>Conga<span class="menu-link-arrow">›</span></a>
+    <a href="/the-lelolai.html" class="menu-link"><span class="menu-link-icon">🔤</span>LeLoLai Letras<span class="menu-link-arrow">›</span></a>
+    <a href="/the-domino.html" class="menu-link"><span class="menu-link-icon">🎲</span>La Marquesina<span class="menu-link-arrow">›</span></a>
+    <a href="/the-isla.html" class="menu-link"><span class="menu-link-icon">🧩</span>La Isla<span class="menu-link-arrow">›</span></a>
+    <div class="menu-spacer"></div>
+    <div class="menu-footer">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <p>© 2026 GoStar Digital LLC 🇵🇷</p>
+    </div>
+  </div>
+
   <div class="page">
+    <!-- LOGO -->
     <div class="logo"><img src="/icon.png" alt="Hey Bori"></div>
 
-    <div class="tagline" data-en="Hey Bori. Your Private Bilingual Spanish and English Digital Assistant." data-es="Hey Bori. Tu Asistente Digital Privado Bilingüe de Español e Inglés.">Hey Bori. Your Private Bilingual Spanish and English Digital Assistant.</div>
+    <!-- STATEMENT -->
+    <div class="statement" data-en="Hey Bori. Your Private Bilingual Spanish and English Digital Assistant." data-es="Hey Bori. Tu Asistente Digital Privado Bilingüe de Español e Inglés.">Hey Bori. Your Private Bilingual Spanish and English Digital Assistant.</div>
 
+    <!-- BADGE -->
     <div class="badge" data-en="Puerto Rico is Spanish USA" data-es="Puerto Rico es el Español de USA">Puerto Rico is Spanish USA</div>
 
+    <!-- FORTUNE COCO -->
+    <div class="coco" id="coco" onclick="crackCoco()">
+      <div class="coco-whole" id="cocoWhole">
+        <span class="coco-nut">🥥</span>
+        <div class="coco-label">FORTUNE COCO™</div>
+        <div class="coco-tap" id="cocoTap" data-en="TAP TO CRACK 💥" data-es="TOCA PA' ROMPER 💥">TAP TO CRACK 💥</div>
+      </div>
+      <div class="coco-crumbs" id="cocoCrumbs">
+        <span class="coco-crumb" style="--fx:-70px;--fy:-60px;--fr:120deg">🥥</span>
+        <span class="coco-crumb" style="--fx:80px;--fy:-50px;--fr:-150deg">🌴</span>
+        <span class="coco-crumb" style="--fx:-55px;--fy:55px;--fr:200deg">✨</span>
+        <span class="coco-crumb" style="--fx:65px;--fy:60px;--fr:-100deg">🥥</span>
+        <span class="coco-crumb" style="--fx:-85px;--fy:10px;--fr:80deg">💛</span>
+        <span class="coco-crumb" style="--fx:40px;--fy:75px;--fr:-220deg">🇵🇷</span>
+      </div>
+      <div class="coco-fortune" id="cocoFortune">
+        <div class="coco-fortune-icon">🥥✨</div>
+        <div class="coco-fortune-label" data-en="TODAY'S FORTUNE" data-es="LA FORTUNA DE HOY">TODAY'S FORTUNE</div>
+        <div class="coco-text" id="cocoText"></div>
+        <button class="coco-share" onclick="event.stopPropagation();shareFortune()">
+          <span id="shareLabel" data-en="↗ SHARE" data-es="↗ COMPARTE">↗ SHARE</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- FREE INFO -->
     <div class="free-info" data-en="✨ <span>Free</span> — 10 conversations daily" data-es="✨ <span>Gratis</span> — 10 conversaciones diarias">✨ <span>Free</span> — 10 conversations daily</div>
 
+    <!-- CTA -->
     <a href="/chat" class="cta" data-en="Start Talking" data-es="Empieza a Hablar">Start Talking</a>
 
+    <!-- PRICING -->
+    <hr class="pricing-divider">
+    <div class="pricing-wrap">
+      <!-- LIBRE -->
+      <div class="plan">
+        <div class="plan-name">Bori Libre</div>
+        <div class="plan-price">$0</div>
+        <div class="plan-desc" data-en="Free forever" data-es="Gratis siempre">Free forever</div>
+        <ul class="plan-features" id="libreFeat">
+          <li><span class="ck">✓</span><span data-en="10 messages per day" data-es="10 mensajes por día">10 messages per day</span></li>
+          <li><span class="ck">✓</span><span data-en="Bilingual chat (EN/ES)" data-es="Chat bilingüe (EN/ES)">Bilingual chat (EN/ES)</span></li>
+          <li><span class="ck">✓</span><span data-en="Fortune Coco™ daily" data-es="Fortune Coco™ diario">Fortune Coco™ daily</span></li>
+          <li><span class="ck">✓</span><span data-en="4 cultural games" data-es="4 juegos culturales">4 cultural games</span></li>
+        </ul>
+        <a href="/chat" class="plan-btn plan-btn-free" data-en="Start Free" data-es="Empezar Gratis">Start Free</a>
+      </div>
+      <!-- PLUS -->
+      <div class="plan featured">
+        <div class="plan-tag" data-en="RECOMMENDED" data-es="RECOMENDADO">RECOMMENDED</div>
+        <div class="plan-name">Bori Plus</div>
+        <div class="plan-price">$4<span>.99/mo</span></div>
+        <div class="plan-desc" data-en="Unlimited. 24/7. All yours." data-es="Ilimitado. 24/7. Todo tuyo.">Unlimited. 24/7. All yours.</div>
+        <ul class="plan-features" id="plusFeat">
+          <li><span class="ck">✓</span><span data-en="Unlimited messages" data-es="Mensajes ilimitados">Unlimited messages</span></li>
+          <li><span class="ck">✓</span><span data-en="Bilingual chat (EN/ES)" data-es="Chat bilingüe (EN/ES)">Bilingual chat (EN/ES)</span></li>
+          <li><span class="ck">✓</span><span data-en="Conversation history" data-es="Historial de conversación">Conversation history</span></li>
+          <li><span class="ck">✓</span><span data-en="Priority speed" data-es="Velocidad prioritaria">Priority speed</span></li>
+          <li><span class="ck">✓</span><span data-en="All games unlocked" data-es="Todos los juegos desbloqueados">All games unlocked</span></li>
+        </ul>
+        <button class="plan-btn plan-btn-plus" data-en="Join Bori Plus" data-es="Únete a Bori Plus">Join Bori Plus</button>
+      </div>
+    </div>
+
+    <!-- TOGGLE -->
     <div class="lang-wrap">
       <div class="lang-label" data-en="Pick Your Language" data-es="Escoge Tu Idioma">Pick Your Language</div>
       <div class="lang-toggle">
@@ -67,6 +247,7 @@
       </div>
     </div>
 
+    <!-- FOOTER -->
     <footer>
       <p>© 2026 GoStar Digital LLC. All Rights Reserved.</p>
       <p class="tm">"Puerto Rico is Spanish USA"™ GoStar Digital LLC · San Juan, PR 🇵🇷</p>
@@ -76,6 +257,15 @@
 
   <script>
     var lang='en';
+    var cocoCracked=false;
+
+    // MENU
+    function toggleMenu(){
+      document.getElementById('burger').classList.toggle('open');
+      document.getElementById('menu').classList.toggle('open');
+      document.getElementById('menuOverlay').classList.toggle('open');
+    }
+
     function setLang(l){
       lang=l;
       document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');
@@ -84,10 +274,55 @@
       for(var i=0;i<els.length;i++){
         var el=els[i],val=el.getAttribute('data-'+l);
         if(val&&!el.classList.contains('lang-btn')){
-          if(el.tagName==='A')el.textContent=val;
+          if(el.tagName==='A'||el.tagName==='BUTTON')el.textContent=val;
           else el.innerHTML=val;
         }
       }
+      if(cocoCracked)loadFortune();
+    }
+
+    // FORTUNE COCO
+    function crackCoco(){
+      if(cocoCracked)return;
+      cocoCracked=true;
+      var el=document.getElementById('coco');
+      el.classList.add('cracking');
+      setTimeout(function(){
+        el.classList.remove('cracking');
+        el.classList.add('cracked');
+        loadFortune();
+      },500);
+    }
+
+    function loadFortune(){
+      var today=new Date().toISOString().split('T')[0];
+      var key='fortune_'+lang+'_'+today;
+      try{var saved=localStorage.getItem(key);if(saved){document.getElementById('cocoText').textContent=saved;return;}}catch(e){}
+      document.getElementById('cocoText').innerHTML='<div class="coco-loading"><div class="coco-spinner"></div></div>';
+      fetch('/api/fortune?lang='+lang)
+        .then(function(r){return r.json();})
+        .then(function(data){
+          var text=data.fortune||data.message||(lang==='es'?'Hoy es tu día. Créelo.':'Today is your day. Believe it.');
+          try{localStorage.setItem(key,text);}catch(e){}
+          document.getElementById('cocoText').textContent=text;
+        })
+        .catch(function(){
+          var fallbacks=[
+            lang==='es'?'El coco dice: hoy es un buen día pa\' brillar. 🥥✨':'The coco says: today is a good day to shine. 🥥✨',
+            lang==='es'?'Algo bueno viene pa\' ti hoy. Lo siento en el aire. 🌴':'Something good is coming your way today. I can feel it. 🌴',
+            lang==='es'?'Tu energía hoy está fuego. Úsala bien. 🔥':'Your energy today is fire. Use it well. 🔥'
+          ];
+          document.getElementById('cocoText').textContent=fallbacks[Math.floor(Math.random()*fallbacks.length)];
+        });
+    }
+
+    function shareFortune(){
+      var text=document.getElementById('cocoText').textContent;
+      var shareText='🥥 '+text+' — heybori.com';
+      if(navigator.share){navigator.share({title:'Fortune Coco™ — Hey Bori',text:shareText,url:'https://heybori.com'}).catch(function(){});}
+      else{navigator.clipboard.writeText(shareText).then(function(){
+        var btn=document.querySelector('.coco-share');btn.textContent='✓ Copied!';setTimeout(function(){btn.innerHTML='<span>↗ SHARE</span>';},2000);
+      }).catch(function(){});}
     }
   </script>
 </body>
