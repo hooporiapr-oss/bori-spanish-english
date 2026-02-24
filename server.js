@@ -21,6 +21,12 @@ const STRIPE_PRODUCT_ID = 'prod_U2NT53dHR4yPPJ';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 const BASE_URL = process.env.BASE_URL || 'https://heybori.com';
 
+// ═══ ELEVENLABS CONFIG ═══
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
+const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'zwDSHuqO0tEVwNUuHmR1';
+const ELEVENLABS_MODEL_TTS = 'eleven_flash_v2_5';
+const ELEVENLABS_MODEL_STT = 'scribe_v2';
+
 // ═══ ADMIN BYPASS ═══
 const ADMIN_EMAILS = [
   'gostardigital@gmail.com',
@@ -104,6 +110,144 @@ const chatLimiter = rateLimit({
 
 // ═══ STATIC FILES ═══
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ═══ ELEVENLABS: TEXT-TO-SPEECH ═══
+app.post('/api/voice/tts', async (req, res) => {
+  try {
+    const { text, lang } = req.body;
+    if (!text || typeof text !== 'string') {
+      return res.status(400).json({ error: 'Text is required.' });
+    }
+
+    // Limit text length to control costs
+    const trimmedText = text.slice(0, 1000);
+
+    const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
+      method: 'POST',
+      headers: {
+        'xi-api-key': ELEVENLABS_API_KEY,
+        'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg',
+      },
+      body: JSON.stringify({
+        text: trimmedText,
+        model_id: ELEVENLABS_MODEL_TTS,
+        language_code: lang === 'es' ? 'es' : 'en',
+        voice_settings: {
+          stability: 0.6,
+          similarity_boost: 0.85,
+          style: 0.4,
+          use_speaker_boost: true,
+        },
+      }),
+    });
+
+    if (!ttsRes.ok) {
+      const errText = await ttsRes.text();
+      console.error('[ElevenLabs TTS Error]', ttsRes.status, errText);
+      return res.status(500).json({ error: 'Voice generation failed.' });
+    }
+
+    // Stream audio back as mp3
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.setHeader('Cache-Control', 'no-cache');
+
+    const arrayBuffer = await ttsRes.arrayBuffer();
+    res.send(Buffer.from(arrayBuffer));
+  } catch (err) {
+    console.error('[ElevenLabs TTS Error]', err.message);
+    res.status(500).json({ error: 'Voice generation failed.' });
+  }
+});
+
+// ═══ ELEVENLABS: SPEECH-TO-TEXT ═══
+app.post('/api/voice/stt', async (req, res) => {
+  try {
+    // Receive raw audio as binary
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(chunk));
+    req.on('end', async () => {
+      try {
+        const audioBuffer = Buffer.concat(chunks);
+
+        if (audioBuffer.length < 100) {
+          return res.status(400).json({ error: 'Audio too short.' });
+        }
+
+        // Create form data for ElevenLabs STT
+        const boundary = '----ElevenLabsBoundary' + Date.now();
+        const contentType = req.headers['content-type'] || 'audio/webm';
+
+        // Determine file extension from content type
+        let ext = 'webm';
+        if (contentType.includes('mp4')) ext = 'mp4';
+        else if (contentType.includes('ogg')) ext = 'ogg';
+        else if (contentType.includes('wav')) ext = 'wav';
+
+        // Build multipart form data manually
+        const formParts = [];
+
+        // File part
+        formParts.push(Buffer.from(
+          `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="file"; filename="audio.${ext}"\r\n` +
+          `Content-Type: ${contentType}\r\n\r\n`
+        ));
+        formParts.push(audioBuffer);
+        formParts.push(Buffer.from('\r\n'));
+
+        // Model part
+        formParts.push(Buffer.from(
+          `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="model_id"\r\n\r\n` +
+          `${ELEVENLABS_MODEL_STT}\r\n`
+        ));
+
+        // Language code part (auto-detect if not specified)
+        const lang = req.headers['x-lang'] || '';
+        if (lang === 'es' || lang === 'en') {
+          formParts.push(Buffer.from(
+            `--${boundary}\r\n` +
+            `Content-Disposition: form-data; name="language_code"\r\n\r\n` +
+            `${lang}\r\n`
+          ));
+        }
+
+        // Close boundary
+        formParts.push(Buffer.from(`--${boundary}--\r\n`));
+
+        const formBody = Buffer.concat(formParts);
+
+        const sttRes = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
+          method: 'POST',
+          headers: {
+            'xi-api-key': ELEVENLABS_API_KEY,
+            'Content-Type': `multipart/form-data; boundary=${boundary}`,
+          },
+          body: formBody,
+        });
+
+        if (!sttRes.ok) {
+          const errText = await sttRes.text();
+          console.error('[ElevenLabs STT Error]', sttRes.status, errText);
+          return res.status(500).json({ error: 'Transcription failed.' });
+        }
+
+        const data = await sttRes.json();
+        res.json({
+          text: data.text || '',
+          language: data.language_code || '',
+        });
+      } catch (innerErr) {
+        console.error('[ElevenLabs STT Inner Error]', innerErr.message);
+        res.status(500).json({ error: 'Transcription failed.' });
+      }
+    });
+  } catch (err) {
+    console.error('[ElevenLabs STT Error]', err.message);
+    res.status(500).json({ error: 'Transcription failed.' });
+  }
+});
 
 // ═══ STRIPE: CREATE CHECKOUT SESSION ═══
 app.post('/api/stripe/checkout', async (req, res) => {
@@ -311,5 +455,6 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`[Hey Bori] Live on port ${PORT}`);
   console.log(`[Hey Bori] Stripe: ${process.env.STRIPE_SECRET_KEY ? 'Connected' : 'NOT configured'}`);
+  console.log(`[Hey Bori] ElevenLabs: ${ELEVENLABS_API_KEY ? 'Connected' : 'NOT configured'}`);
   console.log(`[Hey Bori] Language learning companion ready`);
 });
