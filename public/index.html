@@ -20,7 +20,7 @@
     .page{display:flex;flex-direction:column;align-items:center;max-width:480px;margin:0 auto;padding:40px 24px 48px;text-align:center}
 
     /* LOGO */
-    .logo{width:160px;height:160px;margin-bottom:14px}
+    .logo{width:240px;height:240px;margin-bottom:14px}
     .logo img{width:100%;height:100%;object-fit:contain}
 
     /* STATEMENT */
@@ -108,7 +108,7 @@
     .menu{position:fixed;top:0;right:-300px;width:280px;height:100%;background:var(--white);z-index:101;transition:right .3s cubic-bezier(.22,1,.36,1);box-shadow:-4px 0 24px rgba(0,0,0,0.1);display:flex;flex-direction:column;padding:28px 0;overflow-y:auto}
     .menu.open{right:0}
     .menu-header{padding:0 24px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
-    .menu-header img{width:40px;height:40px;object-fit:contain}
+    .menu-header img{width:52px;height:52px;object-fit:contain}
     .menu-header-text{flex:1}
     .menu-header-title{font-size:18px;font-weight:900;color:var(--dark)}.menu-header-title .hey{color:var(--sun)}
     .menu-header-sub{font-size:11px;color:var(--text-3);font-weight:600}
@@ -238,7 +238,7 @@
         <ul class="plan-features" id="plusFeat">
           <li><span class="ck">✓</span><span data-en="Unlimited messages" data-es="Mensajes ilimitados">Unlimited messages</span></li>
           <li><span class="ck">✓</span><span data-en="Bilingual chat (EN/ES)" data-es="Chat bilingüe (EN/ES)">Bilingual chat (EN/ES)</span></li>
-          <li><span class="ck">✓</span><span data-en="Conversation history" data-es="Historial de conversación">Conversation history</span></li>
+          <li><span class="ck">✓</span><span data-en="Voice conversation" data-es="Conversación por voz">Voice conversation</span></li>
           <li><span class="ck">✓</span><span data-en="Priority speed" data-es="Velocidad prioritaria">Priority speed</span></li>
           <li><span class="ck">✓</span><span data-en="All games unlocked" data-es="Todos los juegos desbloqueados">All games unlocked</span></li>
         </ul>
@@ -258,7 +258,6 @@
     var lang='en';
     var cocoCracked=false;
 
-    // MENU
     function toggleMenu(){
       document.getElementById('burger').classList.toggle('open');
       document.getElementById('menu').classList.toggle('open');
@@ -280,7 +279,6 @@
       if(cocoCracked)loadFortune();
     }
 
-    // FORTUNE COCO
     function crackCoco(){
       if(cocoCracked)return;
       cocoCracked=true;
@@ -324,7 +322,6 @@
       }).catch(function(){});}
     }
 
-    // STRIPE CHECKOUT
     function joinBoriPlus(){
       var btn=document.querySelector('.plan-btn-plus');
       var origText=btn.textContent;
