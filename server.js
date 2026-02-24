@@ -120,7 +120,7 @@ app.post('/api/voice/tts', async (req, res) => {
     }
 
     // Limit text length to control costs
-    const trimmedText = text.slice(0, 1000);
+    const trimmedText = text.slice(0, 2000);
 
     const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
       method: 'POST',
