@@ -21,6 +21,11 @@ const STRIPE_PRODUCT_ID = 'prod_U2NT53dHR4yPPJ';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 const BASE_URL = process.env.BASE_URL || 'https://heybori.com';
 
+// ═══ ADMIN BYPASS ═══
+const ADMIN_EMAILS = [
+  'gostardigital@gmail.com',
+];
+
 // ═══ SYSTEM PROMPT ═══
 const systemPrompt = fs.readFileSync(path.join(__dirname, 'system-prompt.md'), 'utf-8');
 
@@ -148,6 +153,11 @@ app.post('/api/stripe/status', async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.json({ subscribed: false });
+
+    // Admin bypass — full access, no Stripe check
+    if (ADMIN_EMAILS.includes(email.trim().toLowerCase())) {
+      return res.json({ subscribed: true, customerId: 'admin', plan: 'admin' });
+    }
 
     const customers = await stripe.customers.list({ email: email.trim(), limit: 1 });
     if (!customers.data.length) return res.json({ subscribed: false });
