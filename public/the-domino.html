@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>La Marquesina™ — Hey Bori™</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --mesa: #1a5c2a;
+  --mesa-dark: #0f3d1a;
+  --mesa-light: #2a7a3a;
+  --domino-white: #f5f0e8;
+  --domino-border: #2a2a2a;
+  --domino-dot: #1a1a1a;
+  --gold: #FFD700;
+  --bori-green: #00875A;
+  --bori-red: #CC0033;
+  --bori-blue: #003DA5;
+  --text-light: #f5f0e8;
+  --text-dark: #1a1a1a;
+  --shadow: rgba(0,0,0,0.4);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--mesa);
+  color: var(--text-light);
+  overflow: hidden;
+  height: 100dvh;
+  width: 100vw;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ═══ MESA (TABLE) BACKGROUND ═══ */
+.mesa {
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 50% 50%, var(--mesa-light) 0%, var(--mesa) 50%, var(--mesa-dark) 100%);
+  z-index: 0;
+}
+.mesa::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='60' height='60' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ═══ GAME LAYOUT ═══ */
+.game-container {
+  position: relative;
+  z-index: 1;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══ TOP BAR ═══ */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  min-height: 44px;
+}
+.top-bar .title {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+}
+.top-bar .scores {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.score-item { display: flex; align-items: center; gap: 4px; }
+.score-item .label { opacity: 0.7; font-weight: 400; font-size: 12px; }
+.score-item .value { color: var(--gold); }
+
+.top-bar .menu-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ═══ OPPONENT AREA ═══ */
+.opponent-area {
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 70px;
+}
+.opponent-name {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 500;
+}
+.opponent-hand {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.opponent-tile {
+  width: 22px;
+  height: 40px;
+  background: linear-gradient(135deg, #3a3a4a, #2a2a3a);
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: all 0.3s;
+}
+
+/* ═══ BOARD AREA ═══ */
+.board-area {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.board-inner {
+  position: relative;
+  min-width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chain-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  gap: 2px;
+  max-width: 100%;
+}
+
+/* ═══ DOMINO TILES ═══ */
+.domino {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.domino:hover { transform: scale(1.05); }
+.domino.playable { animation: pulse-glow 1.5s ease-in-out infinite; }
+
+@keyframes pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(255,215,0,0.3)); }
+  50% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.7)); }
+}
+
+.domino svg {
+  display: block;
+  filter: drop-shadow(2px 3px 4px rgba(0,0,0,0.4));
+}
+
+/* ═══ TRASH TALK BUBBLE ═══ */
+.trash-talk {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 16px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 20;
+  pointer-events: none;
+  border: 1px solid rgba(255,215,0,0.3);
+}
+.trash-talk.show { opacity: 1; }
+
+/* ═══ PLAYER HAND ═══ */
+.player-area {
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 8px 8px 12px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.hand-label {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.player-hand {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  flex-wrap: wrap;
+  min-height: 70px;
+  align-items: center;
+}
+.player-hand .domino {
+  transition: transform 0.15s, margin-top 0.15s;
+}
+.player-hand .domino.selected {
+  transform: translateY(-8px) scale(1.08);
+  filter: drop-shadow(0 0 12px rgba(255,215,0,0.8));
+}
+.player-hand .domino.unplayable {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ═══ ACTION BUTTONS ═══ */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 12px 10px;
+  background: rgba(0,0,0,0.35);
+}
+.action-btn {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 24px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.action-btn:active { transform: scale(0.95); }
+.btn-pass {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+.btn-pass:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-draw {
+  background: linear-gradient(135deg, var(--gold), #FFA500);
+  color: var(--text-dark);
+  box-shadow: 0 3px 12px rgba(255,215,0,0.3);
+}
+.btn-draw:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ═══ BONEYARD ═══ */
+.boneyard-info {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  padding: 2px;
+}
+
+/* ═══ SIDE PICKER MODAL ═══ */
+.side-picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 50;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.side-picker-overlay.show { display: flex; }
+.side-picker {
+  background: linear-gradient(135deg, #1a3a2a, #0f2a1a);
+  border: 2px solid var(--gold);
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.side-picker h3 {
+  font-family: 'Fredoka', sans-serif;
+  color: var(--gold);
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.side-picker p {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-bottom: 16px;
+}
+.side-options {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.side-btn {
+  flex: 1;
+  padding: 14px 8px;
+  border-radius: 14px;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.side-btn:hover {
+  border-color: var(--gold);
+  background: rgba(255,215,0,0.15);
+}
+
+/* ═══ GAME OVER MODAL ═══ */
+.game-over-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.game-over-overlay.show { display: flex; }
+.game-over {
+  background: linear-gradient(135deg, #1a3a2a, #0f2a1a);
+  border: 2px solid var(--gold);
+  border-radius: 24px;
+  padding: 32px 24px;
+  text-align: center;
+  max-width: 340px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.game-over h2 {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+.game-over .result-text {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 20px;
+}
+.game-over .final-scores {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 20px;
+}
+.final-score-item {
+  text-align: center;
+}
+.final-score-item .fs-label {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-bottom: 4px;
+}
+.final-score-item .fs-value {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.play-again-btn {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 40px;
+  border-radius: 30px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold), #FFA500);
+  color: var(--text-dark);
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255,215,0,0.3);
+  transition: transform 0.2s;
+}
+.play-again-btn:active { transform: scale(0.95); }
+
+/* ═══ WELCOME SCREEN ═══ */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, #1a5c2a, #0a2a12);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: opacity 0.5s;
+}
+.welcome-overlay.hiding { opacity: 0; pointer-events: none; }
+.welcome-content {
+  text-align: center;
+  padding: 24px;
+}
+.welcome-content h1 {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 36px;
+  color: var(--gold);
+  margin-bottom: 4px;
+  text-shadow: 0 3px 12px rgba(0,0,0,0.4);
+}
+.welcome-content .subtitle {
+  font-size: 15px;
+  opacity: 0.7;
+  margin-bottom: 32px;
+}
+.welcome-dominos {
+  font-size: 48px;
+  margin-bottom: 24px;
+  letter-spacing: 8px;
+}
+.start-btn {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  padding: 16px 48px;
+  border-radius: 30px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold), #FFA500);
+  color: var(--text-dark);
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(255,215,0,0.3);
+  transition: transform 0.2s;
+  margin-bottom: 16px;
+}
+.start-btn:active { transform: scale(0.95); }
+.lang-toggle {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.lang-btn {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.lang-btn.active {
+  background: var(--gold);
+  color: var(--text-dark);
+  border-color: var(--gold);
+  font-weight: 600;
+}
+
+/* ═══ BOARD TILES ═══ */
+.board-tile {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes slap {
+  0% { transform: scale(1.3) rotate(-5deg); opacity: 0.5; }
+  50% { transform: scale(0.95) rotate(1deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.slap-in { animation: slap 0.3s ease-out; }
+
+@keyframes slide-up {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.slide-up { animation: slide-up 0.3s ease-out; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 380px) {
+  .top-bar .title { font-size: 15px; }
+  .player-hand .domino svg { width: 36px; height: 64px; }
+}
+</style>
+</head>
+<body>
+
+<div class="mesa"></div>
+
+<!-- WELCOME SCREEN -->
+<div class="welcome-overlay" id="welcomeScreen">
+  <div class="welcome-content">
+    <div class="welcome-dominos">🁣 🁫 🂃</div>
+    <h1>La Marquesina™</h1>
+    <p class="subtitle" id="welcomeSub">La mesa está servida. ¿Te atreves?</p>
+    <button class="start-btn" id="startBtn" onclick="startGame()">¡DALE!</button>
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="es" onclick="setLang('es')">Español</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
+    </div>
+    <p style="margin-top:20px;font-size:12px;opacity:0.4;">
+      <a href="/" style="color:var(--gold);text-decoration:none;">Hey Bori™</a> — GoStar Digital LLC
+    </p>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="game-container" id="gameContainer">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="title">La Marquesina™</div>
+    <div class="scores">
+      <div class="score-item">
+        <span class="label" id="lblYou">Tú</span>
+        <span class="value" id="scorePlayer">0</span>
+      </div>
+      <div class="score-item">
+        <span class="label">Bori</span>
+        <span class="value" id="scoreAI">0</span>
+      </div>
+    </div>
+    <button class="menu-btn" onclick="showWelcome()">✕</button>
+  </div>
+
+  <!-- Opponent -->
+  <div class="opponent-area">
+    <div class="opponent-name">🤖 Bori</div>
+    <div class="opponent-hand" id="opponentHand"></div>
+    <div class="trash-talk" id="trashTalk"></div>
+  </div>
+
+  <!-- Board -->
+  <div class="board-area" id="boardArea">
+    <div class="board-inner">
+      <div class="chain-container" id="chainContainer"></div>
+    </div>
+  </div>
+
+  <!-- Boneyard Info -->
+  <div class="boneyard-info" id="boneyardInfo"></div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="action-btn btn-pass" id="passBtn" onclick="playerPass()" disabled>
+      <span id="lblPass">Paso</span>
+    </button>
+    <button class="action-btn btn-draw" id="drawBtn" onclick="playerDraw()" disabled>
+      <span id="lblDraw">Jalar</span>
+    </button>
+  </div>
+
+  <!-- Player Hand -->
+  <div class="player-area">
+    <div class="hand-label" id="handLabel">Tu mano</div>
+    <div class="player-hand" id="playerHand"></div>
+  </div>
+</div>
+
+<!-- SIDE PICKER -->
+<div class="side-picker-overlay" id="sidePickerOverlay">
+  <div class="side-picker">
+    <h3 id="spTitle">¿Por cuál lado?</h3>
+    <p id="spSub">Escoge dónde jugar esta ficha</p>
+    <div class="side-options">
+      <button class="side-btn" id="spLeft" onclick="playSide('left')"></button>
+      <button class="side-btn" id="spRight" onclick="playSide('right')"></button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div class="game-over-overlay" id="gameOverOverlay">
+  <div class="game-over">
+    <h2 id="goTitle">🎉</h2>
+    <p class="result-text" id="goText"></p>
+    <div class="final-scores">
+      <div class="final-score-item">
+        <div class="fs-label" id="goYou">Tú</div>
+        <div class="fs-value" id="goPlayerScore">0</div>
+      </div>
+      <div class="final-score-item">
+        <div class="fs-label">Bori</div>
+        <div class="fs-value" id="goAIScore">0</div>
+      </div>
+    </div>
+    <button class="play-again-btn" onclick="startGame()"><span id="goBtn">¡Otra!</span></button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// LA MARQUESINA™ — Hey Bori™
+// ═══════════════════════════════════════
+
+// --- LANGUAGE ---
+let lang = 'es';
+const T = {
+  es: {
+    welcomeSub: 'La mesa está servida. ¿Te atreves?',
+    start: '¡DALE!',
+    you: 'Tú', hand: 'Tu mano', pass: 'Paso', draw: 'Jalar',
+    boneyard: (n) => `Pila: ${n} fichas`,
+    pickSide: '¿Por cuál lado?', pickSub: 'Escoge dónde jugar esta ficha',
+    leftSide: '◀ Izquierda', rightSide: 'Derecha ▶',
+    youWin: '¡GANASTE!', youLose: 'Bori Ganó', tie: '¡TRANQUE!',
+    winText: '¡Wepa! ¡Le diste una pela!', loseText: '¡Pa\' la próxima!',
+    tieText: 'Nadie pudo pegar...', again: '¡Otra!',
+    yourTurn: 'Tu turno', boriTurn: 'Bori está pensando...',
+    noPlay: 'No puedes jugar — jala o pasa',
+    capicu: '¡¡CAPICÚ!! 🔥', chuchazo: '¡¡CHUCHAZO!! 💥',
+    trashWin: ['¡Te pegué, mano!', '¡Eso era! ¡Vámonos!', '¡Así se juega, papá!', '¡Dominó, baby!'],
+    trashPlay: ['Mira y aprende...', 'Ahí va esa...', '¿Qué tú vas a hacer ahora?', 'Toma...', 'Esa es mía, flow...'],
+    trashDraw: ['¡Jala, jala! 😂', 'Uy, ¿no tienes? ¡Jala!', '¡A la pila, nene!'],
+    trashLose: ['¡Ay bendito! Me cogiste...', 'Esa no la vi venir...', 'Okay okay, la próxima es mía...'],
+    trashTranque: ['¡Tranque! Nadie pudo...', 'Hmm, empatamos esta...']
+  },
+  en: {
+    welcomeSub: 'The table is set. You ready?',
+    start: "LET'S GO!",
+    you: 'You', hand: 'Your hand', pass: 'Pass', draw: 'Draw',
+    boneyard: (n) => `Boneyard: ${n} tiles`,
+    pickSide: 'Which side?', pickSub: 'Choose where to play this tile',
+    leftSide: '◀ Left', rightSide: 'Right ▶',
+    youWin: 'YOU WIN!', youLose: 'Bori Wins', tie: 'BLOCKED!',
+    winText: '¡Wepa! You crushed it!', loseText: 'Next time, boricua!',
+    tieText: 'Nobody could play...', again: 'Play Again!',
+    yourTurn: 'Your turn', boriTurn: 'Bori is thinking...',
+    noPlay: "Can't play — draw or pass",
+    capicu: '¡¡CAPICÚ!! 🔥', chuchazo: '¡¡CHUCHAZO!! 💥',
+    trashWin: ['Got you!', 'That\'s game, baby!', 'Dominó! Let\'s go!', '¡Wepa! Too easy!'],
+    trashPlay: ['Watch and learn...', 'There you go...', 'What you gonna do now?', 'Take that...', 'Smooth, right?'],
+    trashDraw: ['Draw, draw! 😂', 'Oops, nothing to play?', 'To the pile you go!'],
+    trashLose: ['Okay you got me...', 'Didn\'t see that coming...', 'Next one is mine...'],
+    trashTranque: ['Blocked! Nobody wins...', 'Hmm, we tied this one...']
+  }
+};
+
+function t(key) { return T[lang][key]; }
+function randFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+  document.getElementById('welcomeSub').textContent = t('welcomeSub');
+  document.getElementById('startBtn').textContent = t('start');
+}
+
+// --- AUDIO (Web Audio API for slap sounds) ---
+let audioCtx;
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+function playSlap() {
+  initAudio();
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.08, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 8);
+  }
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.3;
+  src.connect(gain).connect(audioCtx.destination);
+  src.start();
+}
+function playWin() {
+  initAudio();
+  [523, 659, 784].forEach((f, i) => {
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.frequency.value = f;
+    osc.type = 'triangle';
+    g.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.15);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.15 + 0.4);
+    osc.connect(g).connect(audioCtx.destination);
+    osc.start(audioCtx.currentTime + i * 0.15);
+    osc.stop(audioCtx.currentTime + i * 0.15 + 0.4);
+  });
+}
+
+// --- DOMINO ENGINE ---
+let allTiles = [];
+let boneyard = [];
+let playerHand = [];
+let aiHand = [];
+let chain = [];
+let leftEnd = -1;
+let rightEnd = -1;
+let playerScore = 0;
+let aiScore = 0;
+let isPlayerTurn = true;
+let gameActive = false;
+let selectedTile = null;
+let consecutivePasses = 0;
+
+function createAllTiles() {
+  const tiles = [];
+  for (let a = 0; a <= 6; a++) {
+    for (let b = a; b <= 6; b++) {
+      tiles.push({ a, b });
+    }
+  }
+  return tiles;
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startGame() {
+  initAudio();
+  document.getElementById('welcomeScreen').classList.add('hiding');
+  document.getElementById('gameOverOverlay').classList.remove('show');
+  document.getElementById('sidePickerOverlay').classList.remove('show');
+  
+  setTimeout(() => {
+    document.getElementById('welcomeScreen').style.display = 'none';
+  }, 500);
+
+  allTiles = createAllTiles();
+  shuffle(allTiles);
+  playerHand = allTiles.splice(0, 7);
+  aiHand = allTiles.splice(0, 7);
+  boneyard = [...allTiles];
+  chain = [];
+  leftEnd = -1;
+  rightEnd = -1;
+  consecutivePasses = 0;
+  selectedTile = null;
+  gameActive = true;
+
+  document.getElementById('lblYou').textContent = t('you');
+  document.getElementById('handLabel').textContent = t('hand');
+  document.getElementById('lblPass').textContent = t('pass');
+  document.getElementById('lblDraw').textContent = t('draw');
+  
+  let firstPlayer = determineFirstPlayer();
+  isPlayerTurn = firstPlayer === 'player';
+
+  updateScoreDisplay();
+  render();
+
+  if (!isPlayerTurn) {
+    setTimeout(() => aiTurn(), 800);
+  }
+}
+
+function determineFirstPlayer() {
+  for (let d = 6; d >= 0; d--) {
+    const pIdx = playerHand.findIndex(t => t.a === d && t.b === d);
+    const aIdx = aiHand.findIndex(t => t.a === d && t.b === d);
+    if (pIdx !== -1 && aIdx === -1) return 'player';
+    if (aIdx !== -1 && pIdx === -1) return 'ai';
+    if (pIdx !== -1 && aIdx !== -1) return 'player';
+  }
+  return 'player';
+}
+
+function tileSum(tile) { return tile.a + tile.b; }
+function isDouble(tile) { return tile.a === tile.b; }
+
+function canPlay(tile) {
+  if (chain.length === 0) return true;
+  return tile.a === leftEnd || tile.b === leftEnd || tile.a === rightEnd || tile.b === rightEnd;
+}
+
+function canPlayAnySide(tile) {
+  const sides = [];
+  if (chain.length === 0) return ['first'];
+  if (tile.a === leftEnd || tile.b === leftEnd) sides.push('left');
+  if (tile.a === rightEnd || tile.b === rightEnd) sides.push('right');
+  return sides;
+}
+
+function playTile(tile, side) {
+  if (chain.length === 0) {
+    chain.push({ ...tile });
+    leftEnd = tile.a;
+    rightEnd = tile.b;
+  } else if (side === 'left') {
+    if (tile.b === leftEnd) {
+      chain.unshift({ a: tile.a, b: tile.b });
+      leftEnd = tile.a;
+    } else {
+      chain.unshift({ a: tile.b, b: tile.a });
+      leftEnd = tile.b;
+    }
+  } else {
+    if (tile.a === rightEnd) {
+      chain.push({ a: tile.a, b: tile.b });
+      rightEnd = tile.b;
+    } else {
+      chain.push({ a: tile.b, b: tile.a });
+      rightEnd = tile.a;
+    }
+  }
+}
+
+// --- SVG DOMINO RENDERING ---
+function dotPositions(n) {
+  const cx = 16, cy = 16, s = 7;
+  const pos = {
+    0: [],
+    1: [[cx, cy]],
+    2: [[cx - s, cy - s], [cx + s, cy + s]],
+    3: [[cx - s, cy - s], [cx, cy], [cx + s, cy + s]],
+    4: [[cx - s, cy - s], [cx + s, cy - s], [cx - s, cy + s], [cx + s, cy + s]],
+    5: [[cx - s, cy - s], [cx + s, cy - s], [cx, cy], [cx - s, cy + s], [cx + s, cy + s]],
+    6: [[cx - s, cy - s], [cx + s, cy - s], [cx - s, cy], [cx + s, cy], [cx - s, cy + s], [cx + s, cy + s]]
+  };
+  return pos[n] || [];
+}
+
+function renderHalf(n, yOffset) {
+  let dots = '';
+  dotPositions(n).forEach(([x, y]) => {
+    dots += `<circle cx="${x}" cy="${y + yOffset}" r="3.2" fill="var(--domino-dot)"/>`;
+  });
+  return dots;
+}
+
+function createDominoSVG(tile, w = 42, h = 74, faceDown = false) {
+  if (faceDown) {
+    return `<svg width="${w}" height="${h}" viewBox="0 0 32 56">
+      <rect x="1" y="1" width="30" height="54" rx="4" fill="#2a2a3a" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <circle cx="16" cy="28" r="4" fill="rgba(255,255,255,0.1)"/>
+    </svg>`;
+  }
+  return `<svg width="${w}" height="${h}" viewBox="0 0 32 56">
+    <rect x="1" y="1" width="30" height="54" rx="4" fill="#f0ebe0" stroke="#555" stroke-width="1.2"/>
+    ${renderHalf(tile.a, 0)}
+    <line x1="5" y1="28" x2="27" y2="28" stroke="#999" stroke-width="1"/>
+    ${renderHalf(tile.b, 28)}
+  </svg>`;
+}
+
+function createHorizontalDominoSVG(tile, w = 74, h = 42) {
+  function dotPosH(n, xOff) {
+    const cx = 16 + xOff, cy = 16, s = 7;
+    const pos = {
+      0: [],
+      1: [[cx, cy]],
+      2: [[cx - s, cy - s], [cx + s, cy + s]],
+      3: [[cx - s, cy - s], [cx, cy], [cx + s, cy + s]],
+      4: [[cx - s, cy - s], [cx + s, cy - s], [cx - s, cy + s], [cx + s, cy + s]],
+      5: [[cx - s, cy - s], [cx + s, cy - s], [cx, cy], [cx - s, cy + s], [cx + s, cy + s]],
+      6: [[cx - s, cy - s], [cx + s, cy - s], [cx - s, cy], [cx + s, cy], [cx - s, cy + s], [cx + s, cy + s]]
+    };
+    return pos[n] || [];
+  }
+
+  let dotsA = '';
+  dotPosH(tile.a, 0).forEach(([x, y]) => {
+    dotsA += `<circle cx="${x}" cy="${y}" r="3.2" fill="var(--domino-dot)"/>`;
+  });
+  let dotsB = '';
+  dotPosH(tile.b, 28).forEach(([x, y]) => {
+    dotsB += `<circle cx="${x}" cy="${y}" r="3.2" fill="var(--domino-dot)"/>`;
+  });
+
+  return `<svg width="${w}" height="${h}" viewBox="0 0 56 32">
+    <rect x="1" y="1" width="54" height="30" rx="4" fill="#f0ebe0" stroke="#555" stroke-width="1.2"/>
+    ${dotsA}
+    <line x1="28" y1="5" x2="28" y2="27" stroke="#999" stroke-width="1"/>
+    ${dotsB}
+  </svg>`;
+}
+
+// --- TRASH TALK ---
+let trashTimeout;
+function showTrashTalk(text) {
+  const el = document.getElementById('trashTalk');
+  el.textContent = text;
+  el.classList.add('show');
+  clearTimeout(trashTimeout);
+  trashTimeout = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// --- RENDER ---
+function render() {
+  const oppEl = document.getElementById('opponentHand');
+  oppEl.innerHTML = '';
+  aiHand.forEach(() => {
+    const div = document.createElement('div');
+    div.className = 'opponent-tile';
+    oppEl.appendChild(div);
+  });
+
+  renderBoard();
+
+  const phEl = document.getElementById('playerHand');
+  phEl.innerHTML = '';
+  playerHand.forEach((tile, idx) => {
+    const div = document.createElement('div');
+    div.className = 'domino slide-up';
+    div.style.animationDelay = `${idx * 0.03}s`;
+    const playable = canPlay(tile) && isPlayerTurn && gameActive;
+    if (playable) div.classList.add('playable');
+    if (!playable && isPlayerTurn && gameActive) div.classList.add('unplayable');
+    if (selectedTile === idx) div.classList.add('selected');
+    div.innerHTML = createDominoSVG(tile);
+    div.addEventListener('click', () => handleTileClick(idx));
+    phEl.appendChild(div);
+  });
+
+  document.getElementById('boneyardInfo').textContent = t('boneyard')(boneyard.length);
+
+  const hasPlayable = playerHand.some(t => canPlay(t));
+  document.getElementById('drawBtn').disabled = !(isPlayerTurn && gameActive && !hasPlayable && boneyard.length > 0);
+  document.getElementById('passBtn').disabled = !(isPlayerTurn && gameActive && !hasPlayable && boneyard.length === 0);
+
+  if (gameActive) {
+    document.getElementById('handLabel').textContent = isPlayerTurn ? t('yourTurn') : t('boriTurn');
+  }
+}
+
+function renderBoard() {
+  const container = document.getElementById('chainContainer');
+  container.innerHTML = '';
+  
+  chain.forEach((tile, idx) => {
+    const div = document.createElement('div');
+    div.className = 'board-tile';
+    if (idx === chain.length - 1) div.classList.add('slap-in');
+    
+    if (isDouble(tile)) {
+      div.innerHTML = createDominoSVG(tile, 32, 56);
+    } else {
+      div.innerHTML = createHorizontalDominoSVG(tile, 56, 32);
+    }
+    container.appendChild(div);
+  });
+
+  const board = document.getElementById('boardArea');
+  board.scrollLeft = board.scrollWidth;
+}
+
+// --- PLAYER ACTIONS ---
+function handleTileClick(idx) {
+  if (!isPlayerTurn || !gameActive) return;
+  const tile = playerHand[idx];
+  if (!canPlay(tile)) return;
+
+  playSlap();
+  const sides = canPlayAnySide(tile);
+  
+  if (chain.length === 0) {
+    executePlayerPlay(idx, 'first');
+  } else if (sides.length === 1) {
+    executePlayerPlay(idx, sides[0]);
+  } else if (sides.length === 2 && leftEnd === rightEnd) {
+    executePlayerPlay(idx, 'left');
+  } else if (sides.length === 2) {
+    selectedTile = idx;
+    showSidePicker(tile);
+  }
+}
+
+function showSidePicker(tile) {
+  document.getElementById('spTitle').textContent = t('pickSide');
+  document.getElementById('spSub').textContent = t('pickSub');
+  document.getElementById('spLeft').textContent = `◀ ${leftEnd}`;
+  document.getElementById('spRight').textContent = `${rightEnd} ▶`;
+  document.getElementById('sidePickerOverlay').classList.add('show');
+}
+
+function playSide(side) {
+  document.getElementById('sidePickerOverlay').classList.remove('show');
+  if (selectedTile !== null) {
+    executePlayerPlay(selectedTile, side);
+    selectedTile = null;
+  }
+}
+
+function executePlayerPlay(idx, side) {
+  const tile = playerHand.splice(idx, 1)[0];
+  playTile(tile, side === 'first' ? 'left' : side);
+  consecutivePasses = 0;
+  selectedTile = null;
+
+  if (playerHand.length === 0) {
+    if (chain.length > 1 && leftEnd === rightEnd) {
+      showTrashTalk(t('capicu'));
+    }
+    if (isDouble(tile)) {
+      showTrashTalk(t('chuchazo'));
+    }
+  }
+
+  if (checkWin()) return;
+
+  isPlayerTurn = false;
+  render();
+  setTimeout(() => aiTurn(), 600 + Math.random() * 800);
+}
+
+function playerDraw() {
+  if (!isPlayerTurn || !gameActive || boneyard.length === 0) return;
+  const tile = boneyard.pop();
+  playerHand.push(tile);
+  playSlap();
+  
+  if (Math.random() > 0.5) {
+    showTrashTalk(randFrom(t('trashDraw')));
+  }
+  
+  render();
+}
+
+function playerPass() {
+  if (!isPlayerTurn || !gameActive) return;
+  consecutivePasses++;
+  if (consecutivePasses >= 2) {
+    endGameTranque();
+    return;
+  }
+  isPlayerTurn = false;
+  render();
+  setTimeout(() => aiTurn(), 600 + Math.random() * 800);
+}
+
+// --- AI ---
+let aiDrawCount = 0;
+
+function aiTurn() {
+  if (!gameActive) return;
+
+  const playable = [];
+  aiHand.forEach((tile, idx) => {
+    const sides = canPlayAnySide(tile);
+    if (sides.length > 0) {
+      playable.push({ tile, idx, sides });
+    }
+  });
+
+  if (playable.length === 0) {
+    if (boneyard.length > 0) {
+      const drawn = boneyard.pop();
+      aiHand.push(drawn);
+      aiDrawCount++;
+      render();
+      setTimeout(() => aiTurn(), 400);
+      return;
+    } else {
+      aiDrawCount = 0;
+      consecutivePasses++;
+      if (consecutivePasses >= 2) {
+        endGameTranque();
+        return;
+      }
+      isPlayerTurn = true;
+      render();
+      return;
+    }
+  }
+  aiDrawCount = 0;
+
+  playable.sort((a, b) => {
+    if (isDouble(a.tile) && !isDouble(b.tile)) return -1;
+    if (!isDouble(a.tile) && isDouble(b.tile)) return 1;
+    return tileSum(b.tile) - tileSum(a.tile);
+  });
+
+  const chosen = playable[0];
+  const tile = aiHand.splice(chosen.idx, 1)[0];
+  
+  let side;
+  if (chain.length === 0) {
+    side = 'left';
+  } else if (chosen.sides.length === 1) {
+    side = chosen.sides[0];
+  } else {
+    const afterLeft = tile.a === leftEnd ? tile.b : tile.a;
+    const afterRight = tile.a === rightEnd ? tile.b : tile.a;
+    const leftMatches = aiHand.filter(t => t.a === afterLeft || t.b === afterLeft).length;
+    const rightMatches = aiHand.filter(t => t.a === afterRight || t.b === afterRight).length;
+    side = leftMatches >= rightMatches ? 'left' : 'right';
+  }
+
+  playTile(tile, side);
+  consecutivePasses = 0;
+  playSlap();
+
+  if (aiHand.length === 0) {
+    showTrashTalk(randFrom(t('trashWin')));
+  } else if (Math.random() > 0.6) {
+    showTrashTalk(randFrom(t('trashPlay')));
+  }
+
+  if (checkWin()) return;
+
+  isPlayerTurn = true;
+  render();
+}
+
+// --- WIN/END ---
+function checkWin() {
+  if (playerHand.length === 0) {
+    endGameWin('player');
+    return true;
+  }
+  if (aiHand.length === 0) {
+    endGameWin('ai');
+    return true;
+  }
+  return false;
+}
+
+function endGameWin(winner) {
+  gameActive = false;
+  const loserSum = winner === 'player' 
+    ? aiHand.reduce((s, t) => s + tileSum(t), 0)
+    : playerHand.reduce((s, t) => s + tileSum(t), 0);
+  
+  if (winner === 'player') {
+    playerScore += loserSum;
+    playWin();
+    showTrashTalk(randFrom(t('trashLose')));
+  } else {
+    aiScore += loserSum;
+    showTrashTalk(randFrom(t('trashWin')));
+  }
+
+  updateScoreDisplay();
+  
+  setTimeout(() => {
+    showGameOver(winner, loserSum);
+  }, 1200);
+}
+
+function endGameTranque() {
+  gameActive = false;
+  const pSum = playerHand.reduce((s, t) => s + tileSum(t), 0);
+  const aSum = aiHand.reduce((s, t) => s + tileSum(t), 0);
+  
+  let winner;
+  if (pSum < aSum) {
+    winner = 'player';
+    playerScore += aSum;
+  } else if (aSum < pSum) {
+    winner = 'ai';
+    aiScore += pSum;
+  } else {
+    winner = 'tie';
+  }
+
+  showTrashTalk(randFrom(t('trashTranque')));
+  updateScoreDisplay();
+  
+  setTimeout(() => {
+    showGameOver(winner === 'tie' ? 'tie' : winner, Math.abs(pSum - aSum));
+  }, 1200);
+}
+
+function updateScoreDisplay() {
+  document.getElementById('scorePlayer').textContent = playerScore;
+  document.getElementById('scoreAI').textContent = aiScore;
+}
+
+function showGameOver(winner, points) {
+  const overlay = document.getElementById('gameOverOverlay');
+  
+  if (winner === 'player') {
+    document.getElementById('goTitle').textContent = '🎉 ' + t('youWin');
+    document.getElementById('goTitle').style.color = 'var(--gold)';
+    document.getElementById('goText').textContent = t('winText') + ` (+${points})`;
+  } else if (winner === 'ai') {
+    document.getElementById('goTitle').textContent = '😤 ' + t('youLose');
+    document.getElementById('goTitle').style.color = '#ff6b6b';
+    document.getElementById('goText').textContent = t('loseText') + ` (+${points})`;
+  } else {
+    document.getElementById('goTitle').textContent = '🤝 ' + t('tie');
+    document.getElementById('goTitle').style.color = 'white';
+    document.getElementById('goText').textContent = t('tieText');
+  }
+
+  document.getElementById('goYou').textContent = t('you');
+  document.getElementById('goPlayerScore').textContent = playerScore;
+  document.getElementById('goAIScore').textContent = aiScore;
+  document.getElementById('goBtn').textContent = t('again');
+  
+  overlay.classList.add('show');
+  render();
+}
+
+function showWelcome() {
+  gameActive = false;
+  playerScore = 0;
+  aiScore = 0;
+  const w = document.getElementById('welcomeScreen');
+  w.style.display = 'flex';
+  w.classList.remove('hiding');
+  document.getElementById('gameOverOverlay').classList.remove('show');
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
