@@ -81,9 +81,8 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);-webkit-font
 .bub-bori{background:var(--warm);color:var(--text);border-bottom-left-radius:6px;position:relative}
 .bub-user{background:var(--sun);color:var(--white);border-bottom-right-radius:6px;font-weight:600}
 .bub-err{background:#FFF0F0;color:#C0392B;border-bottom-left-radius:6px}
-.replay-btn{position:absolute;bottom:6px;right:8px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,0.06);border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:13px;opacity:.5;transition:all .2s;-webkit-tap-highlight-color:transparent;padding:0}
+.replay-btn{position:absolute;bottom:6px;right:8px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,0.06);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;opacity:.5;transition:all .2s;-webkit-tap-highlight-color:transparent;padding:0}
 .replay-btn:hover{opacity:.9;background:rgba(0,0,0,0.1)}
-.replay-btn.visible{display:flex}
 .dots{display:flex;gap:8px;align-items:flex-start;align-self:flex-start}
 .dots .av{width:32px;height:32px;background:transparent;overflow:hidden}
 .dots .av img{width:100%;height:100%;object-fit:contain}
@@ -184,8 +183,9 @@ function startRecording(){if(!navigator.mediaDevices||!navigator.mediaDevices.ge
 function stopRecording(){if(mediaRecorder&&mediaRecorder.state==='recording')mediaRecorder.stop();isRecording=false;micBtn.classList.remove('recording');inp.placeholder=lang==='es'?'Escribe un mensaje...':'Type a message...';}
 function transcribeAudio(blob){inp.placeholder=lang==='es'?'Transcribiendo...':'Transcribing...';fetch('/api/voice/stt',{method:'POST',headers:{'Content-Type':blob.type||'audio/webm','X-Lang':lang},body:blob}).then(function(r){return r.json();}).then(function(data){inp.placeholder=lang==='es'?'Escribe un mensaje...':'Type a message...';if(data.text&&data.text.trim()){inp.value=data.text.trim();inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,110)+'px';setTimeout(function(){doSend();},200);}else{showToast(lang==='es'?'No entendí — intenta de nuevo':'Didn\'t catch that — try again');}}).catch(function(){inp.placeholder=lang==='es'?'Escribe un mensaje...':'Type a message...';showToast(lang==='es'?'Error de transcripción':'Transcription error');});}
 
-function addReplayBtn(el,text){var btn=document.createElement('button');btn.className='replay-btn';btn.innerHTML='🔊';btn.onclick=function(e){e.stopPropagation();speakText(text);};if(voiceOn)btn.classList.add('visible');el.appendChild(btn);}
-function updateReplayButtons(){var btns=document.querySelectorAll('.replay-btn');for(var i=0;i<btns.length;i++)btns[i].classList.toggle('visible',voiceOn);}
+function addReplayBtn(el,text){var btn=document.createElement('button');btn.className='replay-btn';btn.innerHTML='🔊';btn.onclick=function(e){e.stopPropagation();playTTS(text);};el.appendChild(btn);}
+function updateReplayButtons(){}
+function playTTS(text){stopAudio();hdrAv.classList.add('speaking');fetch('/api/voice/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,lang:lang})}).then(function(r){if(!r.ok)throw new Error('TTS failed');return r.blob();}).then(function(blob){var url=URL.createObjectURL(blob);currentAudio=new Audio(url);currentAudio.onended=function(){hdrAv.classList.remove('speaking');URL.revokeObjectURL(url);currentAudio=null;};currentAudio.onerror=function(){hdrAv.classList.remove('speaking');currentAudio=null;};currentAudio.play().catch(function(){hdrAv.classList.remove('speaking');});}).catch(function(err){console.error('TTS error:',err);hdrAv.classList.remove('speaking');});}
 function updateVoiceLock(){if(isSubscriber){var b=voiceBtn.querySelector('.voice-lock-badge');if(b)b.remove();voiceBtn.classList.remove('locked');}else{if(!voiceBtn.querySelector('.voice-lock-badge')){var b=document.createElement('span');b.className='voice-lock-badge';b.textContent='🔒';voiceBtn.appendChild(b);}voiceBtn.classList.add('locked');}}
 function restoreVoicePref(){if(!isSubscriber)return;try{if(localStorage.getItem('bori-voice')==='1'){voiceOn=true;voiceBtn.classList.add('on');micBtn.classList.add('visible');}}catch(e){}}
 
@@ -219,7 +219,7 @@ clearWelcome();var r=document.createElement('div');r.className='row row-bori';va
 var fullReply='',reader=res.body.getReader(),decoder=new TextDecoder(),buffer='';
 while(true){var result=await reader.read();if(result.done)break;buffer+=decoder.decode(result.value,{stream:true});var lines=buffer.split('\n');buffer=lines.pop()||'';for(var i=0;i<lines.length;i++){var line=lines[i].trim();if(!line.startsWith('data: '))continue;try{var evt=JSON.parse(line.slice(6));if(evt.type==='text'){fullReply+=evt.text;b.textContent=fullReply;chat.scrollTop=chat.scrollHeight;}else if(evt.type==='error'&&!fullReply){b.className='bub bub-err';b.textContent=evt.error||'Something went wrong.';}}catch(pe){}}}
 if(!fullReply){b.className='bub bub-err';b.textContent=lang==='es'?'No recibí respuesta. Intenta de nuevo.':'No response received. Try again.';}
-if(fullReply){addReplayBtn(b,fullReply);if(voiceOn)speakText(fullReply);}
+if(fullReply){addReplayBtn(b,fullReply);if(voiceOn)playTTS(fullReply);}
 hist.push({role:'assistant',content:fullReply});if(hist.length>40)hist=hist.slice(-40);if(isLimitReached())setTimeout(function(){showLimitOverlay();},1500);
 }catch(e){killDots();addBub('bori',e.name==='AbortError'?(lang==='es'?'Se agotó el tiempo. Intenta de nuevo.':'Request timed out. Try again.'):(lang==='es'?'Problema de conexión. Intenta de nuevo.':'Connection issue. Try again.'),true);}
 busy=false;sendBtn.disabled=false;inp.focus();};
