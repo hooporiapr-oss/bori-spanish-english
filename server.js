@@ -160,7 +160,7 @@ app.post('/api/voice/tts', async (req, res) => {
   }
 });
 
-// ═══ ELEVENLABS: SPEECH-TO-TEXT ═══
+// ═══ ELEVENLABS: SPEECH-TO-TEXT (BATCH — FALLBACK) ═══
 app.post('/api/voice/stt', async (req, res) => {
   try {
     // Receive raw audio as binary
@@ -278,6 +278,37 @@ app.post('/api/voice/stt', async (req, res) => {
   } catch (err) {
     console.error('[ElevenLabs STT Error]', err.message);
     res.status(500).json({ error: 'Transcription failed.' });
+  }
+});
+
+// ═══ ELEVENLABS: REALTIME SCRIBE TOKEN ═══
+// Generates a single-use token for client-side WebSocket STT
+// Token expires after 15 minutes, API key never exposed to client
+app.get('/api/voice/scribe-token', async (req, res) => {
+  try {
+    if (!ELEVENLABS_API_KEY) {
+      return res.status(500).json({ error: 'Voice not configured.' });
+    }
+
+    const tokenRes = await fetch('https://api.elevenlabs.io/v1/single-use-token/realtime_scribe', {
+      method: 'POST',
+      headers: {
+        'xi-api-key': ELEVENLABS_API_KEY,
+      },
+    });
+
+    if (!tokenRes.ok) {
+      const errText = await tokenRes.text();
+      console.error('[ElevenLabs Scribe Token Error]', tokenRes.status, errText);
+      return res.status(500).json({ error: 'Could not generate voice token.' });
+    }
+
+    const data = await tokenRes.json();
+    console.log('[ElevenLabs] Scribe token generated');
+    res.json({ token: data.token });
+  } catch (err) {
+    console.error('[ElevenLabs Scribe Token Error]', err.message);
+    res.status(500).json({ error: 'Could not generate voice token.' });
   }
 });
 
@@ -488,5 +519,6 @@ app.listen(PORT, () => {
   console.log(`[Hey Bori] Live on port ${PORT}`);
   console.log(`[Hey Bori] Stripe: ${process.env.STRIPE_SECRET_KEY ? 'Connected' : 'NOT configured'}`);
   console.log(`[Hey Bori] ElevenLabs: ${ELEVENLABS_API_KEY ? 'Connected' : 'NOT configured'}`);
+  console.log(`[Hey Bori] Realtime Scribe: Ready (GET /api/voice/scribe-token)`);
   console.log(`[Hey Bori] Language learning companion ready`);
 });
