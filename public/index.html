@@ -24,7 +24,8 @@
     .logo img{width:100%;height:100%;object-fit:contain}
 
     /* STATEMENT */
-    .statement{font-size:clamp(18px,5vw,22px);font-weight:900;color:var(--dark);max-width:360px;line-height:1.45;margin-bottom:10px}
+    .statement{font-size:clamp(18px,5vw,22px);font-weight:900;color:var(--dark);max-width:360px;line-height:1.45;margin-bottom:6px}
+    .sub-statement{font-size:clamp(14px,3.5vw,16px);font-weight:700;color:var(--text-2);max-width:360px;line-height:1.5;margin-bottom:12px}
 
     /* BADGE */
     .badge{display:inline-block;padding:6px 18px;border-radius:50px;background:#0050A0;color:var(--white);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
@@ -165,14 +166,24 @@
   </div>
 
   <div class="page">
+    <!-- TOGGLE -->
+    <div class="lang-wrap">
+      <div class="lang-label" data-en="Pick Your Language" data-es="Escoge Tu Idioma">Pick Your Language</div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-en" onclick="setLang('en')">English</button>
+        <button class="lang-btn" id="btn-es" onclick="setLang('es')">Español</button>
+      </div>
+    </div>
+
     <!-- LOGO -->
     <div class="logo"><img src="/icon.png" alt="Hey Bori"></div>
 
     <!-- STATEMENT -->
-    <div class="statement" data-en="Hey Bori. Your Private Bilingual Spanish and English Digital Assistant." data-es="Hey Bori. Tu Asistente Digital Privado Bilingüe de Español e Inglés.">Hey Bori. Your Private Bilingual Spanish and English Digital Assistant.</div>
+    <div class="statement" data-en="Real Conversations." data-es="Conversaciones Reales.">Real Conversations.</div>
+    <div class="sub-statement" data-en="Learn Spanish and English naturally." data-es="Aprende español e inglés naturalmente.">Learn Spanish and English naturally.</div>
 
     <!-- BADGE -->
-    <div class="badge" data-en="Puerto Rico is Spanish USA" data-es="Puerto Rico es el Español de USA">Puerto Rico is Spanish USA</div>
+    <div class="badge" data-en="No lessons. No pressure. Just natural learning." data-es="Sin lecciones. Sin presión. Solo aprendizaje natural.">No lessons. No pressure. Just natural learning.</div>
 
     <!-- FORTUNE COCO -->
     <div class="coco" id="coco" onclick="crackCoco()">
@@ -225,7 +236,7 @@
       <div class="plan featured">
         <div class="plan-tag" data-en="RECOMMENDED" data-es="RECOMENDADO">RECOMMENDED</div>
         <div class="plan-name">Bori Plus</div>
-        <div class="plan-price">$4<span>.99/mo</span></div>
+        <div class="plan-price">$7<span>.00/mo</span></div>
         <div class="plan-desc" data-en="Unlimited. 24/7. All yours." data-es="Ilimitado. 24/7. Todo tuyo.">Unlimited. 24/7. All yours.</div>
         <ul class="plan-features" id="plusFeat">
           <li><span class="ck">✓</span><span data-en="Unlimited messages" data-es="Mensajes ilimitados">Unlimited messages</span></li>
@@ -235,15 +246,6 @@
           <li><span class="ck">✓</span><span data-en="All games unlocked" data-es="Todos los juegos desbloqueados">All games unlocked</span></li>
         </ul>
         <button class="plan-btn plan-btn-plus" data-en="Join Bori Plus" data-es="Únete a Bori Plus">Join Bori Plus</button>
-      </div>
-    </div>
-
-    <!-- TOGGLE -->
-    <div class="lang-wrap">
-      <div class="lang-label" data-en="Pick Your Language" data-es="Escoge Tu Idioma">Pick Your Language</div>
-      <div class="lang-toggle">
-        <button class="lang-btn active" id="btn-en" onclick="setLang('en')">English</button>
-        <button class="lang-btn" id="btn-es" onclick="setLang('es')">Español</button>
       </div>
     </div>
 
