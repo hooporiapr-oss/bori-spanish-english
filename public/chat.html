@@ -177,6 +177,24 @@ var hist=[],busy=false,lang='en',MAX_MSGS=10,isSubscriber=false;
 var voiceOn=false,currentAudio=null,upgradeTipTimer=null;
 var boriSpeakingTimer=null,sendTimeout=null;
 
+// ── Mobile audio unlock: pre-create Audio element on user gesture ──
+var unlockedAudio=null;
+function unlockAudio(){
+  if(unlockedAudio)return;
+  unlockedAudio=new Audio();
+  // Play silent to unlock audio context on iOS/Safari
+  unlockedAudio.src='data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAAwAAAbAAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0P///////////////////////////////wAAAABMYXZjNTguMTMAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAbBJJOKEAAAAAAAAAAAAAAAAAAAA/+M4wAAESGl0ACBGBEi2GMYBD/BeD8Pg/B+D9+D/wfg/B+D8H4P//g/B+D8H4Pwf/8H4Pwfg/B+D8H///wfg/B+D8H4Pwf///8H4Pwfg/B+D8H////4Pwfg/B+D8H4P';
+  unlockedAudio.volume=0.01;
+  unlockedAudio.play().then(function(){
+    unlockedAudio.pause();
+    unlockedAudio.volume=1;
+    console.log('[Audio] Unlocked for mobile playback');
+  }).catch(function(e){
+    console.log('[Audio] Unlock attempt:',e.message);
+    unlockedAudio=null;
+  });
+}
+
 /* ═══════════════════════════════════════════
    VOICE MODE — WebSocket Realtime STT Engine
    PATCHED: no wild text, reliable auto-send, boriSpeaking safety
@@ -208,12 +226,12 @@ function setBoriSpeaking(val){
   if(boriSpeakingTimer){clearTimeout(boriSpeakingTimer);boriSpeakingTimer=null;}
   if(val){
     boriSpeakingTimer=setTimeout(function(){
-      console.warn('[Voice] boriSpeaking safety reset after 60s');
+      console.warn('[Voice] boriSpeaking safety reset after 15s');
       boriSpeaking=false;
       hdrAv.classList.remove('speaking');
       if(currentAudio){try{currentAudio.pause();}catch(e){}}
       currentAudio=null;
-    },60000);
+    },15000);
   }
 }
 
@@ -417,6 +435,7 @@ function cleanupVoiceMode(){
 }
 
 function toggleMic(){
+  unlockAudio(); // unlock audio on user gesture for mobile
   if(!isSubscriber){showUpgradeTip();return;}
   if(isLimitReached()){showLimitOverlay();return;}
   if(busy&&!voiceModeActive)return;
@@ -440,33 +459,46 @@ function speakText(text){
   setBoriSpeaking(true);
   hdrAv.classList.add('speaking');
   fetch('/api/voice/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,lang:lang})}).then(function(r){
-    if(!r.ok)throw new Error('TTS failed');return r.blob();
+    if(!r.ok)throw new Error('TTS failed '+r.status);return r.blob();
   }).then(function(blob){
     var url=URL.createObjectURL(blob);
-    currentAudio=new Audio(url);
-    currentAudio.onended=function(){
+    // Use unlocked audio element if available (mobile Safari), otherwise create new
+    var audio=unlockedAudio||new Audio();
+    currentAudio=audio;
+    audio.onended=function(){
       hdrAv.classList.remove('speaking');
       URL.revokeObjectURL(url);
       currentAudio=null;
       setBoriSpeaking(false);
       if(voiceModeActive){inp.placeholder=lang==='es'?'🎙 Escuchando...':'🎙 Listening...';}
     };
-    currentAudio.onerror=function(){
+    audio.onerror=function(e){
+      console.error('[TTS] Audio error:',e);
       hdrAv.classList.remove('speaking');
       currentAudio=null;
       setBoriSpeaking(false);
     };
-    currentAudio.play().catch(function(){
-      hdrAv.classList.remove('speaking');
-      setBoriSpeaking(false);
-    });
+    audio.src=url;
+    audio.volume=1;
+    var playPromise=audio.play();
+    if(playPromise){
+      playPromise.then(function(){
+        console.log('[TTS] Playing audio');
+      }).catch(function(e){
+        console.error('[TTS] Play blocked:',e.message);
+        hdrAv.classList.remove('speaking');
+        setBoriSpeaking(false);
+        // Show manual play button as fallback
+        showToast(lang==='es'?'Toca 🔊 en el mensaje para escuchar':'Tap 🔊 on the message to hear it');
+      });
+    }
   }).catch(function(err){
-    console.error('TTS error:',err);
+    console.error('[TTS] Fetch error:',err);
     hdrAv.classList.remove('speaking');
     setBoriSpeaking(false);
   });
 }
-function stopAudio(){if(currentAudio){currentAudio.pause();currentAudio.currentTime=0;currentAudio=null;}hdrAv.classList.remove('speaking');setBoriSpeaking(false);}
+function stopAudio(){if(currentAudio){currentAudio.pause();try{currentAudio.currentTime=0;}catch(e){}currentAudio=null;}hdrAv.classList.remove('speaking');setBoriSpeaking(false);}
 
 function addReplayBtn(el,text){var btn=document.createElement('button');btn.className='replay-btn';btn.innerHTML='🔊';btn.onclick=function(e){e.stopPropagation();playTTS(text);};el.appendChild(btn);}
 function updateReplayButtons(){}
@@ -478,10 +510,13 @@ function playTTS(text){
     if(!r.ok)throw new Error('TTS failed');return r.blob();
   }).then(function(blob){
     var url=URL.createObjectURL(blob);
-    currentAudio=new Audio(url);
-    currentAudio.onended=function(){hdrAv.classList.remove('speaking');URL.revokeObjectURL(url);currentAudio=null;setBoriSpeaking(false);};
-    currentAudio.onerror=function(){hdrAv.classList.remove('speaking');currentAudio=null;setBoriSpeaking(false);};
-    currentAudio.play().catch(function(){hdrAv.classList.remove('speaking');setBoriSpeaking(false);});
+    var audio=unlockedAudio||new Audio();
+    currentAudio=audio;
+    audio.onended=function(){hdrAv.classList.remove('speaking');URL.revokeObjectURL(url);currentAudio=null;setBoriSpeaking(false);};
+    audio.onerror=function(){hdrAv.classList.remove('speaking');currentAudio=null;setBoriSpeaking(false);};
+    audio.src=url;
+    audio.volume=1;
+    audio.play().catch(function(e){console.error('[TTS] Play error:',e);hdrAv.classList.remove('speaking');setBoriSpeaking(false);});
   }).catch(function(err){
     console.error('TTS error:',err);hdrAv.classList.remove('speaking');setBoriSpeaking(false);
   });
