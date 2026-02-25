@@ -220,6 +220,13 @@ async function enterVoiceMode(){
   }
 
   try{
+    // Auto-enable voice toggle when entering voice mode
+    if(!voiceOn){
+      voiceOn=true;
+      voiceBtn.classList.add('on');
+      try{localStorage.setItem('bori-voice','1');}catch(e){}
+    }
+
     // 1. Get scribe token from server
     var tokenRes=await fetch('/api/voice/scribe-token');
     if(!tokenRes.ok)throw new Error('Token fetch failed');
