@@ -25,7 +25,7 @@ const BASE_URL = process.env.BASE_URL || 'https://heybori.com';
 
 // ═══ DEEPGRAM CONFIG ═══
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
-const DEEPGRAM_VOICE = 'aura-2-javier-es';
+const DEEPGRAM_VOICE = 'aura-2-aquila-es';
 
 // ═══ ADMIN BYPASS ═══
 const ADMIN_EMAILS = [
@@ -480,6 +480,6 @@ server.listen(PORT, () => {
   console.log(`[Hey Bori] Stripe: ${process.env.STRIPE_SECRET_KEY ? 'Connected' : 'NOT configured'}`);
   console.log(`[Hey Bori] Deepgram: ${DEEPGRAM_API_KEY ? 'Connected' : 'NOT configured'}`);
   console.log(`[Hey Bori] STT: Nova-3 WebSocket Proxy (/ws/deepgram-stt)`);
-  console.log(`[Hey Bori] TTS: Aura-2 Javier (bilingual code-switcher)`);
+  console.log(`[Hey Bori] TTS: Aura-2 Aquila (Latin American bilingual code-switcher)`);
   console.log(`[Hey Bori] Language learning companion ready`);
 });
