@@ -110,11 +110,9 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);-webkit-font
 .mic-btn.visible{display:flex}
 .mic-btn:hover{border-color:var(--sun);background:var(--sun-light)}
 .mic-btn svg{width:22px;height:22px;fill:var(--text-2);transition:fill .2s}
-/* Voice mode active — green pulsing mic */
 .mic-btn.voice-mode{background:var(--green);border-color:var(--green);animation:vm-pulse 1.8s ease-in-out infinite}
 .mic-btn.voice-mode svg{fill:var(--white)}
 @keyframes vm-pulse{0%,100%{box-shadow:0 0 0 0 rgba(42,157,110,0.4)}50%{box-shadow:0 0 0 14px rgba(42,157,110,0)}}
-/* Old recording state (batch fallback) */
 .mic-btn.recording{background:var(--sun);border-color:var(--sun);animation:mic-pulse 1.5s ease-in-out infinite}
 .mic-btn.recording svg{fill:var(--white)}
 @keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,0.4)}50%{box-shadow:0 0 0 12px rgba(255,107,53,0)}}
@@ -177,21 +175,21 @@ var micBtn=document.getElementById('micBtn'),voiceBtn=document.getElementById('v
 var voiceUpgradeTip=document.getElementById('voiceUpgradeTip'),hdrAv=document.getElementById('hdrAv');
 var hist=[],busy=false,lang='en',MAX_MSGS=10,isSubscriber=false;
 var voiceOn=false,currentAudio=null,upgradeTipTimer=null;
+var boriSpeakingTimer=null,sendTimeout=null;
 
 /* ═══════════════════════════════════════════
    VOICE MODE — WebSocket Realtime STT Engine
+   PATCHED: no wild text, reliable auto-send, boriSpeaking safety
    ═══════════════════════════════════════════ */
-var voiceModeActive=false;    // true = continuous listening mode ON
-var sttWS=null;               // WebSocket to our server proxy → Deepgram
-var micStream=null;           // getUserMedia stream
-var audioCtx=null;            // AudioContext for PCM conversion
-var scriptNode=null;          // ScriptProcessorNode
-var micSource=null;           // MediaStreamSource
-var partialText='';           // current partial transcript
-var savedPlaceholder='';      // original placeholder to restore
-var boriSpeaking=false;       // true while TTS audio is playing
-var waitingForBori=false;     // true while waiting for Bori's response
-var lastFinalText='';         // track last final to avoid duplicates
+var voiceModeActive=false;
+var sttWS=null;
+var micStream=null;
+var audioCtx=null;
+var scriptNode=null;
+var micSource=null;
+var savedPlaceholder='';
+var boriSpeaking=false;
+var lastFinalText='';
 
 // ── Float32 → Int16 PCM conversion ──
 function floatTo16BitPCM(float32Array){
@@ -204,6 +202,46 @@ function floatTo16BitPCM(float32Array){
   return buf;
 }
 
+// ── Safety wrapper: reset boriSpeaking if stuck ──
+function setBoriSpeaking(val){
+  boriSpeaking=val;
+  if(boriSpeakingTimer){clearTimeout(boriSpeakingTimer);boriSpeakingTimer=null;}
+  if(val){
+    boriSpeakingTimer=setTimeout(function(){
+      console.warn('[Voice] boriSpeaking safety reset after 60s');
+      boriSpeaking=false;
+      hdrAv.classList.remove('speaking');
+      if(currentAudio){try{currentAudio.pause();}catch(e){}}
+      currentAudio=null;
+    },60000);
+  }
+}
+
+// ── Auto-send accumulated final text ──
+function voiceAutoSend(){
+  if(sendTimeout){clearTimeout(sendTimeout);sendTimeout=null;}
+  var text=lastFinalText.trim();
+  lastFinalText='';
+  if(!text||text.length<2)return;
+  if(busy||isLimitReached())return;
+  console.log('[Voice] Auto-sending:',text);
+  inp.value=text;
+  inp.style.color='';
+  inp.style.fontStyle='';
+  doSend();
+}
+
+// ── Fallback timer: send if UtteranceEnd doesn't fire ──
+function scheduleSendTimeout(){
+  if(sendTimeout)clearTimeout(sendTimeout);
+  sendTimeout=setTimeout(function(){
+    if(lastFinalText.trim().length>1){
+      console.log('[Voice] Fallback send (no UtteranceEnd)');
+      voiceAutoSend();
+    }
+  },2000);
+}
+
 // ── Enter voice mode ──
 async function enterVoiceMode(){
   if(voiceModeActive)return;
@@ -213,17 +251,14 @@ async function enterVoiceMode(){
   }
 
   try{
-    // 1. Get mic permission
     micStream=await navigator.mediaDevices.getUserMedia({
       audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1,sampleRate:16000}
     });
 
-    // 2. Set up AudioContext for PCM extraction
     audioCtx=new(window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
     micSource=audioCtx.createMediaStreamSource(micStream);
     scriptNode=audioCtx.createScriptProcessor(4096,1,1);
 
-    // 3. Open WebSocket to our server proxy (server forwards to Deepgram)
     var wsProto=location.protocol==='https:'?'wss:':'ws:';
     var wsUrl=wsProto+'//'+location.host+'/ws/deepgram-stt?lang='+lang;
 
@@ -232,14 +267,12 @@ async function enterVoiceMode(){
 
     sttWS.onopen=function(){
       console.log('[Deepgram] WebSocket proxy connected');
-      // Don't activate yet — wait for server to confirm Deepgram connection
     };
 
     sttWS.onmessage=function(evt){
       try{
         var msg=JSON.parse(evt.data);
 
-        // Server confirms Deepgram upstream is connected
         if(msg.type==='connected'){
           console.log('[Deepgram] Upstream ready');
           voiceModeActive=true;
@@ -249,7 +282,6 @@ async function enterVoiceMode(){
           inp.value='';
           showToast(lang==='es'?'🎙 Modo voz activado':'🎙 Voice mode on');
 
-          // Start sending raw PCM audio chunks as binary
           scriptNode.onaudioprocess=function(e){
             if(!voiceModeActive||!sttWS||sttWS.readyState!==WebSocket.OPEN)return;
             if(boriSpeaking)return;
@@ -260,7 +292,6 @@ async function enterVoiceMode(){
           micSource.connect(scriptNode);
           scriptNode.connect(audioCtx.destination);
 
-          // Auto-enable voice toggle for hands-free experience
           if(!voiceOn){voiceOn=true;voiceBtn.classList.toggle('on',true);try{localStorage.setItem('bori-voice','1');}catch(e){}}
           return;
         }
@@ -272,47 +303,39 @@ async function enterVoiceMode(){
           var transcript=alt.transcript||'';
 
           if(!msg.is_final){
-            // Interim result — show live partial
+            // ── INTERIM: show in placeholder only (NO inp.value changes) ──
             if(transcript){
-              partialText=transcript;
-              inp.value=partialText;
-              inp.style.color='var(--text-3)';
-              inp.style.fontStyle='italic';
+              inp.placeholder=lang==='es'?'🎙 '+transcript.slice(0,50):'🎙 '+transcript.slice(0,50);
             }
           } else {
-            // Final result
+            // ── FINAL: accumulate, don't send yet (wait for UtteranceEnd) ──
             if(transcript&&transcript.length>1){
-              partialText='';
-              inp.style.color='';
-              inp.style.fontStyle='';
-              inp.value='';
-              console.log('[Deepgram] Final:',transcript);
-              lastFinalText=transcript;
+              if(lastFinalText){
+                lastFinalText=lastFinalText+' '+transcript;
+              }else{
+                lastFinalText=transcript;
+              }
+              inp.placeholder='🎙 '+lastFinalText.slice(0,50)+(lastFinalText.length>50?'…':'');
+              console.log('[Deepgram] Final:',transcript,'| Total:',lastFinalText);
+              scheduleSendTimeout();
             }
           }
         }
 
-        // UtteranceEnd — Deepgram detected end of speech
+        // UtteranceEnd → send accumulated text now
         if(msg.type==='UtteranceEnd'){
-          if(lastFinalText&&lastFinalText.length>1){
-            console.log('[Deepgram] Utterance end, sending:',lastFinalText);
-            inp.style.color='';
-            inp.style.fontStyle='';
-            inp.value=lastFinalText;
-            lastFinalText='';
-            partialText='';
-            doSend();
+          console.log('[Deepgram] UtteranceEnd');
+          if(lastFinalText&&lastFinalText.trim().length>1){
+            voiceAutoSend();
           }
         }
 
-        // Error from server proxy
         if(msg.type==='error'){
           console.error('[Deepgram] Error:',msg.message);
           showToast(lang==='es'?'Error de voz — intenta de nuevo':'Voice error — try again');
           exitVoiceMode();
         }
 
-        // Metadata (ignore, just log)
         if(msg.type==='Metadata'){
           console.log('[Deepgram] Session metadata received');
         }
@@ -345,62 +368,32 @@ async function enterVoiceMode(){
   }
 }
 
-// ── Exit voice mode ──
 function exitVoiceMode(){
   voiceModeActive=false;
   cleanupVoiceMode();
   showToast(lang==='es'?'🎙 Modo voz desactivado':'🎙 Voice mode off');
 }
 
-// ── Cleanup all voice resources ──
 function cleanupVoiceMode(){
   voiceModeActive=false;
-
-  if(sttWS){
-    try{sttWS.close();}catch(e){}
-    sttWS=null;
-  }
-
-  if(scriptNode){
-    try{scriptNode.disconnect();}catch(e){}
-    scriptNode.onaudioprocess=null;
-    scriptNode=null;
-  }
-  if(micSource){
-    try{micSource.disconnect();}catch(e){}
-    micSource=null;
-  }
-
-  if(audioCtx){
-    try{audioCtx.close();}catch(e){}
-    audioCtx=null;
-  }
-
-  if(micStream){
-    micStream.getTracks().forEach(function(t){t.stop();});
-    micStream=null;
-  }
-
+  if(sendTimeout){clearTimeout(sendTimeout);sendTimeout=null;}
+  if(sttWS){try{sttWS.close();}catch(e){}sttWS=null;}
+  if(scriptNode){try{scriptNode.disconnect();}catch(e){}scriptNode.onaudioprocess=null;scriptNode=null;}
+  if(micSource){try{micSource.disconnect();}catch(e){}micSource=null;}
+  if(audioCtx){try{audioCtx.close();}catch(e){}audioCtx=null;}
+  if(micStream){micStream.getTracks().forEach(function(t){t.stop();});micStream=null;}
   micBtn.classList.remove('voice-mode');
-  inp.style.color='';
-  inp.style.fontStyle='';
-  inp.value='';
-  partialText='';
+  inp.style.color='';inp.style.fontStyle='';inp.value='';
   lastFinalText='';
   if(savedPlaceholder)inp.placeholder=savedPlaceholder;
+  if(boriSpeakingTimer){clearTimeout(boriSpeakingTimer);boriSpeakingTimer=null;}
 }
 
-// ── Toggle mic: voice mode on/off ──
 function toggleMic(){
   if(!isSubscriber){showUpgradeTip();return;}
   if(isLimitReached()){showLimitOverlay();return;}
   if(busy&&!voiceModeActive)return;
-
-  if(voiceModeActive){
-    exitVoiceMode();
-  }else{
-    enterVoiceMode();
-  }
+  if(voiceModeActive){exitVoiceMode();}else{enterVoiceMode();}
 }
 
 /* ═══════════════════════════════════════
@@ -411,12 +404,12 @@ function showUpgradeTip(){if(upgradeTipTimer)clearTimeout(upgradeTipTimer);voice
 document.addEventListener('click',function(e){if(!e.target.closest('.voice-toggle'))voiceUpgradeTip.classList.remove('show');});
 
 /* ═══════════════════════════════════════
-   TTS — Bori speaks
+   TTS — Bori speaks (PATCHED: setBoriSpeaking safety)
    ═══════════════════════════════════════ */
 function speakText(text){
   if(!voiceOn)return;
   stopAudio();
-  boriSpeaking=true;
+  setBoriSpeaking(true);
   hdrAv.classList.add('speaking');
   fetch('/api/voice/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,lang:lang})}).then(function(r){
     if(!r.ok)throw new Error('TTS failed');return r.blob();
@@ -427,42 +420,42 @@ function speakText(text){
       hdrAv.classList.remove('speaking');
       URL.revokeObjectURL(url);
       currentAudio=null;
-      boriSpeaking=false;
-      // Voice mode: Bori finished speaking, mic stays open
+      setBoriSpeaking(false);
+      if(voiceModeActive){inp.placeholder=lang==='es'?'🎙 Escuchando...':'🎙 Listening...';}
     };
     currentAudio.onerror=function(){
       hdrAv.classList.remove('speaking');
       currentAudio=null;
-      boriSpeaking=false;
+      setBoriSpeaking(false);
     };
     currentAudio.play().catch(function(){
       hdrAv.classList.remove('speaking');
-      boriSpeaking=false;
+      setBoriSpeaking(false);
     });
   }).catch(function(err){
     console.error('TTS error:',err);
     hdrAv.classList.remove('speaking');
-    boriSpeaking=false;
+    setBoriSpeaking(false);
   });
 }
-function stopAudio(){if(currentAudio){currentAudio.pause();currentAudio.currentTime=0;currentAudio=null;}hdrAv.classList.remove('speaking');boriSpeaking=false;}
+function stopAudio(){if(currentAudio){currentAudio.pause();currentAudio.currentTime=0;currentAudio=null;}hdrAv.classList.remove('speaking');setBoriSpeaking(false);}
 
 function addReplayBtn(el,text){var btn=document.createElement('button');btn.className='replay-btn';btn.innerHTML='🔊';btn.onclick=function(e){e.stopPropagation();playTTS(text);};el.appendChild(btn);}
 function updateReplayButtons(){}
 function playTTS(text){
   stopAudio();
-  boriSpeaking=true;
+  setBoriSpeaking(true);
   hdrAv.classList.add('speaking');
   fetch('/api/voice/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,lang:lang})}).then(function(r){
     if(!r.ok)throw new Error('TTS failed');return r.blob();
   }).then(function(blob){
     var url=URL.createObjectURL(blob);
     currentAudio=new Audio(url);
-    currentAudio.onended=function(){hdrAv.classList.remove('speaking');URL.revokeObjectURL(url);currentAudio=null;boriSpeaking=false;};
-    currentAudio.onerror=function(){hdrAv.classList.remove('speaking');currentAudio=null;boriSpeaking=false;};
-    currentAudio.play().catch(function(){hdrAv.classList.remove('speaking');boriSpeaking=false;});
+    currentAudio.onended=function(){hdrAv.classList.remove('speaking');URL.revokeObjectURL(url);currentAudio=null;setBoriSpeaking(false);};
+    currentAudio.onerror=function(){hdrAv.classList.remove('speaking');currentAudio=null;setBoriSpeaking(false);};
+    currentAudio.play().catch(function(){hdrAv.classList.remove('speaking');setBoriSpeaking(false);});
   }).catch(function(err){
-    console.error('TTS error:',err);hdrAv.classList.remove('speaking');boriSpeaking=false;
+    console.error('TTS error:',err);hdrAv.classList.remove('speaking');setBoriSpeaking(false);
   });
 }
 function updateVoiceLock(){if(isSubscriber){var b=voiceBtn.querySelector('.voice-lock-badge');if(b)b.remove();voiceBtn.classList.remove('locked');}else{if(!voiceBtn.querySelector('.voice-lock-badge')){var b=document.createElement('span');b.className='voice-lock-badge';b.textContent='🔒';voiceBtn.appendChild(b);}voiceBtn.classList.add('locked');}}
@@ -490,7 +483,6 @@ function closeLimitOverlay(){limitOverlay.className='limit-overlay';}
 function doShare(){var url=window.location.origin;var t=lang==='es'?'Estoy aprendiendo español e inglés con Hey Bori — ¡pruébalo! 🇵🇷 '+url:'I\'m learning Spanish & English with Hey Bori — try it! 🇵🇷 '+url;if(navigator.share){navigator.share({title:'Hey Bori',text:t,url:url}).catch(function(){});}else{navigator.clipboard.writeText(t).then(function(){showToast(lang==='es'?'¡Enlace copiado!':'Link copied!');}).catch(function(){});}}
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show';setTimeout(function(){t.className='toast';},2500);}
 function setLang(l){lang=l;document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');var els=document.querySelectorAll('[data-'+l+']');for(var i=0;i<els.length;i++){var el=els[i],val=el.getAttribute('data-'+l);if(val&&el.tagName==='TEXTAREA')el.placeholder=val;else if(val&&!el.classList.contains('lang-btn'))el.textContent=val;}updateCounter();
-  // If voice mode is active and language changed, reconnect with new language
   if(voiceModeActive){exitVoiceMode();setTimeout(function(){enterVoiceMode();},500);}
 }
 inp.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px';});
@@ -511,13 +503,17 @@ window.doSend=async function(){
 
   busy=true;sendBtn.disabled=true;
   inp.value='';inp.style.height='auto';
-  // Reset any voice-mode styling on input
   inp.style.color='';inp.style.fontStyle='';
 
   addBub('user',text);
   hist.push({role:'user',content:text});
   incMsgCount();updateCounter();
   addDots();stopAudio();
+
+  // In voice mode, show "thinking" state
+  if(voiceModeActive){
+    inp.placeholder=lang==='es'?'💭 Bori está pensando...':'💭 Bori is thinking...';
+  }
 
   try{
     var ctrl=new AbortController();
@@ -550,7 +546,6 @@ window.doSend=async function(){
     if(!fullReply){b.className='bub bub-err';b.textContent=lang==='es'?'No recibí respuesta. Intenta de nuevo.':'No response received. Try again.';}
     if(fullReply){
       addReplayBtn(b,fullReply);
-      // Auto-speak Bori's reply if voice toggle is on
       if(voiceOn)speakText(fullReply);
     }
     hist.push({role:'assistant',content:fullReply});
@@ -562,7 +557,6 @@ window.doSend=async function(){
     addBub('bori',e.name==='AbortError'?(lang==='es'?'Se agotó el tiempo. Intenta de nuevo.':'Request timed out. Try again.'):(lang==='es'?'Problema de conexión. Intenta de nuevo.':'Connection issue. Try again.'),true);
   }
   busy=false;sendBtn.disabled=false;
-  // In voice mode, restore listening indicator
   if(voiceModeActive){
     inp.placeholder=lang==='es'?'🎙 Escuchando...':'🎙 Listening...';
   }else{
