@@ -110,12 +110,11 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);-webkit-font
 .mic-btn.visible{display:flex}
 .mic-btn:hover{border-color:var(--sun);background:var(--sun-light)}
 .mic-btn svg{width:22px;height:22px;fill:var(--text-2);transition:fill .2s}
-.mic-btn.voice-mode{background:var(--green);border-color:var(--green);animation:vm-pulse 1.8s ease-in-out infinite}
-.mic-btn.voice-mode svg{fill:var(--white)}
-@keyframes vm-pulse{0%,100%{box-shadow:0 0 0 0 rgba(42,157,110,0.4)}50%{box-shadow:0 0 0 14px rgba(42,157,110,0)}}
 .mic-btn.recording{background:var(--sun);border-color:var(--sun);animation:mic-pulse 1.5s ease-in-out infinite}
 .mic-btn.recording svg{fill:var(--white)}
 @keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,0.4)}50%{box-shadow:0 0 0 12px rgba(255,107,53,0)}}
+.mic-btn.transcribing{background:var(--green);border-color:var(--green)}
+.mic-btn.transcribing svg{fill:var(--white)}
 .limit-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .limit-overlay.show{display:flex}
 .limit-card{background:var(--white);border-radius:24px;padding:40px 28px;max-width:380px;width:92%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
@@ -175,352 +174,242 @@ var micBtn=document.getElementById('micBtn'),voiceBtn=document.getElementById('v
 var voiceUpgradeTip=document.getElementById('voiceUpgradeTip'),hdrAv=document.getElementById('hdrAv');
 var hist=[],busy=false,lang='en',MAX_MSGS=10,isSubscriber=false;
 var voiceOn=false,currentAudio=null,upgradeTipTimer=null;
-var boriSpeakingTimer=null,sendTimeout=null;
 
-// ── Mobile audio unlock: pre-create Audio element on user gesture ──
-var unlockedAudio=null;
+/* ═══════════════════════════════════════════
+   MOBILE AUDIO UNLOCK
+   Pre-create Audio element on user tap so Safari allows playback later
+   ═══════════════════════════════════════════ */
+var ttsAudio=new Audio();
+var audioUnlocked=false;
+
 function unlockAudio(){
-  if(unlockedAudio)return;
-  unlockedAudio=new Audio();
-  // Play silent to unlock audio context on iOS/Safari
-  unlockedAudio.src='data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAAwAAAbAAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0P///////////////////////////////wAAAABMYXZjNTguMTMAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAbBJJOKEAAAAAAAAAAAAAAAAAAAA/+M4wAAESGl0ACBGBEi2GMYBD/BeD8Pg/B+D9+D/wfg/B+D8H4P//g/B+D8H4Pwf/8H4Pwfg/B+D8H///wfg/B+D8H4Pwf///8H4Pwfg/B+D8H////4Pwfg/B+D8H4P';
-  unlockedAudio.volume=0.01;
-  unlockedAudio.play().then(function(){
-    unlockedAudio.pause();
-    unlockedAudio.volume=1;
-    console.log('[Audio] Unlocked for mobile playback');
-  }).catch(function(e){
-    console.log('[Audio] Unlock attempt:',e.message);
-    unlockedAudio=null;
-  });
+  if(audioUnlocked)return;
+  ttsAudio.src='data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAAwAAAbAAkJCQkJCQkJCQkJCQkJCQkJCQkJCQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ////////////////AAAAAEXDYXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/+M4wAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
+  ttsAudio.volume=0.01;
+  ttsAudio.play().then(function(){
+    ttsAudio.pause();
+    ttsAudio.volume=1;
+    ttsAudio.currentTime=0;
+    audioUnlocked=true;
+    console.log('[Audio] Unlocked');
+  }).catch(function(){});
 }
 
 /* ═══════════════════════════════════════════
-   VOICE MODE — WebSocket Realtime STT Engine
-   PATCHED: no wild text, reliable auto-send, boriSpeaking safety
+   VOICE MODE — Push-to-Talk with REST STT
+   Simple: tap mic → record → tap again → transcribe → send → Bori speaks
+   No WebSocket complexity. No interim results. Just works.
    ═══════════════════════════════════════════ */
-var voiceModeActive=false;
-var sttWS=null;
+var isRecording=false;
+var mediaRecorder=null;
+var audioChunks=[];
 var micStream=null;
-var audioCtx=null;
-var scriptNode=null;
-var micSource=null;
-var savedPlaceholder='';
-var boriSpeaking=false;
-var lastFinalText='';
+var silenceTimer=null;
+var analyser=null;
+var silenceStart=null;
 
-// ── Float32 → Int16 PCM conversion ──
-function floatTo16BitPCM(float32Array){
-  var buf=new ArrayBuffer(float32Array.length*2);
-  var view=new DataView(buf);
-  for(var i=0;i<float32Array.length;i++){
-    var s=Math.max(-1,Math.min(1,float32Array[i]));
-    view.setInt16(i*2,s<0?s*0x8000:s*0x7FFF,true);
-  }
-  return buf;
-}
-
-// ── Safety wrapper: reset boriSpeaking if stuck ──
-function setBoriSpeaking(val){
-  boriSpeaking=val;
-  if(boriSpeakingTimer){clearTimeout(boriSpeakingTimer);boriSpeakingTimer=null;}
-  if(val){
-    boriSpeakingTimer=setTimeout(function(){
-      console.warn('[Voice] boriSpeaking safety reset after 15s');
-      boriSpeaking=false;
-      hdrAv.classList.remove('speaking');
-      if(currentAudio){try{currentAudio.pause();}catch(e){}}
-      currentAudio=null;
-    },15000);
-  }
-}
-
-// ── Auto-send accumulated final text ──
-var pendingVoiceText='';  // queued text if busy
-var pendingVoiceCheck=null;
-
-function voiceAutoSend(){
-  if(sendTimeout){clearTimeout(sendTimeout);sendTimeout=null;}
-  var text=lastFinalText.trim();
-  lastFinalText='';
-  if(!text||text.length<2)return;
-  if(isLimitReached())return;
-
-  if(busy){
-    // Queue it — will send when Bori finishes responding
-    console.log('[Voice] Busy, queuing:',text);
-    pendingVoiceText=text;
-    inp.placeholder=lang==='es'?'💭 Esperando a Bori...':'💭 Waiting for Bori...';
-    if(!pendingVoiceCheck){
-      pendingVoiceCheck=setInterval(function(){
-        if(!busy&&pendingVoiceText){
-          var queued=pendingVoiceText;
-          pendingVoiceText='';
-          clearInterval(pendingVoiceCheck);
-          pendingVoiceCheck=null;
-          console.log('[Voice] Sending queued:',queued);
-          inp.value=queued;
-          doSend();
-        }
-      },300);
-    }
-    return;
-  }
-
-  console.log('[Voice] Auto-sending:',text);
-  inp.value=text;
-  inp.style.color='';
-  inp.style.fontStyle='';
-  doSend();
-}
-
-// ── Fallback timer: send if UtteranceEnd doesn't fire ──
-function scheduleSendTimeout(){
-  if(sendTimeout)clearTimeout(sendTimeout);
-  sendTimeout=setTimeout(function(){
-    if(lastFinalText.trim().length>1){
-      console.log('[Voice] Fallback send (no UtteranceEnd)');
-      voiceAutoSend();
-    }
-  },2000);
-}
-
-// ── Enter voice mode ──
-async function enterVoiceMode(){
-  if(voiceModeActive)return;
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
-    showToast(lang==='es'?'Tu navegador no soporta micrófono':'Your browser doesn\'t support microphone');
-    return;
-  }
-
+async function startRecording(){
   try{
     micStream=await navigator.mediaDevices.getUserMedia({
-      audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1,sampleRate:16000}
+      audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}
     });
 
-    audioCtx=new(window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
-    micSource=audioCtx.createMediaStreamSource(micStream);
-    scriptNode=audioCtx.createScriptProcessor(4096,1,1);
+    // Set up silence detection
+    var actx=new(window.AudioContext||window.webkitAudioContext)();
+    var source=actx.createMediaStreamSource(micStream);
+    analyser=actx.createAnalyser();
+    analyser.fftSize=512;
+    source.connect(analyser);
+    silenceStart=null;
 
-    var wsProto=location.protocol==='https:'?'wss:':'ws:';
-    var wsUrl=wsProto+'//'+location.host+'/ws/deepgram-stt?lang='+lang;
+    // Check for silence every 200ms — auto-stop after 2s of silence
+    silenceTimer=setInterval(function(){
+      if(!isRecording)return;
+      var data=new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(data);
+      var avg=0;for(var i=0;i<data.length;i++)avg+=data[i];
+      avg/=data.length;
 
-    sttWS=new WebSocket(wsUrl);
-    sttWS.binaryType='arraybuffer';
-
-    sttWS.onopen=function(){
-      console.log('[Deepgram] WebSocket proxy connected');
-    };
-
-    sttWS.onmessage=function(evt){
-      try{
-        var msg=JSON.parse(evt.data);
-
-        if(msg.type==='connected'){
-          console.log('[Deepgram] Upstream ready');
-          voiceModeActive=true;
-          micBtn.classList.add('voice-mode');
-          savedPlaceholder=inp.placeholder;
-          inp.placeholder=lang==='es'?'🎙 Escuchando...':'🎙 Listening...';
-          inp.value='';
-          showToast(lang==='es'?'🎙 Modo voz activado':'🎙 Voice mode on');
-
-          scriptNode.onaudioprocess=function(e){
-            if(!voiceModeActive||!sttWS||sttWS.readyState!==WebSocket.OPEN)return;
-            if(boriSpeaking)return;
-            var inputData=e.inputBuffer.getChannelData(0);
-            var pcmBuffer=floatTo16BitPCM(inputData);
-            sttWS.send(pcmBuffer);
-          };
-          micSource.connect(scriptNode);
-          scriptNode.connect(audioCtx.destination);
-
-          if(!voiceOn){voiceOn=true;voiceBtn.classList.toggle('on',true);try{localStorage.setItem('bori-voice','1');}catch(e){}}
-          return;
+      if(avg<8){ // silence threshold
+        if(!silenceStart)silenceStart=Date.now();
+        else if(Date.now()-silenceStart>2000){
+          // 2 seconds of silence — auto-stop
+          console.log('[Mic] Auto-stop after silence');
+          stopAndTranscribe();
         }
-
-        // Deepgram transcription results
-        if(msg.type==='Results'&&msg.channel){
-          var alt=msg.channel.alternatives&&msg.channel.alternatives[0];
-          if(!alt)return;
-          var transcript=alt.transcript||'';
-
-          if(!msg.is_final){
-            // ── INTERIM: show in placeholder only (NO inp.value changes) ──
-            if(transcript){
-              inp.placeholder=lang==='es'?'🎙 '+transcript.slice(0,50):'🎙 '+transcript.slice(0,50);
-            }
-          } else {
-            // ── FINAL: accumulate, don't send yet (wait for UtteranceEnd) ──
-            if(transcript&&transcript.length>1){
-              if(lastFinalText){
-                lastFinalText=lastFinalText+' '+transcript;
-              }else{
-                lastFinalText=transcript;
-              }
-              inp.placeholder='🎙 '+lastFinalText.slice(0,50)+(lastFinalText.length>50?'…':'');
-              console.log('[Deepgram] Final:',transcript,'| Total:',lastFinalText);
-              scheduleSendTimeout();
-            }
-          }
-        }
-
-        // UtteranceEnd → send accumulated text now
-        if(msg.type==='UtteranceEnd'){
-          console.log('[Deepgram] UtteranceEnd');
-          if(lastFinalText&&lastFinalText.trim().length>1){
-            voiceAutoSend();
-          }
-        }
-
-        if(msg.type==='error'){
-          console.error('[Deepgram] Error:',msg.message);
-          showToast(lang==='es'?'Error de voz — intenta de nuevo':'Voice error — try again');
-          exitVoiceMode();
-        }
-
-        if(msg.type==='Metadata'){
-          console.log('[Deepgram] Session metadata received');
-        }
-      }catch(parseErr){
-        console.error('[Deepgram] Parse error:',parseErr);
+      }else{
+        silenceStart=null; // reset on speech
       }
+    },200);
+
+    // Use webm/opus if available, fallback to wav
+    var mimeType='audio/webm;codecs=opus';
+    if(!MediaRecorder.isTypeSupported(mimeType)){
+      mimeType='audio/webm';
+      if(!MediaRecorder.isTypeSupported(mimeType))mimeType='audio/mp4';
+      if(!MediaRecorder.isTypeSupported(mimeType))mimeType='';
+    }
+
+    var options=mimeType?{mimeType:mimeType}:{};
+    mediaRecorder=new MediaRecorder(micStream,options);
+    audioChunks=[];
+
+    mediaRecorder.ondataavailable=function(e){
+      if(e.data.size>0)audioChunks.push(e.data);
     };
 
-    sttWS.onerror=function(err){
-      console.error('[Deepgram] WebSocket error:',err);
-    };
+    mediaRecorder.onstop=function(){
+      // Cleanup mic
+      if(silenceTimer){clearInterval(silenceTimer);silenceTimer=null;}
+      if(micStream){micStream.getTracks().forEach(function(t){t.stop();});micStream=null;}
+      if(actx.state!=='closed')try{actx.close();}catch(e){}
 
-    sttWS.onclose=function(evt){
-      console.log('[Deepgram] WebSocket closed:',evt.code,evt.reason);
-      if(voiceModeActive){
-        voiceModeActive=false;
-        cleanupVoiceMode();
-        showToast(lang==='es'?'Conexión de voz perdida':'Voice connection lost');
+      if(audioChunks.length===0){
+        micBtn.classList.remove('recording','transcribing');
+        isRecording=false;
+        return;
       }
+
+      // Transcribe
+      micBtn.classList.remove('recording');
+      micBtn.classList.add('transcribing');
+      inp.placeholder=lang==='es'?'✨ Transcribiendo...':'✨ Transcribing...';
+
+      var blob=new Blob(audioChunks,{type:mediaRecorder.mimeType||'audio/webm'});
+      transcribeAudio(blob);
     };
+
+    mediaRecorder.start(250); // collect chunks every 250ms
+    isRecording=true;
+    micBtn.classList.add('recording');
+    inp.placeholder=lang==='es'?'🎙 Hablando... toca para enviar':'🎙 Speaking... tap to send';
+    stopAudio(); // stop any playing audio
+
+    // Auto-enable voice toggle
+    if(!voiceOn){voiceOn=true;voiceBtn.classList.toggle('on',true);try{localStorage.setItem('bori-voice','1');}catch(e){}}
 
   }catch(err){
-    console.error('[Voice Mode] Error:',err);
-    cleanupVoiceMode();
+    console.error('[Mic]',err);
+    isRecording=false;
+    micBtn.classList.remove('recording');
     if(err.name==='NotAllowedError'){
       showToast(lang==='es'?'Permite el micrófono en ajustes':'Allow microphone in settings');
     }else{
-      showToast(lang==='es'?'Error al activar voz':'Voice activation error');
+      showToast(lang==='es'?'Error de micrófono':'Microphone error');
     }
   }
 }
 
-function exitVoiceMode(){
-  voiceModeActive=false;
-  cleanupVoiceMode();
-  showToast(lang==='es'?'🎙 Modo voz desactivado':'🎙 Voice mode off');
+function stopAndTranscribe(){
+  if(!isRecording||!mediaRecorder)return;
+  isRecording=false;
+  try{mediaRecorder.stop();}catch(e){}
 }
 
-function cleanupVoiceMode(){
-  voiceModeActive=false;
-  if(sendTimeout){clearTimeout(sendTimeout);sendTimeout=null;}
-  if(pendingVoiceCheck){clearInterval(pendingVoiceCheck);pendingVoiceCheck=null;}
-  pendingVoiceText='';
-  if(sttWS){try{sttWS.close();}catch(e){}sttWS=null;}
-  if(scriptNode){try{scriptNode.disconnect();}catch(e){}scriptNode.onaudioprocess=null;scriptNode=null;}
-  if(micSource){try{micSource.disconnect();}catch(e){}micSource=null;}
-  if(audioCtx){try{audioCtx.close();}catch(e){}audioCtx=null;}
-  if(micStream){micStream.getTracks().forEach(function(t){t.stop();});micStream=null;}
-  micBtn.classList.remove('voice-mode');
-  inp.style.color='';inp.style.fontStyle='';inp.value='';
-  lastFinalText='';
-  if(savedPlaceholder)inp.placeholder=savedPlaceholder;
-  if(boriSpeakingTimer){clearTimeout(boriSpeakingTimer);boriSpeakingTimer=null;}
+async function transcribeAudio(blob){
+  try{
+    // Send to our server endpoint which proxies to Deepgram REST API
+    var formData=new FormData();
+    formData.append('audio',blob,'recording.webm');
+    formData.append('lang',lang);
+
+    var res=await fetch('/api/voice/stt',{method:'POST',body:formData});
+    var data=await res.json();
+
+    micBtn.classList.remove('transcribing');
+    inp.placeholder=lang==='es'?'Escribe un mensaje...':'Type a message...';
+
+    if(data.transcript&&data.transcript.trim().length>1){
+      console.log('[STT]',data.transcript);
+      inp.value=data.transcript;
+      doSend(); // auto-send
+    }else{
+      showToast(lang==='es'?'No te escuché. Intenta de nuevo.':'Didn\'t catch that. Try again.');
+    }
+  }catch(err){
+    console.error('[STT]',err);
+    micBtn.classList.remove('transcribing');
+    inp.placeholder=lang==='es'?'Escribe un mensaje...':'Type a message...';
+    showToast(lang==='es'?'Error de transcripción':'Transcription error');
+  }
 }
 
 function toggleMic(){
-  unlockAudio(); // unlock audio on user gesture for mobile
+  unlockAudio();
   if(!isSubscriber){showUpgradeTip();return;}
   if(isLimitReached()){showLimitOverlay();return;}
-  if(busy&&!voiceModeActive)return;
-  if(voiceModeActive){exitVoiceMode();}else{enterVoiceMode();}
+  if(busy&&!isRecording)return;
+
+  if(isRecording){
+    stopAndTranscribe();
+  }else{
+    startRecording();
+  }
 }
 
 /* ═══════════════════════════════════════
    VOICE TOGGLE (auto-speak on/off)
    ═══════════════════════════════════════ */
-function toggleVoice(){if(!isSubscriber){showUpgradeTip();return;}voiceOn=!voiceOn;voiceBtn.classList.toggle('on',voiceOn);if(voiceOn){showToast(lang==='es'?'🔊 Voz automática activada':'🔊 Auto-voice on');}else{showToast(lang==='es'?'🔇 Voz automática desactivada':'🔇 Auto-voice off');stopAudio();if(voiceModeActive)exitVoiceMode();}try{localStorage.setItem('bori-voice',voiceOn?'1':'0');}catch(e){}}
+function toggleVoice(){
+  unlockAudio();
+  if(!isSubscriber){showUpgradeTip();return;}
+  voiceOn=!voiceOn;voiceBtn.classList.toggle('on',voiceOn);
+  if(voiceOn){showToast(lang==='es'?'🔊 Voz activada':'🔊 Voice on');}
+  else{showToast(lang==='es'?'🔇 Voz desactivada':'🔇 Voice off');stopAudio();}
+  try{localStorage.setItem('bori-voice',voiceOn?'1':'0');}catch(e){}
+}
 function showUpgradeTip(){if(upgradeTipTimer)clearTimeout(upgradeTipTimer);voiceUpgradeTip.classList.add('show');upgradeTipTimer=setTimeout(function(){voiceUpgradeTip.classList.remove('show');},3500);}
 document.addEventListener('click',function(e){if(!e.target.closest('.voice-toggle'))voiceUpgradeTip.classList.remove('show');});
 
 /* ═══════════════════════════════════════
-   TTS — Bori speaks (PATCHED: setBoriSpeaking safety)
+   TTS — Bori speaks (uses pre-unlocked Audio element)
    ═══════════════════════════════════════ */
+var boriSpeaking=false;
+
 function speakText(text){
-  console.log('[TTS] speakText called, voiceOn=',voiceOn,'text length=',text.length);
   if(!voiceOn)return;
   stopAudio();
-  setBoriSpeaking(true);
+  boriSpeaking=true;
   hdrAv.classList.add('speaking');
+
   fetch('/api/voice/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,lang:lang})}).then(function(r){
-    if(!r.ok)throw new Error('TTS failed '+r.status);return r.blob();
+    if(!r.ok)throw new Error('TTS '+r.status);return r.blob();
   }).then(function(blob){
     var url=URL.createObjectURL(blob);
-    // Use unlocked audio element if available (mobile Safari), otherwise create new
-    var audio=unlockedAudio||new Audio();
-    currentAudio=audio;
-    audio.onended=function(){
+    ttsAudio.onended=function(){
       hdrAv.classList.remove('speaking');
       URL.revokeObjectURL(url);
-      currentAudio=null;
-      setBoriSpeaking(false);
-      if(voiceModeActive){inp.placeholder=lang==='es'?'🎙 Escuchando...':'🎙 Listening...';}
+      boriSpeaking=false;
     };
-    audio.onerror=function(e){
-      console.error('[TTS] Audio error:',e);
+    ttsAudio.onerror=function(){
       hdrAv.classList.remove('speaking');
-      currentAudio=null;
-      setBoriSpeaking(false);
+      boriSpeaking=false;
     };
-    audio.src=url;
-    audio.volume=1;
-    var playPromise=audio.play();
-    if(playPromise){
-      playPromise.then(function(){
-        console.log('[TTS] Playing audio');
-      }).catch(function(e){
-        console.error('[TTS] Play blocked:',e.message);
-        hdrAv.classList.remove('speaking');
-        setBoriSpeaking(false);
-        // Show manual play button as fallback
-        showToast(lang==='es'?'Toca 🔊 en el mensaje para escuchar':'Tap 🔊 on the message to hear it');
-      });
-    }
+    ttsAudio.src=url;
+    ttsAudio.currentTime=0;
+    ttsAudio.volume=1;
+    ttsAudio.play().then(function(){
+      console.log('[TTS] Playing');
+    }).catch(function(e){
+      console.error('[TTS] Play blocked:',e.message);
+      hdrAv.classList.remove('speaking');
+      boriSpeaking=false;
+    });
   }).catch(function(err){
-    console.error('[TTS] Fetch error:',err);
+    console.error('[TTS]',err);
     hdrAv.classList.remove('speaking');
-    setBoriSpeaking(false);
+    boriSpeaking=false;
   });
 }
-function stopAudio(){if(currentAudio){currentAudio.pause();try{currentAudio.currentTime=0;}catch(e){}currentAudio=null;}hdrAv.classList.remove('speaking');setBoriSpeaking(false);}
 
-function addReplayBtn(el,text){var btn=document.createElement('button');btn.className='replay-btn';btn.innerHTML='🔊';btn.onclick=function(e){e.stopPropagation();playTTS(text);};el.appendChild(btn);}
-function updateReplayButtons(){}
-function playTTS(text){
-  stopAudio();
-  setBoriSpeaking(true);
-  hdrAv.classList.add('speaking');
-  fetch('/api/voice/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,lang:lang})}).then(function(r){
-    if(!r.ok)throw new Error('TTS failed');return r.blob();
-  }).then(function(blob){
-    var url=URL.createObjectURL(blob);
-    var audio=unlockedAudio||new Audio();
-    currentAudio=audio;
-    audio.onended=function(){hdrAv.classList.remove('speaking');URL.revokeObjectURL(url);currentAudio=null;setBoriSpeaking(false);};
-    audio.onerror=function(){hdrAv.classList.remove('speaking');currentAudio=null;setBoriSpeaking(false);};
-    audio.src=url;
-    audio.volume=1;
-    audio.play().catch(function(e){console.error('[TTS] Play error:',e);hdrAv.classList.remove('speaking');setBoriSpeaking(false);});
-  }).catch(function(err){
-    console.error('TTS error:',err);hdrAv.classList.remove('speaking');setBoriSpeaking(false);
-  });
+function stopAudio(){
+  try{ttsAudio.pause();ttsAudio.currentTime=0;}catch(e){}
+  hdrAv.classList.remove('speaking');
+  boriSpeaking=false;
 }
+
+function addReplayBtn(el,text){var btn=document.createElement('button');btn.className='replay-btn';btn.innerHTML='🔊';btn.onclick=function(e){e.stopPropagation();unlockAudio();speakText(text);};el.appendChild(btn);}
+
 function updateVoiceLock(){if(isSubscriber){var b=voiceBtn.querySelector('.voice-lock-badge');if(b)b.remove();voiceBtn.classList.remove('locked');}else{if(!voiceBtn.querySelector('.voice-lock-badge')){var b=document.createElement('span');b.className='voice-lock-badge';b.textContent='🔒';voiceBtn.appendChild(b);}voiceBtn.classList.add('locked');}}
 function restoreVoicePref(){if(!isSubscriber)return;micBtn.classList.add('visible');try{if(localStorage.getItem('bori-voice')==='1'){voiceOn=true;voiceBtn.classList.add('on');}}catch(e){}}
 
@@ -541,13 +430,11 @@ function isLimitReached(){return getMsgCount()>=MAX_MSGS;}
 function updateCounter(){var count=getMsgCount(),rem=MAX_MSGS-count;document.getElementById('counterText').innerHTML=lang==='es'?'<span class="count">'+count+'</span> / '+MAX_MSGS+' mensajes hoy':'<span class="count">'+count+'</span> / '+MAX_MSGS+' messages today';counterBar.className=rem<=2&&rem>0?'counter-bar low':'counter-bar';if(isLimitReached()){inputBar.className='input-bar disabled';inp.placeholder=lang==='es'?'Límite diario alcanzado':'Daily limit reached';}else{inputBar.className='input-bar';inp.placeholder=lang==='es'?'Escribe un mensaje...':'Type a message...';}}
 function getTimeToMidnight(){var now=new Date(),mn=new Date(now);mn.setHours(24,0,0,0);var d=mn-now;var h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);return(h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;}
 setInterval(function(){document.getElementById('limitTimer').textContent=getTimeToMidnight();if(!isLimitReached()&&limitOverlay.classList.contains('show')){closeLimitOverlay();updateCounter();}},1000);
-function showLimitOverlay(){limitOverlay.className='limit-overlay show';if(voiceModeActive)exitVoiceMode();}
+function showLimitOverlay(){limitOverlay.className='limit-overlay show';if(isRecording)stopAndTranscribe();}
 function closeLimitOverlay(){limitOverlay.className='limit-overlay';}
 function doShare(){var url=window.location.origin;var t=lang==='es'?'Estoy aprendiendo español e inglés con Hey Bori — ¡pruébalo! 🇵🇷 '+url:'I\'m learning Spanish & English with Hey Bori — try it! 🇵🇷 '+url;if(navigator.share){navigator.share({title:'Hey Bori',text:t,url:url}).catch(function(){});}else{navigator.clipboard.writeText(t).then(function(){showToast(lang==='es'?'¡Enlace copiado!':'Link copied!');}).catch(function(){});}}
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show';setTimeout(function(){t.className='toast';},2500);}
-function setLang(l){lang=l;document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');var els=document.querySelectorAll('[data-'+l+']');for(var i=0;i<els.length;i++){var el=els[i],val=el.getAttribute('data-'+l);if(val&&el.tagName==='TEXTAREA')el.placeholder=val;else if(val&&!el.classList.contains('lang-btn'))el.textContent=val;}updateCounter();
-  if(voiceModeActive){exitVoiceMode();setTimeout(function(){enterVoiceMode();},500);}
-}
+function setLang(l){lang=l;document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');var els=document.querySelectorAll('[data-'+l+']');for(var i=0;i<els.length;i++){var el=els[i],val=el.getAttribute('data-'+l);if(val&&el.tagName==='TEXTAREA')el.placeholder=val;else if(val&&!el.classList.contains('lang-btn'))el.textContent=val;}updateCounter();}
 inp.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px';});
 inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}});
 
@@ -566,17 +453,11 @@ window.doSend=async function(){
 
   busy=true;sendBtn.disabled=true;
   inp.value='';inp.style.height='auto';
-  inp.style.color='';inp.style.fontStyle='';
 
   addBub('user',text);
   hist.push({role:'user',content:text});
   incMsgCount();updateCounter();
   addDots();stopAudio();
-
-  // In voice mode, show "thinking" state
-  if(voiceModeActive){
-    inp.placeholder=lang==='es'?'💭 Bori está pensando...':'💭 Bori is thinking...';
-  }
 
   try{
     var ctrl=new AbortController();
@@ -609,7 +490,7 @@ window.doSend=async function(){
     if(!fullReply){b.className='bub bub-err';b.textContent=lang==='es'?'No recibí respuesta. Intenta de nuevo.':'No response received. Try again.';}
     if(fullReply){
       addReplayBtn(b,fullReply);
-      if(voiceOn){console.log('[doSend] Calling speakText, voiceOn=true');speakText(fullReply);}else{console.log('[doSend] voiceOn is false, skipping TTS');}
+      if(voiceOn)speakText(fullReply);
     }
     hist.push({role:'assistant',content:fullReply});
     if(hist.length>40)hist=hist.slice(-40);
@@ -619,12 +500,7 @@ window.doSend=async function(){
     killDots();
     addBub('bori',e.name==='AbortError'?(lang==='es'?'Se agotó el tiempo. Intenta de nuevo.':'Request timed out. Try again.'):(lang==='es'?'Problema de conexión. Intenta de nuevo.':'Connection issue. Try again.'),true);
   }
-  busy=false;sendBtn.disabled=false;
-  if(voiceModeActive){
-    inp.placeholder=lang==='es'?'🎙 Escuchando...':'🎙 Listening...';
-  }else{
-    inp.focus();
-  }
+  busy=false;sendBtn.disabled=false;inp.focus();
 };
 
 updateCounter();updateVoiceLock();if(isLimitReached())showLimitOverlay();
