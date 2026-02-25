@@ -179,37 +179,17 @@ var hist=[],busy=false,lang='en',MAX_MSGS=10,isSubscriber=false;
 var voiceOn=false,currentAudio=null,upgradeTipTimer=null;
 
 /* ═══════════════════════════════════════════
-   VOICE MODE — WebSocket Realtime STT Engine
+   VOICE MODE — Deepgram WebSocket Realtime STT
    ═══════════════════════════════════════════ */
 var voiceModeActive=false;    // true = continuous listening mode ON
-var scribeWS=null;            // WebSocket to ElevenLabs Scribe
+var dgWS=null;                // WebSocket to Deepgram
 var micStream=null;           // getUserMedia stream
-var audioCtx=null;            // AudioContext for PCM conversion
-var scriptNode=null;          // ScriptProcessorNode
-var micSource=null;           // MediaStreamSource
-var partialText='';           // current partial transcript
+var mediaRec=null;            // MediaRecorder for audio chunks
+var partialText='';           // current interim transcript
 var savedPlaceholder='';      // original placeholder to restore
 var boriSpeaking=false;       // true while TTS audio is playing
 var waitingForBori=false;     // true while waiting for Bori's response
-
-// ── Float32 → Int16 PCM conversion ──
-function floatTo16BitPCM(float32Array){
-  var buf=new ArrayBuffer(float32Array.length*2);
-  var view=new DataView(buf);
-  for(var i=0;i<float32Array.length;i++){
-    var s=Math.max(-1,Math.min(1,float32Array[i]));
-    view.setInt16(i*2,s<0?s*0x8000:s*0x7FFF,true);
-  }
-  return buf;
-}
-
-// ── ArrayBuffer → base64 ──
-function arrayBufferToBase64(buffer){
-  var bytes=new Uint8Array(buffer);
-  var binary='';
-  for(var i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);
-  return btoa(binary);
-}
+var dgKeepAlive=null;         // KeepAlive interval
 
 // ── Enter voice mode ──
 async function enterVoiceMode(){
@@ -227,8 +207,8 @@ async function enterVoiceMode(){
       try{localStorage.setItem('bori-voice','1');}catch(e){}
     }
 
-    // 1. Get scribe token from server
-    var tokenRes=await fetch('/api/voice/scribe-token');
+    // 1. Get Deepgram temp token from server
+    var tokenRes=await fetch('/api/voice/deepgram-token');
     if(!tokenRes.ok)throw new Error('Token fetch failed');
     var tokenData=await tokenRes.json();
     if(!tokenData.token)throw new Error('No token returned');
@@ -238,27 +218,25 @@ async function enterVoiceMode(){
       audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1,sampleRate:16000}
     });
 
-    // 3. Set up AudioContext for PCM extraction
-    audioCtx=new(window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
-    micSource=audioCtx.createMediaStreamSource(micStream);
-    // ScriptProcessorNode: 4096 samples buffer, 1 input channel, 1 output channel
-    scriptNode=audioCtx.createScriptProcessor(4096,1,1);
+    // 3. Build Deepgram WebSocket URL with params
+    var dgLang=lang==='es'?'es':'en';
+    var wsUrl='wss://api.deepgram.com/v1/listen'
+      +'?model=nova-3'
+      +'&language='+dgLang
+      +'&smart_format=true'
+      +'&punctuate=true'
+      +'&interim_results=true'
+      +'&utterance_end_ms=1500'
+      +'&vad_events=true'
+      +'&endpointing=400'
+      +'&encoding=linear16'
+      +'&sample_rate=16000';
 
-    // 4. Open WebSocket to ElevenLabs Scribe Realtime
-    var langCode=lang==='es'?'spa':'eng';
-    var wsUrl='wss://api.elevenlabs.io/v1/speech-to-text/realtime'
-      +'?model_id=scribe_v2_realtime'
-      +'&token='+encodeURIComponent(tokenData.token)
-      +'&language_code='+langCode
-      +'&commit_strategy=vad'
-      +'&vad_silence_threshold_secs=1.5'
-      +'&sample_rate=16000'
-      +'&audio_format=pcm_16000';
+    // 4. Open WebSocket — auth via protocol header
+    dgWS=new WebSocket(wsUrl,['token',tokenData.token]);
 
-    scribeWS=new WebSocket(wsUrl);
-
-    scribeWS.onopen=function(){
-      console.log('[Scribe] WebSocket connected');
+    dgWS.onopen=function(){
+      console.log('[Deepgram] WebSocket connected');
       voiceModeActive=true;
       micBtn.classList.add('voice-mode');
       savedPlaceholder=inp.placeholder;
@@ -266,76 +244,108 @@ async function enterVoiceMode(){
       inp.value='';
       showToast(lang==='es'?'🎙 Modo voz activado':'🎙 Voice mode on');
 
-      // Start sending audio chunks
-      scriptNode.onaudioprocess=function(e){
-        if(!voiceModeActive||!scribeWS||scribeWS.readyState!==WebSocket.OPEN)return;
+      // Start MediaRecorder to capture audio chunks
+      // Use AudioContext to get raw PCM (linear16) data
+      var audioCtx=new(window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
+      var source=audioCtx.createMediaStreamSource(micStream);
+      var processor=audioCtx.createScriptProcessor(4096,1,1);
+
+      processor.onaudioprocess=function(e){
+        if(!voiceModeActive||!dgWS||dgWS.readyState!==WebSocket.OPEN)return;
         // Don't send audio while Bori is speaking (echo cancellation backup)
         if(boriSpeaking)return;
-        var inputData=e.inputBuffer.getChannelData(0);
-        var pcmBuffer=floatTo16BitPCM(inputData);
-        var base64=arrayBufferToBase64(pcmBuffer);
-        scribeWS.send(JSON.stringify({
-          message_type:'input_audio_chunk',
-          audio_base_64:base64,
-          sample_rate:16000
-        }));
+        var float32=e.inputBuffer.getChannelData(0);
+        // Convert Float32 → Int16 PCM
+        var buf=new ArrayBuffer(float32.length*2);
+        var view=new DataView(buf);
+        for(var i=0;i<float32.length;i++){
+          var s=Math.max(-1,Math.min(1,float32[i]));
+          view.setInt16(i*2,s<0?s*0x8000:s*0x7FFF,true);
+        }
+        // Deepgram accepts raw binary — send ArrayBuffer directly
+        dgWS.send(buf);
       };
-      micSource.connect(scriptNode);
-      scriptNode.connect(audioCtx.destination);
+
+      source.connect(processor);
+      processor.connect(audioCtx.destination);
+
+      // Store refs for cleanup
+      dgWS._audioCtx=audioCtx;
+      dgWS._source=source;
+      dgWS._processor=processor;
+
+      // KeepAlive every 8s to prevent timeout
+      dgKeepAlive=setInterval(function(){
+        if(dgWS&&dgWS.readyState===WebSocket.OPEN){
+          dgWS.send(JSON.stringify({type:'KeepAlive'}));
+        }
+      },8000);
     };
 
-    scribeWS.onmessage=function(evt){
+    dgWS.onmessage=function(evt){
       try{
         var msg=JSON.parse(evt.data);
 
-        if(msg.message_type==='partial_transcript'){
-          // Show live partial text in gray italic
-          partialText=msg.text||'';
-          if(partialText){
-            inp.value=partialText;
-            inp.style.color='var(--text-3)';
-            inp.style.fontStyle='italic';
+        if(msg.type==='Results'){
+          var alt=msg.channel&&msg.channel.alternatives&&msg.channel.alternatives[0];
+          var transcript=alt?alt.transcript:'';
+
+          if(!msg.is_final){
+            // Interim result — show as gray italic partial
+            if(transcript){
+              partialText=transcript;
+              inp.value=partialText;
+              inp.style.color='var(--text-3)';
+              inp.style.fontStyle='italic';
+            }
+          } else {
+            // Final result for this segment
+            if(transcript){
+              partialText='';
+              inp.style.color='';
+              inp.style.fontStyle='';
+
+              // speech_final=true means utterance complete (VAD silence detected)
+              if(msg.speech_final){
+                console.log('[Deepgram] Speech final:',transcript);
+                inp.value=transcript;
+                doSend();
+              } else {
+                // is_final but not speech_final — segment boundary, keep accumulating
+                inp.value=transcript;
+                inp.style.color='var(--text-3)';
+                inp.style.fontStyle='italic';
+              }
+            }
           }
         }
-        else if(msg.message_type==='committed_transcript'){
-          // VAD detected silence — final transcript ready
-          var finalText=(msg.text||'').trim();
-          console.log('[Scribe] Committed:',finalText);
-
-          // Reset input styling
-          inp.style.color='';
-          inp.style.fontStyle='';
-          inp.value='';
-          partialText='';
-
-          if(finalText&&finalText.length>1){
-            // Auto-send the transcribed message
-            inp.value=finalText;
+        else if(msg.type==='UtteranceEnd'){
+          // Utterance ended — if there's accumulated text, send it
+          var accumulated=(inp.value||'').trim();
+          if(accumulated&&accumulated.length>1&&inp.style.fontStyle==='italic'){
+            console.log('[Deepgram] UtteranceEnd send:',accumulated);
+            inp.style.color='';
+            inp.style.fontStyle='';
             doSend();
           }
         }
-        else if(msg.message_type==='session_started'){
-          console.log('[Scribe] Session started:',msg.session_id);
+        else if(msg.type==='Metadata'){
+          console.log('[Deepgram] Session metadata received');
         }
-        else if(msg.message_type&&msg.message_type.includes('error')){
-          console.error('[Scribe] Error:',msg);
-          // Don't kill voice mode on transient errors
-          if(msg.message_type==='scribe_auth_error'||msg.message_type==='scribe_quota_exceeded_error'){
-            showToast(lang==='es'?'Error de voz — intenta de nuevo':'Voice error — try again');
-            exitVoiceMode();
-          }
+        else if(msg.type==='SpeechStarted'){
+          // User started speaking — could reset partial
         }
       }catch(parseErr){
-        console.error('[Scribe] Parse error:',parseErr);
+        console.error('[Deepgram] Parse error:',parseErr);
       }
     };
 
-    scribeWS.onerror=function(err){
-      console.error('[Scribe] WebSocket error:',err);
+    dgWS.onerror=function(err){
+      console.error('[Deepgram] WebSocket error:',err);
     };
 
-    scribeWS.onclose=function(evt){
-      console.log('[Scribe] WebSocket closed:',evt.code,evt.reason);
+    dgWS.onclose=function(evt){
+      console.log('[Deepgram] WebSocket closed:',evt.code,evt.reason);
       // If voice mode is still supposed to be active, it was an unexpected close
       if(voiceModeActive){
         voiceModeActive=false;
@@ -366,27 +376,30 @@ function exitVoiceMode(){
 function cleanupVoiceMode(){
   voiceModeActive=false;
 
-  // Close WebSocket
-  if(scribeWS){
-    try{scribeWS.close();}catch(e){}
-    scribeWS=null;
-  }
+  // Stop KeepAlive
+  if(dgKeepAlive){clearInterval(dgKeepAlive);dgKeepAlive=null;}
 
-  // Disconnect audio nodes
-  if(scriptNode){
-    try{scriptNode.disconnect();}catch(e){}
-    scriptNode.onaudioprocess=null;
-    scriptNode=null;
-  }
-  if(micSource){
-    try{micSource.disconnect();}catch(e){}
-    micSource=null;
-  }
-
-  // Close AudioContext
-  if(audioCtx){
-    try{audioCtx.close();}catch(e){}
-    audioCtx=null;
+  // Close WebSocket and its audio nodes
+  if(dgWS){
+    // Cleanup audio processing nodes
+    if(dgWS._processor){
+      try{dgWS._processor.disconnect();}catch(e){}
+      dgWS._processor.onaudioprocess=null;
+    }
+    if(dgWS._source){
+      try{dgWS._source.disconnect();}catch(e){}
+    }
+    if(dgWS._audioCtx){
+      try{dgWS._audioCtx.close();}catch(e){}
+    }
+    // Send CloseStream before closing
+    try{
+      if(dgWS.readyState===WebSocket.OPEN){
+        dgWS.send(JSON.stringify({type:'CloseStream'}));
+      }
+      dgWS.close();
+    }catch(e){}
+    dgWS=null;
   }
 
   // Stop mic stream
