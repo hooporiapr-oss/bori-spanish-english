@@ -21,11 +21,10 @@ const STRIPE_PRODUCT_ID = 'prod_U2NT53dHR4yPPJ';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 const BASE_URL = process.env.BASE_URL || 'https://heybori.com';
 
-// ═══ ELEVENLABS CONFIG ═══
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
-const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'zwDSHuqO0tEVwNUuHmR1';
-const ELEVENLABS_MODEL_TTS = 'eleven_flash_v2_5';
-const ELEVENLABS_MODEL_STT = 'scribe_v2';
+// ═══ DEEPGRAM CONFIG ═══
+const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
+// Javier: male Spanish bilingual code-switcher (Aura-2)
+const DEEPGRAM_TTS_MODEL = 'aura-2-javier-es';
 
 // ═══ ADMIN BYPASS ═══
 const ADMIN_EMAILS = [
@@ -111,7 +110,7 @@ const chatLimiter = rateLimit({
 // ═══ STATIC FILES ═══
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ═══ ELEVENLABS: TEXT-TO-SPEECH ═══
+// ═══ DEEPGRAM: TEXT-TO-SPEECH ═══
 app.post('/api/voice/tts', async (req, res) => {
   try {
     const { text, lang } = req.body;
@@ -122,192 +121,69 @@ app.post('/api/voice/tts', async (req, res) => {
     // Limit text length to control costs
     const trimmedText = text.slice(0, 2000);
 
-    const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
+    // Deepgram Aura-2 REST TTS
+    // Javier is a bilingual code-switcher — handles both es and en
+    const ttsRes = await fetch(`https://api.deepgram.com/v1/speak?model=${DEEPGRAM_TTS_MODEL}`, {
       method: 'POST',
       headers: {
-        'xi-api-key': ELEVENLABS_API_KEY,
+        'Authorization': `Token ${DEEPGRAM_API_KEY}`,
         'Content-Type': 'application/json',
-        'Accept': 'audio/mpeg',
       },
       body: JSON.stringify({
         text: trimmedText,
-        model_id: ELEVENLABS_MODEL_TTS,
-        language_code: lang === 'es' ? 'es' : 'en',
-        voice_settings: {
-          stability: 0.6,
-          similarity_boost: 0.85,
-          style: 0.4,
-          use_speaker_boost: true,
-        },
       }),
     });
 
     if (!ttsRes.ok) {
       const errText = await ttsRes.text();
-      console.error('[ElevenLabs TTS Error]', ttsRes.status, errText);
+      console.error('[Deepgram TTS Error]', ttsRes.status, errText);
       return res.status(500).json({ error: 'Voice generation failed.' });
     }
 
-    // Stream audio back as mp3
+    // Stream audio back as mp3 (Deepgram defaults to mp3)
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('Cache-Control', 'no-cache');
 
     const arrayBuffer = await ttsRes.arrayBuffer();
     res.send(Buffer.from(arrayBuffer));
   } catch (err) {
-    console.error('[ElevenLabs TTS Error]', err.message);
+    console.error('[Deepgram TTS Error]', err.message);
     res.status(500).json({ error: 'Voice generation failed.' });
   }
 });
 
-// ═══ ELEVENLABS: SPEECH-TO-TEXT (BATCH — FALLBACK) ═══
-app.post('/api/voice/stt', async (req, res) => {
+// ═══ DEEPGRAM: REALTIME STT TOKEN ═══
+// Generates a temporary JWT (120s TTL) for client-side WebSocket STT
+// Token only needs to be valid at connection time — WebSocket stays open after
+// API key never exposed to client
+app.get('/api/voice/deepgram-token', async (req, res) => {
   try {
-    // Receive raw audio as binary
-    const chunks = [];
-    req.on('data', (chunk) => chunks.push(chunk));
-    req.on('end', async () => {
-      try {
-        const audioBuffer = Buffer.concat(chunks);
-
-        if (audioBuffer.length < 500) {
-          return res.status(400).json({ error: 'Audio too short. Try speaking a bit longer.' });
-        }
-
-        console.log('[ElevenLabs STT] Received audio:', audioBuffer.length, 'bytes, content-type:', req.headers['content-type']);
-
-        // Create form data for ElevenLabs STT
-        const boundary = '----ElevenLabsBoundary' + Date.now();
-        const rawContentType = (req.headers['content-type'] || '').split(';')[0].trim();
-
-        // Map content type to proper file extension for ElevenLabs
-        const extMap = {
-          'audio/mp4': 'm4a',
-          'audio/m4a': 'm4a',
-          'audio/aac': 'aac',
-          'audio/mpeg': 'mp3',
-          'audio/webm': 'webm',
-          'audio/ogg': 'ogg',
-          'audio/wav': 'wav',
-          'audio/x-m4a': 'm4a',
-        };
-        const ext = extMap[rawContentType] || 'm4a';
-
-        // Use a clean content type for the multipart form
-        const cleanContentType = rawContentType || 'audio/mp4';
-
-        console.log('[ElevenLabs STT] Detected format:', cleanContentType, '-> extension:', ext);
-
-        // Build multipart form data manually
-        const formParts = [];
-
-        // File part
-        formParts.push(Buffer.from(
-          `--${boundary}\r\n` +
-          `Content-Disposition: form-data; name="file"; filename="audio.${ext}"\r\n` +
-          `Content-Type: ${cleanContentType}\r\n\r\n`
-        ));
-        formParts.push(audioBuffer);
-        formParts.push(Buffer.from('\r\n'));
-
-        // Model part
-        formParts.push(Buffer.from(
-          `--${boundary}\r\n` +
-          `Content-Disposition: form-data; name="model_id"\r\n\r\n` +
-          `${ELEVENLABS_MODEL_STT}\r\n`
-        ));
-
-        // Language code - ALWAYS send it based on user's toggle
-        const lang = req.headers['x-lang'] || 'en';
-        const langCode = lang === 'es' ? 'spa' : 'eng';
-        formParts.push(Buffer.from(
-          `--${boundary}\r\n` +
-          `Content-Disposition: form-data; name="language_code"\r\n\r\n` +
-          `${langCode}\r\n`
-        ));
-
-        // Tag audio events OFF for cleaner transcription
-        formParts.push(Buffer.from(
-          `--${boundary}\r\n` +
-          `Content-Disposition: form-data; name="tag_audio_events"\r\n\r\n` +
-          `false\r\n`
-        ));
-
-        // Keyterm prompting - bias towards common phrases
-        const keyterms = lang === 'es'
-          ? 'Hey Bori,hola,buenos días,buenas tardes,buenas noches,¿cómo estás?,gracias,por favor,ayúdame,enséñame,traduce,¿qué significa?,Puerto Rico,español,inglés'
-          : 'Hey Bori,hello,good morning,good afternoon,good evening,how are you,thank you,please,help me,teach me,translate,what does it mean,Puerto Rico,Spanish,English';
-
-        formParts.push(Buffer.from(
-          `--${boundary}\r\n` +
-          `Content-Disposition: form-data; name="biased_keywords"\r\n\r\n` +
-          `${keyterms}\r\n`
-        ));
-
-        // Close boundary
-        formParts.push(Buffer.from(`--${boundary}--\r\n`));
-
-        const formBody = Buffer.concat(formParts);
-
-        const sttRes = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
-          method: 'POST',
-          headers: {
-            'xi-api-key': ELEVENLABS_API_KEY,
-            'Content-Type': `multipart/form-data; boundary=${boundary}`,
-          },
-          body: formBody,
-        });
-
-        if (!sttRes.ok) {
-          const errText = await sttRes.text();
-          console.error('[ElevenLabs STT Error]', sttRes.status, errText);
-          return res.status(500).json({ error: 'Transcription failed.' });
-        }
-
-        const data = await sttRes.json();
-        console.log('[ElevenLabs STT] Transcribed:', data.text?.substring(0, 100));
-        res.json({
-          text: data.text || '',
-          language: data.language_code || '',
-        });
-      } catch (innerErr) {
-        console.error('[ElevenLabs STT Inner Error]', innerErr.message);
-        res.status(500).json({ error: 'Transcription failed.' });
-      }
-    });
-  } catch (err) {
-    console.error('[ElevenLabs STT Error]', err.message);
-    res.status(500).json({ error: 'Transcription failed.' });
-  }
-});
-
-// ═══ ELEVENLABS: REALTIME SCRIBE TOKEN ═══
-// Generates a single-use token for client-side WebSocket STT
-// Token expires after 15 minutes, API key never exposed to client
-app.get('/api/voice/scribe-token', async (req, res) => {
-  try {
-    if (!ELEVENLABS_API_KEY) {
+    if (!DEEPGRAM_API_KEY) {
       return res.status(500).json({ error: 'Voice not configured.' });
     }
 
-    const tokenRes = await fetch('https://api.elevenlabs.io/v1/single-use-token/realtime_scribe', {
+    const tokenRes = await fetch('https://api.deepgram.com/v1/auth/grant', {
       method: 'POST',
       headers: {
-        'xi-api-key': ELEVENLABS_API_KEY,
+        'Authorization': `Token ${DEEPGRAM_API_KEY}`,
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        ttl_seconds: 120,
+      }),
     });
 
     if (!tokenRes.ok) {
       const errText = await tokenRes.text();
-      console.error('[ElevenLabs Scribe Token Error]', tokenRes.status, errText);
+      console.error('[Deepgram Token Error]', tokenRes.status, errText);
       return res.status(500).json({ error: 'Could not generate voice token.' });
     }
 
     const data = await tokenRes.json();
-    console.log('[ElevenLabs] Scribe token generated');
-    res.json({ token: data.token });
+    console.log('[Deepgram] STT token generated (expires in', data.expires_in, 's)');
+    res.json({ token: data.access_token });
   } catch (err) {
-    console.error('[ElevenLabs Scribe Token Error]', err.message);
+    console.error('[Deepgram Token Error]', err.message);
     res.status(500).json({ error: 'Could not generate voice token.' });
   }
 });
@@ -317,7 +193,6 @@ app.post('/api/stripe/checkout', async (req, res) => {
   try {
     const { email, lang } = req.body;
 
-    // Look up the price for our product
     const prices = await stripe.prices.list({
       product: STRIPE_PRODUCT_ID,
       active: true,
@@ -342,7 +217,6 @@ app.post('/api/stripe/checkout', async (req, res) => {
       metadata: { source: 'heybori', lang: lang || 'en' },
     };
 
-    // If email provided, pre-fill it
     if (email && typeof email === 'string') {
       sessionParams.customer_email = email.trim();
     }
@@ -361,7 +235,6 @@ app.post('/api/stripe/status', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.json({ subscribed: false });
 
-    // Admin bypass — full access, no Stripe check
     if (ADMIN_EMAILS.includes(email.trim().toLowerCase())) {
       return res.json({ subscribed: true, customerId: 'admin', plan: 'admin' });
     }
@@ -468,7 +341,7 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
     res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders();
 
-    // Retry logic for overloaded errors — try Sonnet twice, then fall back to Haiku
+    // Retry logic for overloaded errors
     const models = [
       'claude-sonnet-4-20250514',
       'claude-sonnet-4-20250514',
@@ -483,7 +356,6 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
       const model = models[attempt];
       if (attempt > 0) {
         console.log(`[Hey Bori] Retry attempt ${attempt + 1} with ${model}`);
-        // Wait before retry: 1s, then 2s
         await new Promise(r => setTimeout(r, attempt * 1000));
       }
 
@@ -495,7 +367,6 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
           messages: messages,
         });
 
-        // Wrap stream in a promise so we can catch overload and retry
         await new Promise((resolve, reject) => {
           let gotText = false;
 
@@ -518,7 +389,6 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
             const errMsg = typeof err === 'object' ? JSON.stringify(err) : String(err);
             console.error('[Hey Bori Stream Error]', errMsg);
 
-            // If we already sent text, we can't retry — just end
             if (gotText) {
               if (!res.writableEnded) {
                 try { res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`); res.end(); } catch(e) {}
@@ -528,14 +398,12 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
               return;
             }
 
-            // Check if overloaded — reject so we can retry
             const isOverloaded = errMsg.includes('overloaded') || errMsg.includes('529');
             if (isOverloaded && attempt < models.length - 1) {
               reject(new Error('overloaded'));
               return;
             }
 
-            // Final attempt or non-overload error — send error to client
             if (!res.writableEnded) {
               try {
                 res.write(`data: ${JSON.stringify({ type: 'error', error: 'Something went wrong. Try again.' })}\n\n`);
@@ -555,13 +423,11 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
         if (succeeded) break;
 
       } catch (retryErr) {
-        // Overloaded — continue to next attempt
         console.log(`[Hey Bori] Attempt ${attempt + 1} overloaded, retrying...`);
         continue;
       }
     }
 
-    // If all retries failed and response still open
     if (!succeeded && !res.writableEnded) {
       try {
         res.write(`data: ${JSON.stringify({ type: 'error', error: 'Bori is taking a quick break. Try again in a moment!' })}\n\n`);
@@ -591,7 +457,8 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`[Hey Bori] Live on port ${PORT}`);
   console.log(`[Hey Bori] Stripe: ${process.env.STRIPE_SECRET_KEY ? 'Connected' : 'NOT configured'}`);
-  console.log(`[Hey Bori] ElevenLabs: ${ELEVENLABS_API_KEY ? 'Connected' : 'NOT configured'}`);
-  console.log(`[Hey Bori] Realtime Scribe: Ready (GET /api/voice/scribe-token)`);
+  console.log(`[Hey Bori] Deepgram: ${DEEPGRAM_API_KEY ? 'Connected' : 'NOT configured'}`);
+  console.log(`[Hey Bori] TTS Voice: ${DEEPGRAM_TTS_MODEL} (Javier — bilingual code-switcher)`);
+  console.log(`[Hey Bori] Realtime STT: Ready (GET /api/voice/deepgram-token)`);
   console.log(`[Hey Bori] Language learning companion ready`);
 });
