@@ -468,38 +468,106 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
     res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders();
 
-    const stream = anthropic.messages.stream({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      system: systemPrompt + langContext,
-      messages: messages,
-    });
+    // Retry logic for overloaded errors — try Sonnet twice, then fall back to Haiku
+    const models = [
+      'claude-sonnet-4-20250514',
+      'claude-sonnet-4-20250514',
+      'claude-sonnet-4-5-20250929',
+    ];
 
-    stream.on('text', (text) => {
-      if (!res.writableEnded) {
-        try { res.write(`data: ${JSON.stringify({ type: 'text', text })}\n\n`); } catch(e) {}
+    let succeeded = false;
+
+    for (let attempt = 0; attempt < models.length; attempt++) {
+      if (res.writableEnded) break;
+
+      const model = models[attempt];
+      if (attempt > 0) {
+        console.log(`[Hey Bori] Retry attempt ${attempt + 1} with ${model}`);
+        // Wait before retry: 1s, then 2s
+        await new Promise(r => setTimeout(r, attempt * 1000));
       }
-    });
 
-    stream.on('end', () => {
-      if (!res.writableEnded) {
-        try { res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`); res.end(); } catch(e) {}
+      try {
+        const stream = anthropic.messages.stream({
+          model: model,
+          max_tokens: 1024,
+          system: systemPrompt + langContext,
+          messages: messages,
+        });
+
+        // Wrap stream in a promise so we can catch overload and retry
+        await new Promise((resolve, reject) => {
+          let gotText = false;
+
+          stream.on('text', (text) => {
+            gotText = true;
+            if (!res.writableEnded) {
+              try { res.write(`data: ${JSON.stringify({ type: 'text', text })}\n\n`); } catch(e) {}
+            }
+          });
+
+          stream.on('end', () => {
+            if (!res.writableEnded) {
+              try { res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`); res.end(); } catch(e) {}
+            }
+            succeeded = true;
+            resolve();
+          });
+
+          stream.on('error', (err) => {
+            const errMsg = typeof err === 'object' ? JSON.stringify(err) : String(err);
+            console.error('[Hey Bori Stream Error]', errMsg);
+
+            // If we already sent text, we can't retry — just end
+            if (gotText) {
+              if (!res.writableEnded) {
+                try { res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`); res.end(); } catch(e) {}
+              }
+              succeeded = true;
+              resolve();
+              return;
+            }
+
+            // Check if overloaded — reject so we can retry
+            const isOverloaded = errMsg.includes('overloaded') || errMsg.includes('529');
+            if (isOverloaded && attempt < models.length - 1) {
+              reject(new Error('overloaded'));
+              return;
+            }
+
+            // Final attempt or non-overload error — send error to client
+            if (!res.writableEnded) {
+              try {
+                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Something went wrong. Try again.' })}\n\n`);
+                res.end();
+              } catch(e) {}
+            }
+            succeeded = true;
+            resolve();
+          });
+
+          req.on('close', () => {
+            try { stream.abort(); } catch(e) {}
+            resolve();
+          });
+        });
+
+        if (succeeded) break;
+
+      } catch (retryErr) {
+        // Overloaded — continue to next attempt
+        console.log(`[Hey Bori] Attempt ${attempt + 1} overloaded, retrying...`);
+        continue;
       }
-    });
+    }
 
-    stream.on('error', (err) => {
-      console.error('[Hey Bori Stream Error]', err.message || err);
-      if (!res.writableEnded) {
-        try {
-          res.write(`data: ${JSON.stringify({ type: 'error', error: 'Something went wrong. Try again.' })}\n\n`);
-          res.end();
-        } catch(e) {}
-      }
-    });
-
-    req.on('close', () => {
-      try { stream.abort(); } catch(e) {}
-    });
+    // If all retries failed and response still open
+    if (!succeeded && !res.writableEnded) {
+      try {
+        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Bori is taking a quick break. Try again in a moment!' })}\n\n`);
+        res.end();
+      } catch(e) {}
+    }
 
   } catch (err) {
     console.error('[Hey Bori Error]', err.message || err);
