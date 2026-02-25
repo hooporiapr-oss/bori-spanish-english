@@ -476,19 +476,24 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
     });
 
     stream.on('text', (text) => {
-      res.write(`data: ${JSON.stringify({ type: 'text', text })}\n\n`);
+      if (!res.writableEnded) {
+        try { res.write(`data: ${JSON.stringify({ type: 'text', text })}\n\n`); } catch(e) {}
+      }
     });
 
     stream.on('end', () => {
-      res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
-      res.end();
+      if (!res.writableEnded) {
+        try { res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`); res.end(); } catch(e) {}
+      }
     });
 
     stream.on('error', (err) => {
       console.error('[Hey Bori Stream Error]', err.message || err);
       if (!res.writableEnded) {
-        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Something went wrong. Try again.' })}\n\n`);
-        res.end();
+        try {
+          res.write(`data: ${JSON.stringify({ type: 'error', error: 'Something went wrong. Try again.' })}\n\n`);
+          res.end();
+        } catch(e) {}
       }
     });
 
