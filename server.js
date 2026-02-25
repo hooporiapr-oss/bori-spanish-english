@@ -5,6 +5,8 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
+const http = require('http');
+const { WebSocketServer, WebSocket } = require('ws');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,8 +25,7 @@ const BASE_URL = process.env.BASE_URL || 'https://heybori.com';
 
 // ═══ DEEPGRAM CONFIG ═══
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
-// Javier: male Spanish bilingual code-switcher (Aura-2)
-const DEEPGRAM_TTS_MODEL = 'aura-2-javier-es';
+const DEEPGRAM_VOICE = 'aura-2-javier-es';
 
 // ═══ ADMIN BYPASS ═══
 const ADMIN_EMAILS = [
@@ -110,7 +111,7 @@ const chatLimiter = rateLimit({
 // ═══ STATIC FILES ═══
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ═══ DEEPGRAM: TEXT-TO-SPEECH ═══
+// ═══ DEEPGRAM: TEXT-TO-SPEECH (REST) ═══
 app.post('/api/voice/tts', async (req, res) => {
   try {
     const { text, lang } = req.body;
@@ -118,20 +119,20 @@ app.post('/api/voice/tts', async (req, res) => {
       return res.status(400).json({ error: 'Text is required.' });
     }
 
-    // Limit text length to control costs
-    const trimmedText = text.slice(0, 2000);
+    if (!DEEPGRAM_API_KEY) {
+      return res.status(500).json({ error: 'Voice not configured.' });
+    }
 
-    // Deepgram Aura-2 REST TTS
-    // Javier is a bilingual code-switcher — handles both es and en
-    const ttsRes = await fetch(`https://api.deepgram.com/v1/speak?model=${DEEPGRAM_TTS_MODEL}`, {
+    const trimmedText = text.slice(0, 2000);
+    const voice = DEEPGRAM_VOICE;
+
+    const ttsRes = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}&encoding=mp3`, {
       method: 'POST',
       headers: {
         'Authorization': `Token ${DEEPGRAM_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        text: trimmedText,
-      }),
+      body: JSON.stringify({ text: trimmedText }),
     });
 
     if (!ttsRes.ok) {
@@ -140,7 +141,6 @@ app.post('/api/voice/tts', async (req, res) => {
       return res.status(500).json({ error: 'Voice generation failed.' });
     }
 
-    // Stream audio back as mp3 (Deepgram defaults to mp3)
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('Cache-Control', 'no-cache');
 
@@ -152,40 +152,13 @@ app.post('/api/voice/tts', async (req, res) => {
   }
 });
 
-// ═══ DEEPGRAM: REALTIME STT TOKEN ═══
-// Generates a temporary JWT (120s TTL) for client-side WebSocket STT
-// Token only needs to be valid at connection time — WebSocket stays open after
-// API key never exposed to client
-app.get('/api/voice/deepgram-token', async (req, res) => {
-  try {
-    if (!DEEPGRAM_API_KEY) {
-      return res.status(500).json({ error: 'Voice not configured.' });
-    }
-
-    const tokenRes = await fetch('https://api.deepgram.com/v1/auth/grant', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Token ${DEEPGRAM_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ttl_seconds: 120,
-      }),
-    });
-
-    if (!tokenRes.ok) {
-      const errText = await tokenRes.text();
-      console.error('[Deepgram Token Error]', tokenRes.status, errText);
-      return res.status(500).json({ error: 'Could not generate voice token.' });
-    }
-
-    const data = await tokenRes.json();
-    console.log('[Deepgram] STT token generated (expires in', data.expires_in, 's)');
-    res.json({ token: data.access_token });
-  } catch (err) {
-    console.error('[Deepgram Token Error]', err.message);
-    res.status(500).json({ error: 'Could not generate voice token.' });
-  }
+// ═══ DEEPGRAM: VOICE STATUS CHECK ═══
+app.get('/api/voice/status', (req, res) => {
+  res.json({
+    stt: DEEPGRAM_API_KEY ? 'ready' : 'not_configured',
+    tts: DEEPGRAM_API_KEY ? 'ready' : 'not_configured',
+    provider: 'deepgram',
+  });
 });
 
 // ═══ STRIPE: CREATE CHECKOUT SESSION ═══
@@ -261,7 +234,7 @@ app.post('/api/stripe/status', async (req, res) => {
   }
 });
 
-// ═══ STRIPE: CUSTOMER PORTAL (manage subscription) ═══
+// ═══ STRIPE: CUSTOMER PORTAL ═══
 app.post('/api/stripe/portal', async (req, res) => {
   try {
     const { email } = req.body;
@@ -341,99 +314,61 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
     res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders();
 
-    // Retry logic for overloaded errors
-    const models = [
-      'claude-sonnet-4-20250514',
-      'claude-sonnet-4-20250514',
-      'claude-sonnet-4-5-20250929',
-    ];
-
-    let succeeded = false;
+    // Retry logic for Anthropic overload
+    let stream = null;
+    const models = ['claude-sonnet-4-20250514', 'claude-sonnet-4-20250514', 'claude-sonnet-4-5-20250929'];
+    const delays = [0, 1000, 2000];
 
     for (let attempt = 0; attempt < models.length; attempt++) {
-      if (res.writableEnded) break;
-
-      const model = models[attempt];
-      if (attempt > 0) {
-        console.log(`[Hey Bori] Retry attempt ${attempt + 1} with ${model}`);
-        await new Promise(r => setTimeout(r, attempt * 1000));
-      }
-
+      if (attempt > 0) await new Promise(r => setTimeout(r, delays[attempt]));
       try {
-        const stream = anthropic.messages.stream({
-          model: model,
+        const testStream = anthropic.messages.stream({
+          model: models[attempt],
           max_tokens: 1024,
           system: systemPrompt + langContext,
           messages: messages,
         });
 
         await new Promise((resolve, reject) => {
-          let gotText = false;
-
-          stream.on('text', (text) => {
-            gotText = true;
-            if (!res.writableEnded) {
-              try { res.write(`data: ${JSON.stringify({ type: 'text', text })}\n\n`); } catch(e) {}
-            }
-          });
-
-          stream.on('end', () => {
-            if (!res.writableEnded) {
-              try { res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`); res.end(); } catch(e) {}
-            }
-            succeeded = true;
-            resolve();
-          });
-
-          stream.on('error', (err) => {
-            const errMsg = typeof err === 'object' ? JSON.stringify(err) : String(err);
-            console.error('[Hey Bori Stream Error]', errMsg);
-
-            if (gotText) {
-              if (!res.writableEnded) {
-                try { res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`); res.end(); } catch(e) {}
-              }
-              succeeded = true;
-              resolve();
-              return;
-            }
-
-            const isOverloaded = errMsg.includes('overloaded') || errMsg.includes('529');
-            if (isOverloaded && attempt < models.length - 1) {
-              reject(new Error('overloaded'));
-              return;
-            }
-
-            if (!res.writableEnded) {
-              try {
-                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Something went wrong. Try again.' })}\n\n`);
-                res.end();
-              } catch(e) {}
-            }
-            succeeded = true;
-            resolve();
-          });
-
-          req.on('close', () => {
-            try { stream.abort(); } catch(e) {}
-            resolve();
-          });
+          let resolved = false;
+          testStream.on('text', () => { if (!resolved) { resolved = true; resolve(); } });
+          testStream.on('error', (err) => { if (!resolved) { resolved = true; reject(err); } });
+          setTimeout(() => { if (!resolved) { resolved = true; resolve(); } }, 5000);
         });
 
-        if (succeeded) break;
-
-      } catch (retryErr) {
-        console.log(`[Hey Bori] Attempt ${attempt + 1} overloaded, retrying...`);
-        continue;
+        stream = testStream;
+        break;
+      } catch (err) {
+        console.error(`[Hey Bori] Attempt ${attempt + 1} failed (${models[attempt]}):`, err.message || err);
       }
     }
 
-    if (!succeeded && !res.writableEnded) {
-      try {
-        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Bori is taking a quick break. Try again in a moment!' })}\n\n`);
-        res.end();
-      } catch(e) {}
+    if (!stream) {
+      try { res.write(`data: ${JSON.stringify({ type: 'error', error: 'Service temporarily busy. Try again.' })}\n\n`); } catch(e) {}
+      try { res.end(); } catch(e) {}
+      return;
     }
+
+    stream.on('text', (text) => {
+      try { res.write(`data: ${JSON.stringify({ type: 'text', text })}\n\n`); } catch(e) {}
+    });
+
+    stream.on('end', () => {
+      try { res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`); } catch(e) {}
+      try { res.end(); } catch(e) {}
+    });
+
+    stream.on('error', (err) => {
+      console.error('[Hey Bori Stream Error]', err.message || err);
+      if (!res.writableEnded) {
+        try { res.write(`data: ${JSON.stringify({ type: 'error', error: 'Something went wrong. Try again.' })}\n\n`); } catch(e) {}
+        try { res.end(); } catch(e) {}
+      }
+    });
+
+    req.on('close', () => {
+      try { stream.abort(); } catch(e) {}
+    });
 
   } catch (err) {
     console.error('[Hey Bori Error]', err.message || err);
@@ -453,12 +388,98 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ═══ HTTP SERVER + WEBSOCKET PROXY FOR DEEPGRAM STT ═══
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server, path: '/ws/deepgram-stt' });
+
+wss.on('connection', (clientWS, req) => {
+  if (!DEEPGRAM_API_KEY) {
+    clientWS.close(4001, 'Voice not configured');
+    return;
+  }
+
+  // Parse language from query string: /ws/deepgram-stt?lang=es
+  const url = new URL(req.url, 'http://localhost');
+  const lang = url.searchParams.get('lang') || 'en';
+  const dgLang = lang === 'es' ? 'es' : 'en';
+
+  console.log(`[Deepgram STT] Client connected, lang=${dgLang}`);
+
+  // Open upstream WebSocket to Deepgram Nova-3
+  const dgUrl = `wss://api.deepgram.com/v1/listen?model=nova-3&language=${dgLang}&punctuate=true&interim_results=true&utterance_end_ms=1500&endpointing=300&encoding=linear16&sample_rate=16000&channels=1`;
+
+  const dgWS = new WebSocket(dgUrl, {
+    headers: { 'Authorization': `Token ${DEEPGRAM_API_KEY}` },
+  });
+
+  let dgReady = false;
+
+  dgWS.on('open', () => {
+    dgReady = true;
+    console.log('[Deepgram STT] Upstream connected');
+    clientWS.send(JSON.stringify({ type: 'connected' }));
+  });
+
+  dgWS.on('message', (data) => {
+    if (clientWS.readyState === WebSocket.OPEN) {
+      clientWS.send(data.toString());
+    }
+  });
+
+  dgWS.on('error', (err) => {
+    console.error('[Deepgram STT] Upstream error:', err.message);
+    if (clientWS.readyState === WebSocket.OPEN) {
+      clientWS.send(JSON.stringify({ type: 'error', message: err.message }));
+    }
+  });
+
+  dgWS.on('close', (code, reason) => {
+    console.log(`[Deepgram STT] Upstream closed: ${code} ${reason}`);
+    if (clientWS.readyState === WebSocket.OPEN) {
+      clientWS.close(1000, 'Deepgram session ended');
+    }
+  });
+
+  // Forward raw binary audio from browser to Deepgram
+  clientWS.on('message', (data) => {
+    if (dgReady && dgWS.readyState === WebSocket.OPEN) {
+      dgWS.send(data);
+    }
+  });
+
+  clientWS.on('close', () => {
+    console.log('[Deepgram STT] Client disconnected');
+    if (dgWS.readyState === WebSocket.OPEN) {
+      try { dgWS.send(JSON.stringify({ type: 'CloseStream' })); } catch(e) {}
+      dgWS.close();
+    }
+  });
+
+  clientWS.on('error', (err) => {
+    console.error('[Deepgram STT] Client error:', err.message);
+    if (dgWS.readyState === WebSocket.OPEN) {
+      dgWS.close();
+    }
+  });
+
+  // KeepAlive every 8 seconds
+  const keepAlive = setInterval(() => {
+    if (dgWS.readyState === WebSocket.OPEN) {
+      dgWS.send(JSON.stringify({ type: 'KeepAlive' }));
+    } else {
+      clearInterval(keepAlive);
+    }
+  }, 8000);
+
+  clientWS.on('close', () => clearInterval(keepAlive));
+});
+
 // ═══ START ═══
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`[Hey Bori] Live on port ${PORT}`);
   console.log(`[Hey Bori] Stripe: ${process.env.STRIPE_SECRET_KEY ? 'Connected' : 'NOT configured'}`);
   console.log(`[Hey Bori] Deepgram: ${DEEPGRAM_API_KEY ? 'Connected' : 'NOT configured'}`);
-  console.log(`[Hey Bori] TTS Voice: ${DEEPGRAM_TTS_MODEL} (Javier — bilingual code-switcher)`);
-  console.log(`[Hey Bori] Realtime STT: Ready (GET /api/voice/deepgram-token)`);
+  console.log(`[Hey Bori] STT: Nova-3 WebSocket Proxy (/ws/deepgram-stt)`);
+  console.log(`[Hey Bori] TTS: Aura-2 Javier (bilingual code-switcher)`);
   console.log(`[Hey Bori] Language learning companion ready`);
 });
