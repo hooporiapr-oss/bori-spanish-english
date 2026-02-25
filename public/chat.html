@@ -218,12 +218,37 @@ function setBoriSpeaking(val){
 }
 
 // ── Auto-send accumulated final text ──
+var pendingVoiceText='';  // queued text if busy
+var pendingVoiceCheck=null;
+
 function voiceAutoSend(){
   if(sendTimeout){clearTimeout(sendTimeout);sendTimeout=null;}
   var text=lastFinalText.trim();
   lastFinalText='';
   if(!text||text.length<2)return;
-  if(busy||isLimitReached())return;
+  if(isLimitReached())return;
+
+  if(busy){
+    // Queue it — will send when Bori finishes responding
+    console.log('[Voice] Busy, queuing:',text);
+    pendingVoiceText=text;
+    inp.placeholder=lang==='es'?'💭 Esperando a Bori...':'💭 Waiting for Bori...';
+    if(!pendingVoiceCheck){
+      pendingVoiceCheck=setInterval(function(){
+        if(!busy&&pendingVoiceText){
+          var queued=pendingVoiceText;
+          pendingVoiceText='';
+          clearInterval(pendingVoiceCheck);
+          pendingVoiceCheck=null;
+          console.log('[Voice] Sending queued:',queued);
+          inp.value=queued;
+          doSend();
+        }
+      },300);
+    }
+    return;
+  }
+
   console.log('[Voice] Auto-sending:',text);
   inp.value=text;
   inp.style.color='';
@@ -377,6 +402,8 @@ function exitVoiceMode(){
 function cleanupVoiceMode(){
   voiceModeActive=false;
   if(sendTimeout){clearTimeout(sendTimeout);sendTimeout=null;}
+  if(pendingVoiceCheck){clearInterval(pendingVoiceCheck);pendingVoiceCheck=null;}
+  pendingVoiceText='';
   if(sttWS){try{sttWS.close();}catch(e){}sttWS=null;}
   if(scriptNode){try{scriptNode.disconnect();}catch(e){}scriptNode.onaudioprocess=null;scriptNode=null;}
   if(micSource){try{micSource.disconnect();}catch(e){}micSource=null;}
@@ -407,6 +434,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('.voice-toggl
    TTS — Bori speaks (PATCHED: setBoriSpeaking safety)
    ═══════════════════════════════════════ */
 function speakText(text){
+  console.log('[TTS] speakText called, voiceOn=',voiceOn,'text length=',text.length);
   if(!voiceOn)return;
   stopAudio();
   setBoriSpeaking(true);
@@ -546,7 +574,7 @@ window.doSend=async function(){
     if(!fullReply){b.className='bub bub-err';b.textContent=lang==='es'?'No recibí respuesta. Intenta de nuevo.':'No response received. Try again.';}
     if(fullReply){
       addReplayBtn(b,fullReply);
-      if(voiceOn)speakText(fullReply);
+      if(voiceOn){console.log('[doSend] Calling speakText, voiceOn=true');speakText(fullReply);}else{console.log('[doSend] voiceOn is false, skipping TTS');}
     }
     hist.push({role:'assistant',content:fullReply});
     if(hist.length>40)hist=hist.slice(-40);
