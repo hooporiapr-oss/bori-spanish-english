@@ -7,6 +7,8 @@ const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const http = require('http');
 const { WebSocketServer, WebSocket } = require('ws');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -152,7 +154,26 @@ app.post('/api/voice/tts', async (req, res) => {
   }
 });
 
-// ═══ DEEPGRAM: VOICE STATUS CHECK ═══
+// ═══ DEEPGRAM: SPEECH-TO-TEXT (REST) ═══
+app.post('/api/voice/stt', upload.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No audio file provided.' });
+    if (!DEEPGRAM_API_KEY) return res.status(500).json({ error: 'Voice not configured.' });
+    const lang = req.body.lang === 'es' ? 'es' : 'en';
+    console.log(`[Deepgram STT] Transcribing ${req.file.size} bytes, lang=${lang}`);
+    const dgRes = await fetch(`https://api.deepgram.com/v1/listen?model=nova-3&language=${lang}&punctuate=true&smart_format=true`, {
+      method: 'POST',
+      headers: { 'Authorization': `Token ${DEEPGRAM_API_KEY}`, 'Content-Type': req.file.mimetype || 'audio/webm' },
+      body: req.file.buffer,
+    });
+    if (!dgRes.ok) { const errText = await dgRes.text(); console.error('[Deepgram STT Error]', dgRes.status, errText); return res.status(500).json({ error: 'Transcription failed.' }); }
+    const data = await dgRes.json();
+    const transcript = data?.results?.channels?.[0]?.alternatives?.[0]?.transcript || '';
+    console.log(`[Deepgram STT] Result: "${transcript}"`);
+    res.json({ transcript });
+  } catch (err) { console.error('[Deepgram STT Error]', err.message); res.status(500).json({ error: 'Transcription failed.' }); }
+});
+
 app.get('/api/voice/status', (req, res) => {
   res.json({
     stt: DEEPGRAM_API_KEY ? 'ready' : 'not_configured',
