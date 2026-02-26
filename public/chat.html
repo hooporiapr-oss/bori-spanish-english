@@ -52,15 +52,20 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);-webkit-font
 .menu-footer a:active{color:var(--sun)}
 .menu-footer p{font-size:10px;color:var(--text-3);margin-top:8px;opacity:.5}
 
-/* ElevenLabs widget container — takes full remaining space */
+/* Widget area */
 .widget-area{flex:1;position:relative;overflow:hidden}
 
-/* Force the ElevenLabs widget to fill our container */
+/* Full-bleed background image */
+.bg-image{position:absolute;inset:0;z-index:0}
+.bg-image img{width:100%;height:100%;object-fit:cover}
+
+/* Force the ElevenLabs widget to fill our container and sit above background */
 elevenlabs-convai{
   position:absolute !important;
   inset:0 !important;
   width:100% !important;
   height:100% !important;
+  z-index:1 !important;
 }
 
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:var(--white);padding:12px 28px;border-radius:50px;font-size:14px;font-weight:700;opacity:0;transition:all .3s;z-index:300;pointer-events:none}
@@ -92,8 +97,10 @@ elevenlabs-convai{
       <button class="burger" id="burger" onclick="toggleMenu()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div></button>
     </div>
 
-    <!-- ElevenLabs widget fills the rest of the screen -->
     <div class="widget-area">
+      <!-- Full-bleed Puerto Rico background -->
+      <div class="bg-image"><img src="/boriosj.png" alt="Puerto Rico"></div>
+      <!-- ElevenLabs widget sits on top -->
       <elevenlabs-convai agent-id="agent_6201kjbe2epdev59wq92kgn49n0r" variant="expanded"></elevenlabs-convai>
     </div>
   </div>
