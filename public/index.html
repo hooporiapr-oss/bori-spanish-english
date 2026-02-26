@@ -21,13 +21,11 @@
 
     .page{display:flex;flex-direction:column;align-items:center;max-width:520px;margin:0 auto;padding:0 24px 48px}
 
-    /* ═══ LANGUAGE TOGGLE ═══ */
     .lang-bar{position:sticky;top:0;z-index:50;background:rgba(255,253,248,0.92);backdrop-filter:blur(12px);padding:14px 0 10px;display:flex;justify-content:center;width:100%;margin-bottom:8px}
     .lang-toggle{display:flex;border-radius:10px;overflow:hidden;border:2px solid var(--border);background:var(--white)}
     .lang-btn{padding:7px 20px;font-size:13px;font-weight:800;border:none;cursor:pointer;background:transparent;color:var(--text-3);transition:all .2s;font-family:var(--body)}
     .lang-btn.active{background:var(--sun);color:var(--white);border-radius:8px}
 
-    /* ═══ HERO ═══ */
     .hero{text-align:center;padding:20px 0 0}
     .hero-img{width:180px;height:180px;margin:0 auto 16px}
     .hero-img img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(255,107,53,0.15))}
@@ -36,15 +34,12 @@
     .hero-subtitle{font-size:clamp(16px,4.5vw,20px);font-weight:800;color:var(--text-2);margin-bottom:8px;line-height:1.4}
     .hero-badge{display:inline-block;padding:6px 18px;border-radius:50px;background:#0050A0;color:var(--white);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:28px}
 
-    /* ═══ DIVIDER ═══ */
     .divider{width:60px;height:1.5px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:0 auto;border:none}
 
-    /* ═══ SECTION TITLES ═══ */
     .section-label{font-size:10px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:6px}
     .section-title{font-size:clamp(22px,6vw,28px);font-weight:900;color:var(--dark);margin-bottom:6px}
     .section-desc{font-size:15px;font-weight:600;color:var(--text-2);line-height:1.7;max-width:400px;margin:0 auto 20px}
 
-    /* ═══ LA RUTA — THE PRE-GAME ═══ */
     .ruta-section{width:100%;padding:32px 0 28px;text-align:center}
     .ruta-section .section-label{color:var(--ruta)}
     .ruta-card{width:100%;background:linear-gradient(145deg,var(--ruta-light),rgba(235,242,227,0.4));border:2px solid var(--ruta-border);border-radius:20px;padding:28px 20px;position:relative}
@@ -58,12 +53,10 @@
     .ruta-btn:active{transform:scale(.98)}
     .ruta-free{font-size:12px;font-weight:700;color:var(--ruta);margin-top:10px;text-align:center}
 
-    /* ═══ TRANSITION TEXT ═══ */
     .transition{text-align:center;padding:28px 0;max-width:360px}
     .transition-text{font-size:16px;font-weight:800;color:var(--text-2);line-height:1.6}
     .transition-text em{color:var(--sun);font-style:normal}
 
-    /* ═══ HEY BORI — THE PRODUCT ═══ */
     .bori-section{width:100%;padding:0 0 28px;text-align:center}
     .bori-section .section-label{color:var(--sun)}
     .bori-card{width:100%;border:2px solid var(--sun);border-radius:20px;padding:28px 24px;background:var(--white);text-align:center;box-shadow:0 4px 24px rgba(255,107,53,0.08);position:relative}
@@ -82,7 +75,6 @@
     .bori-btn:disabled{opacity:.6;cursor:not-allowed}
     .bori-trial-note{font-size:12px;font-weight:700;color:var(--green-dark);margin-top:10px}
 
-    /* ═══ FORTUNE COCO ═══ */
     .coco-section{width:100%;padding:0 0 28px}
     .coco{width:100%;background:linear-gradient(135deg,var(--coco-bg),rgba(245,166,35,0.04));border:1.5px solid var(--coco-border);border-radius:20px;padding:24px 20px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden;transition:border-color .3s;min-height:110px}
     .coco:active:not(.cracked){border-color:rgba(139,90,43,0.35)}
@@ -114,7 +106,6 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     .coco.cracked{border-color:rgba(139,90,43,0.25);box-shadow:0 4px 20px rgba(139,90,43,0.06)}
 
-    /* ═══ GAMES ═══ */
     .games-section{width:100%;padding:0 0 28px}
     .games-title{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;text-align:center;margin-bottom:14px}
     .games-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -126,7 +117,6 @@
     .game-desc{font-size:11px;font-weight:600;color:var(--text-3);line-height:1.4}
     .games-free-note{text-align:center;margin-top:12px;font-size:12px;font-weight:700;color:var(--green-dark)}
 
-    /* ═══ HAMBURGER MENU ═══ */
     .burger{position:fixed;top:16px;right:16px;z-index:99;width:44px;height:44px;border-radius:50%;background:var(--white);border:1.5px solid var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(0,0,0,0.06);transition:all .2s}
     .burger:active{transform:scale(.95)}
     .burger-line{width:18px;height:2.5px;background:var(--sun);border-radius:2px;transition:all .3s}
@@ -188,7 +178,7 @@
     <a href="/the-conga.html" class="menu-link"><span class="menu-link-icon">🥁</span>Conga<span class="menu-link-arrow">›</span></a>
     <a href="/the-lelolai.html" class="menu-link"><span class="menu-link-icon">🔤</span>LeLoLai Letras<span class="menu-link-arrow">›</span></a>
     <a href="/the-domino.html" class="menu-link"><span class="menu-link-icon">🎲</span>La Marquesina<span class="menu-link-arrow">›</span></a>
-    <a href="/the-isla.html" class="menu-link"><span class="menu-link-icon">🧩</span>La Isla<span class="menu-link-arrow">›</span></a>
+    <a href="/the-solitario.html" class="menu-link"><span class="menu-link-icon">🃏</span>Solitario Boricua<span class="menu-link-arrow">›</span></a>
     <div class="menu-spacer"></div>
     <div class="menu-footer">
       <a href="/privacy.html">Privacy</a>
@@ -326,10 +316,10 @@
           <div class="game-name">La Marquesina</div>
           <div class="game-desc" data-en="Classic dominoes" data-es="Dominó clásico">Classic dominoes</div>
         </a>
-        <a href="/the-isla.html" class="game-card">
-          <span class="game-icon">🧩</span>
-          <div class="game-name">La Isla</div>
-          <div class="game-desc" data-en="Island puzzle" data-es="Rompecabezas isleño">Island puzzle</div>
+        <a href="/the-solitario.html" class="game-card">
+          <span class="game-icon">🃏</span>
+          <div class="game-name">Solitario Boricua</div>
+          <div class="game-desc" data-en="PR card solitaire" data-es="Solitario boricua">PR card solitaire</div>
         </a>
       </div>
       <div class="games-free-note" data-en="✨ All games free — no subscription needed" data-es="✨ Todos los juegos gratis — sin suscripción">✨ All games free — no subscription needed</div>
@@ -373,7 +363,6 @@
       if(cocoCracked) loadFortune();
     }
 
-    // ═══ CHECKOUT ═══
     function goToCheckout(){
       var btns = document.querySelectorAll('.bori-btn');
       var origTexts = [];
@@ -395,7 +384,6 @@
       });
     }
 
-    // ═══ FORTUNE COCO ═══
     function crackCoco(){
       if(cocoCracked) return;
       cocoCracked = true;
