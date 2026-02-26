@@ -3,37 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Hey Bori — Your Private Bilingual Spanish and English Digital Assistant. Puerto Rico is Spanish USA.">
-  <meta property="og:title" content="Hey Bori — Learn Spanish & English">
-  <meta property="og:description" content="Your Private Bilingual Spanish and English Digital Assistant. Puerto Rico is Spanish USA.">
+  <meta name="description" content="Hey Bori — Real Conversations. Your bilingual AI voice companion from Puerto Rico. Talk in Spanish and English, naturally.">
+  <meta property="og:title" content="Hey Bori — Real Conversations">
+  <meta property="og:description" content="Your bilingual AI voice companion from Puerto Rico. Talk in Spanish and English, naturally. Try free for 7 days.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://heybori.com">
-  <title>Hey Bori — Your Bilingual Digital Assistant 🇵🇷</title>
+  <title>Hey Bori — Real Conversations 🇵🇷</title>
   <link rel="icon" type="image/png" href="/icon-01F.png">
   <link rel="apple-touch-icon" href="/icon-01F.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    :root{--body:'Nunito',sans-serif;--bg:#FFFDF8;--white:#FFF;--dark:#1A1A1A;--text:#2A2A2A;--text-2:#5A5A5A;--text-3:#999;--border:#EDE8DF;--warm:#F8F4ED;--sun:#FF6B35;--sun-dark:#E55A25;--green:#2A9D6E;--coco-bg:rgba(139,90,43,0.06);--coco-border:rgba(139,90,43,0.18)}
+    :root{--body:'Nunito',sans-serif;--bg:#FFFDF8;--white:#FFF;--dark:#1A1A1A;--text:#2A2A2A;--text-2:#5A5A5A;--text-3:#999;--border:#EDE8DF;--warm:#F8F4ED;--sun:#FF6B35;--sun-dark:#E55A25;--green:#22C55E;--green-dark:#16A34A;--coco-bg:rgba(139,90,43,0.06);--coco-border:rgba(139,90,43,0.18)}
     html{scroll-behavior:smooth}
     body{font-family:var(--body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 
-    .page{display:flex;flex-direction:column;align-items:center;max-width:480px;margin:0 auto;padding:40px 24px 48px;text-align:center}
+    /* ═══ LAYOUT ═══ */
+    .page{display:flex;flex-direction:column;align-items:center;max-width:520px;margin:0 auto;padding:0 24px 48px}
 
-    /* LOGO */
-    .logo{width:240px;height:240px;margin-bottom:14px}
-    .logo img{width:100%;height:100%;object-fit:contain}
+    /* ═══ LANGUAGE TOGGLE — FIXED TOP ═══ */
+    .lang-bar{position:sticky;top:0;z-index:50;background:rgba(255,253,248,0.92);backdrop-filter:blur(12px);padding:14px 0 10px;display:flex;justify-content:center;width:100%;margin-bottom:8px}
+    .lang-toggle{display:flex;border-radius:10px;overflow:hidden;border:2px solid var(--border);background:var(--white)}
+    .lang-btn{padding:7px 20px;font-size:13px;font-weight:800;border:none;cursor:pointer;background:transparent;color:var(--text-3);transition:all .2s;font-family:var(--body)}
+    .lang-btn.active{background:var(--sun);color:var(--white);border-radius:8px}
 
-    /* STATEMENT */
-    .statement{font-size:clamp(18px,5vw,22px);font-weight:900;color:var(--dark);max-width:360px;line-height:1.45;margin-bottom:6px}
-    .sub-statement{font-size:clamp(14px,3.5vw,16px);font-weight:700;color:var(--text-2);max-width:360px;line-height:1.5;margin-bottom:12px}
+    /* ═══ HERO ═══ */
+    .hero{text-align:center;padding:20px 0 0}
+    .hero-img{width:200px;height:200px;margin:0 auto 16px}
+    .hero-img img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(255,107,53,0.15))}
+    .hero-title{font-size:clamp(28px,7vw,36px);font-weight:900;color:var(--dark);line-height:1.15;margin-bottom:6px}
+    .hero-title .hey{color:var(--sun)}
+    .hero-subtitle{font-size:clamp(15px,4vw,18px);font-weight:700;color:var(--text-2);margin-bottom:8px;line-height:1.5}
+    .hero-badge{display:inline-block;padding:6px 18px;border-radius:50px;background:#0050A0;color:var(--white);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
 
-    /* BADGE */
-    .badge{display:inline-block;padding:6px 18px;border-radius:50px;background:#0050A0;color:var(--white);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
+    /* ═══ HERO CTA ═══ */
+    .hero-cta{width:100%;max-width:360px;margin:0 auto 10px}
+    .btn-primary{display:block;width:100%;padding:18px;border-radius:50px;background:var(--sun);color:var(--white);font-size:18px;font-weight:900;font-family:var(--body);text-decoration:none;text-align:center;border:none;cursor:pointer;transition:all .25s;letter-spacing:.3px}
+    .btn-primary:hover{background:var(--sun-dark);transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,107,53,0.3)}
+    .btn-primary:active{transform:scale(.98)}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .hero-trial-note{font-size:12px;font-weight:700;color:var(--green-dark);text-align:center;margin-bottom:6px}
+    .hero-price-note{font-size:12px;font-weight:600;color:var(--text-3);text-align:center;margin-bottom:32px}
 
-    /* FORTUNE COCO */
-    .coco{width:100%;background:linear-gradient(135deg,var(--coco-bg),rgba(245,166,35,0.04));border:1.5px solid var(--coco-border);border-radius:20px;padding:24px 20px;margin-bottom:24px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden;transition:border-color .3s;min-height:110px}
+    /* ═══ DIVIDER ═══ */
+    .divider{width:60px;height:1.5px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:0 auto;border:none}
+
+    /* ═══ WHAT IS BORI ═══ */
+    .pitch{text-align:center;padding:32px 0;max-width:400px}
+    .pitch-icon{font-size:36px;margin-bottom:10px}
+    .pitch-title{font-size:20px;font-weight:900;color:var(--dark);margin-bottom:8px}
+    .pitch-text{font-size:15px;font-weight:600;color:var(--text-2);line-height:1.7}
+
+    /* ═══ FEATURES ═══ */
+    .features{width:100%;padding:8px 0 32px}
+    .feat-grid{display:flex;flex-direction:column;gap:12px}
+    .feat{display:flex;align-items:flex-start;gap:14px;background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:18px 16px;transition:border-color .2s}
+    .feat:hover{border-color:rgba(255,107,53,0.3)}
+    .feat-icon{font-size:28px;flex-shrink:0;width:36px;text-align:center;padding-top:2px}
+    .feat-content{flex:1}
+    .feat-name{font-size:15px;font-weight:800;color:var(--dark);margin-bottom:2px}
+    .feat-desc{font-size:13px;font-weight:600;color:var(--text-2);line-height:1.5}
+
+    /* ═══ FORTUNE COCO ═══ */
+    .coco-section{width:100%;padding:0 0 32px}
+    .coco{width:100%;background:linear-gradient(135deg,var(--coco-bg),rgba(245,166,35,0.04));border:1.5px solid var(--coco-border);border-radius:20px;padding:24px 20px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden;transition:border-color .3s;min-height:110px}
     .coco:active:not(.cracked){border-color:rgba(139,90,43,0.35)}
     .coco>*:not(.coco-crumbs):not(.coco-share){pointer-events:none}
     .coco-whole{transition:all .3s}
@@ -63,42 +97,40 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     .coco.cracked{border-color:rgba(139,90,43,0.25);box-shadow:0 4px 20px rgba(139,90,43,0.06)}
 
-    /* FREE INFO */
-    .free-info{font-size:15px;color:var(--text-3);margin-bottom:20px;font-weight:700}
-    .free-info span{color:var(--sun);font-weight:900}
+    /* ═══ PRICING CARD ═══ */
+    .pricing-section{width:100%;padding:0 0 32px}
+    .pricing-section-title{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;text-align:center;margin-bottom:14px}
+    .price-card{width:100%;border:2px solid var(--sun);border-radius:20px;padding:28px 24px;background:var(--white);text-align:center;box-shadow:0 4px 24px rgba(255,107,53,0.08);position:relative}
+    .price-card-tag{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--sun);color:var(--white);font-size:10px;font-weight:900;letter-spacing:1.5px;padding:4px 16px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
+    .price-card-name{font-size:22px;font-weight:900;color:var(--dark);margin-bottom:4px;margin-top:4px}
+    .price-card-amount{font-size:40px;font-weight:900;color:var(--sun)}
+    .price-card-amount span{font-size:16px;font-weight:600;color:var(--text-3)}
+    .price-card-period{font-size:13px;font-weight:600;color:var(--text-3);margin-bottom:16px}
+    .price-card-features{list-style:none;text-align:left;margin-bottom:20px}
+    .price-card-features li{font-size:14px;color:var(--text);padding:5px 0;font-weight:700;display:flex;align-items:center;gap:10px}
+    .price-card-features .ck{color:var(--green);font-size:16px;flex-shrink:0}
+    .price-card-btn{display:block;width:100%;padding:16px;border-radius:50px;background:var(--sun);color:var(--white);font-size:17px;font-weight:900;font-family:var(--body);border:none;cursor:pointer;transition:all .25s;text-align:center;text-decoration:none}
+    .price-card-btn:hover{background:var(--sun-dark)}
+    .price-card-btn:active{transform:scale(.98)}
+    .price-card-btn:disabled{opacity:.6;cursor:not-allowed}
+    .price-card-note{font-size:12px;font-weight:700;color:var(--green-dark);margin-top:10px}
 
-    /* CTA */
-    .cta{display:inline-block;padding:18px 56px;border-radius:50px;background:var(--sun);color:var(--white);font-size:19px;font-weight:900;text-decoration:none;transition:all .25s;font-family:var(--body);letter-spacing:.3px;margin-bottom:28px}
-    .cta:hover{background:var(--sun-dark);transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,107,53,0.3)}
+    /* ═══ GAMES SECTION ═══ */
+    .games-section{width:100%;padding:0 0 32px}
+    .games-title{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;text-align:center;margin-bottom:14px}
+    .games-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .game-card{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:16px 12px;text-align:center;text-decoration:none;transition:all .2s}
+    .game-card:hover{border-color:rgba(255,107,53,0.3);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.04)}
+    .game-card:active{transform:scale(.97)}
+    .game-icon{font-size:32px;display:block;margin-bottom:6px}
+    .game-name{font-size:14px;font-weight:800;color:var(--dark);margin-bottom:2px}
+    .game-desc{font-size:11px;font-weight:600;color:var(--text-3);line-height:1.4}
+    .games-free-note{text-align:center;margin-top:12px;font-size:12px;font-weight:700;color:var(--green-dark)}
 
-    /* PRICING */
-    .pricing-divider{width:60px;height:1.5px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:0 auto 20px;border:none}
-    .pricing-wrap{width:100%;display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
-    .plan{width:100%;border:1.5px solid var(--border);border-radius:18px;padding:20px;text-align:center;background:var(--white);transition:all .2s}
-    .plan.featured{border-color:var(--sun);box-shadow:0 4px 20px rgba(255,107,53,0.1);position:relative}
-    .plan-tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--sun);color:var(--white);font-size:9px;font-weight:900;letter-spacing:1.5px;padding:3px 14px;border-radius:20px;text-transform:uppercase}
-    .plan-name{font-size:18px;font-weight:900;color:var(--dark);margin-bottom:2px}
-    .plan-price{font-size:32px;font-weight:900;color:var(--dark);margin-bottom:2px}
-    .plan-price span{font-size:14px;font-weight:600;color:var(--text-3)}
-    .plan-desc{font-size:13px;color:var(--text-3);margin-bottom:12px;font-weight:600}
-    .plan-features{list-style:none;text-align:left;margin-bottom:14px}
-    .plan-features li{font-size:13px;color:var(--text-2);padding:4px 0;font-weight:600;display:flex;align-items:center;gap:8px}
-    .plan-features .ck{color:var(--green);font-size:12px}
-    .plan-features .lock{color:var(--text-3);font-size:12px;opacity:.4}
-    .plan-btn{display:block;width:100%;padding:14px;border-radius:50px;font-size:15px;font-weight:800;font-family:var(--body);text-decoration:none;text-align:center;transition:all .2s;border:none;cursor:pointer}
-    .plan-btn-free{background:var(--warm);color:var(--text-2);border:1.5px solid var(--border)}
-    .plan-btn-free:hover{border-color:var(--sun);color:var(--sun)}
-    .plan-btn-plus{background:var(--sun);color:var(--white)}
-    .plan-btn-plus:hover{background:var(--sun-dark)}
+    /* ═══ BOTTOM CTA ═══ */
+    .bottom-cta{width:100%;max-width:360px;text-align:center;padding:0 0 32px}
 
-    /* TOGGLE */
-    .lang-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:24px}
-    .lang-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px}
-    .lang-toggle{display:flex;border-radius:50px;overflow:hidden;border:2px solid var(--border);background:var(--white)}
-    .lang-btn{padding:7px 16px;font-size:13px;font-weight:800;border:none;cursor:pointer;background:transparent;color:var(--text-3);transition:all .2s;font-family:var(--body)}
-    .lang-btn.active{background:var(--sun);color:var(--white)}
-
-    /* HAMBURGER */
+    /* ═══ HAMBURGER MENU ═══ */
     .burger{position:fixed;top:16px;right:16px;z-index:99;width:44px;height:44px;border-radius:50%;background:var(--white);border:1.5px solid var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(0,0,0,0.06);transition:all .2s}
     .burger:active{transform:scale(.95)}
     .burger-line{width:18px;height:2.5px;background:var(--sun);border-radius:2px;transition:all .3s}
@@ -125,13 +157,17 @@
     .menu-footer a:active{color:var(--sun)}
     .menu-footer p{font-size:10px;color:var(--text-3);margin-top:8px;opacity:.5}
 
-    /* FOOTER */
-    footer{text-align:center}
+    /* ═══ FOOTER ═══ */
+    footer{text-align:center;padding-top:8px}
     footer p{font-size:11px;color:var(--text-3);margin-bottom:3px}
     footer .tm{font-size:10px;color:var(--text-3);margin-bottom:6px}
     footer .legal{font-size:11px}
     footer .legal a{color:var(--text-3);text-decoration:none;font-weight:700;margin:0 8px}
     footer .legal a:hover{color:var(--sun)}
+
+    /* ═══ TOAST ═══ */
+    .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:var(--white);padding:12px 28px;border-radius:50px;font-size:14px;font-weight:700;opacity:0;transition:all .3s;z-index:300;pointer-events:none}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   </style>
 </head>
 <body>
@@ -148,10 +184,12 @@
       <img src="/icon-01F.png" alt="Hey Bori">
       <div class="menu-header-text">
         <div class="menu-header-title"><span class="hey">Hey</span> Bori</div>
-        <div class="menu-header-sub" data-en="Your Digital Assistant" data-es="Tu Asistente Digital">Your Digital Assistant</div>
+        <div class="menu-header-sub">Real Conversations</div>
       </div>
     </div>
-    <div class="menu-section">THE GAMEROOM</div>
+    <div class="menu-section">MAIN</div>
+    <a href="/chat" class="menu-link"><span class="menu-link-icon">🎙️</span>Bori Voice<span class="menu-link-arrow">›</span></a>
+    <div class="menu-section">CULTURAL GAMES</div>
     <a href="/the-conga.html" class="menu-link"><span class="menu-link-icon">🥁</span>Conga<span class="menu-link-arrow">›</span></a>
     <a href="/the-lelolai.html" class="menu-link"><span class="menu-link-icon">🔤</span>LeLoLai Letras<span class="menu-link-arrow">›</span></a>
     <a href="/the-domino.html" class="menu-link"><span class="menu-link-icon">🎲</span>La Marquesina<span class="menu-link-arrow">›</span></a>
@@ -165,90 +203,164 @@
   </div>
 
   <div class="page">
-    <!-- TOGGLE -->
-    <div class="lang-wrap">
-      <div class="lang-label" data-en="Pick Your Language" data-es="Escoge Tu Idioma">Pick Your Language</div>
+
+    <!-- LANGUAGE TOGGLE -->
+    <div class="lang-bar">
       <div class="lang-toggle">
         <button class="lang-btn active" id="btn-en" onclick="setLang('en')">English</button>
         <button class="lang-btn" id="btn-es" onclick="setLang('es')">Español</button>
       </div>
     </div>
 
-    <!-- LOGO -->
-    <div class="logo"><img src="/icon-01F.png" alt="Hey Bori"></div>
+    <!-- ═══ HERO ═══ -->
+    <div class="hero">
+      <div class="hero-img"><img src="/icon-01F.png" alt="Hey Bori"></div>
+      <div class="hero-title"><span class="hey">Hey</span> Bori</div>
+      <div class="hero-subtitle" data-en="Real Conversations." data-es="Conversaciones Reales.">Real Conversations.</div>
+      <div class="hero-badge" data-en="Puerto Rico is Spanish USA™" data-es="Puerto Rico es Spanish USA™">Puerto Rico is Spanish USA™</div>
 
-    <!-- STATEMENT -->
-    <div class="statement" data-en="Real Conversations." data-es="Conversaciones Reales.">Real Conversations.</div>
-    <div class="sub-statement" data-en="Learn Spanish and English naturally." data-es="Aprende español e inglés naturalmente.">Learn Spanish and English naturally.</div>
-
-    <!-- BADGE -->
-    <div class="badge" data-en="No lessons. No pressure. Just natural learning." data-es="Sin lecciones. Sin presión. Solo aprendizaje natural.">No lessons. No pressure. Just natural learning.</div>
-
-    <!-- FORTUNE COCO -->
-    <div class="coco" id="coco" onclick="crackCoco()">
-      <div class="coco-whole" id="cocoWhole">
-        <span class="coco-nut">🥥</span>
-        <div class="coco-label">FORTUNE COCO™</div>
-        <div class="coco-tap" id="cocoTap" data-en="TAP TO CRACK 💥" data-es="TOCA PA' ROMPER 💥">TAP TO CRACK 💥</div>
-      </div>
-      <div class="coco-crumbs" id="cocoCrumbs">
-        <span class="coco-crumb" style="--fx:-70px;--fy:-60px;--fr:120deg">🥥</span>
-        <span class="coco-crumb" style="--fx:80px;--fy:-50px;--fr:-150deg">🌴</span>
-        <span class="coco-crumb" style="--fx:-55px;--fy:55px;--fr:200deg">✨</span>
-        <span class="coco-crumb" style="--fx:65px;--fy:60px;--fr:-100deg">🥥</span>
-        <span class="coco-crumb" style="--fx:-85px;--fy:10px;--fr:80deg">💛</span>
-        <span class="coco-crumb" style="--fx:40px;--fy:75px;--fr:-220deg">🇵🇷</span>
-      </div>
-      <div class="coco-fortune" id="cocoFortune">
-        <div class="coco-fortune-icon">🥥✨</div>
-        <div class="coco-fortune-label" data-en="TODAY'S FORTUNE" data-es="LA FORTUNA DE HOY">TODAY'S FORTUNE</div>
-        <div class="coco-text" id="cocoText"></div>
-        <button class="coco-share" onclick="event.stopPropagation();shareFortune()">
-          <span id="shareLabel" data-en="↗ SHARE" data-es="↗ COMPARTE">↗ SHARE</span>
-        </button>
+      <div class="hero-cta">
+        <button class="btn-primary" id="heroCTA" onclick="goToCheckout()" data-en="Start 7-Day Free Trial" data-es="Prueba Gratis — 7 Días">Start 7-Day Free Trial</button>
+        <div class="hero-trial-note" data-en="No charge for 7 days. Cancel anytime." data-es="Sin cargos por 7 días. Cancela cuando quieras.">No charge for 7 days. Cancel anytime.</div>
+        <div class="hero-price-note" data-en="Then $14.99/month" data-es="Luego $14.99/mes">Then $14.99/month</div>
       </div>
     </div>
 
-    <!-- FREE INFO -->
-    <div class="free-info" data-en="✨ <span>Free</span> — 10 conversations daily" data-es="✨ <span>Gratis</span> — 10 conversaciones diarias">✨ <span>Free</span> — 10 conversations daily</div>
+    <hr class="divider">
 
-    <!-- CTA -->
-    <a href="/chat" class="cta" data-en="Start Talking" data-es="Empieza a Hablar">Start Talking</a>
+    <!-- ═══ WHAT IS BORI ═══ -->
+    <div class="pitch">
+      <div class="pitch-icon">🎙️</div>
+      <div class="pitch-title" data-en="Talk. Don't type." data-es="Habla. No escribas.">Talk. Don't type.</div>
+      <div class="pitch-text" data-en="Bori is your bilingual AI voice companion from Puerto Rico. Have real conversations in Spanish and English — naturally, like talking to a friend. No lessons. No flashcards. Just talk." data-es="Bori es tu compañero bilingüe de voz de Puerto Rico. Ten conversaciones reales en español e inglés — naturalmente, como hablar con un amigo. Sin lecciones. Sin tarjetas. Solo habla.">Bori is your bilingual AI voice companion from Puerto Rico. Have real conversations in Spanish and English — naturally, like talking to a friend. No lessons. No flashcards. Just talk.</div>
+    </div>
 
-    <!-- PRICING -->
-    <hr class="pricing-divider">
-    <div class="pricing-wrap">
-      <!-- LIBRE -->
-      <div class="plan">
-        <div class="plan-name">Bori Libre</div>
-        <div class="plan-price">$0</div>
-        <div class="plan-desc" data-en="Free forever" data-es="Gratis siempre">Free forever</div>
-        <ul class="plan-features" id="libreFeat">
-          <li><span class="ck">✓</span><span data-en="10 messages per day" data-es="10 mensajes por día">10 messages per day</span></li>
-          <li><span class="ck">✓</span><span data-en="Bilingual chat (EN/ES)" data-es="Chat bilingüe (EN/ES)">Bilingual chat (EN/ES)</span></li>
-          <li><span class="ck">✓</span><span data-en="Fortune Coco™ daily" data-es="Fortune Coco™ diario">Fortune Coco™ daily</span></li>
-          <li><span class="ck">✓</span><span data-en="4 cultural games" data-es="4 juegos culturales">4 cultural games</span></li>
-        </ul>
-        <a href="/chat" class="plan-btn plan-btn-free" data-en="Start Free" data-es="Empezar Gratis">Start Free</a>
-      </div>
-      <!-- PLUS -->
-      <div class="plan featured">
-        <div class="plan-tag" data-en="RECOMMENDED" data-es="RECOMENDADO">RECOMMENDED</div>
-        <div class="plan-name">Bori Plus</div>
-        <div class="plan-price">$7<span>.00/mo</span></div>
-        <div class="plan-desc" data-en="Unlimited. 24/7. All yours." data-es="Ilimitado. 24/7. Todo tuyo.">Unlimited. 24/7. All yours.</div>
-        <ul class="plan-features" id="plusFeat">
-          <li><span class="ck">✓</span><span data-en="Unlimited messages" data-es="Mensajes ilimitados">Unlimited messages</span></li>
-          <li><span class="ck">✓</span><span data-en="Bilingual chat (EN/ES)" data-es="Chat bilingüe (EN/ES)">Bilingual chat (EN/ES)</span></li>
-          <li><span class="ck">✓</span><span data-en="Voice conversation" data-es="Conversación por voz">Voice conversation</span></li>
-          <li><span class="ck">✓</span><span data-en="Priority speed" data-es="Velocidad prioritaria">Priority speed</span></li>
-          <li><span class="ck">✓</span><span data-en="All games unlocked" data-es="Todos los juegos desbloqueados">All games unlocked</span></li>
-        </ul>
-        <button class="plan-btn plan-btn-plus" onclick="joinBoriPlus()" data-en="Join Bori Plus" data-es="Únete a Bori Plus">Join Bori Plus</button>
+    <hr class="divider">
+
+    <!-- ═══ FEATURES ═══ -->
+    <div class="features">
+      <div class="feat-grid">
+        <div class="feat">
+          <div class="feat-icon">🗣️</div>
+          <div class="feat-content">
+            <div class="feat-name" data-en="Voice Conversations" data-es="Conversaciones de Voz">Voice Conversations</div>
+            <div class="feat-desc" data-en="Talk out loud with Bori. Real-time voice, not a chatbot." data-es="Habla en voz alta con Bori. Voz en tiempo real, no un chatbot.">Talk out loud with Bori. Real-time voice, not a chatbot.</div>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">🇵🇷</div>
+          <div class="feat-content">
+            <div class="feat-name" data-en="Authentic Boricua" data-es="Boricua Auténtico">Authentic Boricua</div>
+            <div class="feat-desc" data-en="Puerto Rican Spanish — not textbook. The way it's actually spoken." data-es="Español puertorriqueño — no de libro. Como se habla de verdad.">Puerto Rican Spanish — not textbook. The way it's actually spoken.</div>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">🔄</div>
+          <div class="feat-content">
+            <div class="feat-name" data-en="Fully Bilingual" data-es="Completamente Bilingüe">Fully Bilingual</div>
+            <div class="feat-desc" data-en="Switch between English and Spanish anytime. Bori follows your lead." data-es="Cambia entre inglés y español cuando quieras. Bori te sigue.">Switch between English and Spanish anytime. Bori follows your lead.</div>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">🧠</div>
+          <div class="feat-content">
+            <div class="feat-name" data-en="Powered by Claude" data-es="Potenciado por Claude">Powered by Claude</div>
+            <div class="feat-desc" data-en="Built on world-class AI. Smart, natural, and always respectful." data-es="Construido con IA de clase mundial. Inteligente, natural y respetuoso.">Built on world-class AI. Smart, natural, and always respectful.</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- FOOTER -->
+    <hr class="divider">
+
+    <!-- ═══ FORTUNE COCO ═══ -->
+    <div class="coco-section">
+      <div class="coco" id="coco" onclick="crackCoco()">
+        <div class="coco-whole" id="cocoWhole">
+          <span class="coco-nut">🥥</span>
+          <div class="coco-label">FORTUNE COCO™</div>
+          <div class="coco-tap" id="cocoTap" data-en="TAP TO CRACK 💥" data-es="TOCA PARA ROMPER 💥">TAP TO CRACK 💥</div>
+        </div>
+        <div class="coco-crumbs" id="cocoCrumbs">
+          <span class="coco-crumb" style="--fx:-70px;--fy:-60px;--fr:120deg">🥥</span>
+          <span class="coco-crumb" style="--fx:80px;--fy:-50px;--fr:-150deg">🌴</span>
+          <span class="coco-crumb" style="--fx:-55px;--fy:55px;--fr:200deg">✨</span>
+          <span class="coco-crumb" style="--fx:65px;--fy:60px;--fr:-100deg">🥥</span>
+          <span class="coco-crumb" style="--fx:-85px;--fy:10px;--fr:80deg">💛</span>
+          <span class="coco-crumb" style="--fx:40px;--fy:75px;--fr:-220deg">🇵🇷</span>
+        </div>
+        <div class="coco-fortune" id="cocoFortune">
+          <div class="coco-fortune-icon">🥥✨</div>
+          <div class="coco-fortune-label" data-en="TODAY'S FORTUNE" data-es="LA FORTUNA DE HOY">TODAY'S FORTUNE</div>
+          <div class="coco-text" id="cocoText"></div>
+          <button class="coco-share" onclick="event.stopPropagation();shareFortune()">
+            <span id="shareLabel" data-en="↗ SHARE" data-es="↗ COMPARTE">↗ SHARE</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ PRICING ═══ -->
+    <div class="pricing-section">
+      <div class="pricing-section-title" data-en="Simple Pricing" data-es="Precio Simple">Simple Pricing</div>
+      <div class="price-card">
+        <div class="price-card-tag" data-en="7 DAYS FREE" data-es="7 DÍAS GRATIS">7 DAYS FREE</div>
+        <div class="price-card-name" data-en="Hey Bori — Real Conversations" data-es="Hey Bori — Conversaciones Reales">Hey Bori — Real Conversations</div>
+        <div class="price-card-amount">$14.99<span>/mo</span></div>
+        <div class="price-card-period" data-en="Cancel anytime" data-es="Cancela cuando quieras">Cancel anytime</div>
+        <ul class="price-card-features">
+          <li><span class="ck">✓</span><span data-en="Unlimited voice conversations" data-es="Conversaciones de voz ilimitadas">Unlimited voice conversations</span></li>
+          <li><span class="ck">✓</span><span data-en="Bilingual — Spanish & English" data-es="Bilingüe — Español e Inglés">Bilingual — Spanish & English</span></li>
+          <li><span class="ck">✓</span><span data-en="Authentic Puerto Rican companion" data-es="Compañero auténtico puertorriqueño">Authentic Puerto Rican companion</span></li>
+          <li><span class="ck">✓</span><span data-en="Cultural games included" data-es="Juegos culturales incluidos">Cultural games included</span></li>
+          <li><span class="ck">✓</span><span data-en="Powered by Claude AI" data-es="Potenciado por Claude AI">Powered by Claude AI</span></li>
+        </ul>
+        <button class="price-card-btn" id="priceCTA" onclick="goToCheckout()" data-en="Start 7-Day Free Trial" data-es="Prueba Gratis — 7 Días">Start 7-Day Free Trial</button>
+        <div class="price-card-note" data-en="No charge for 7 days. Cancel anytime." data-es="Sin cargos por 7 días. Cancela cuando quieras.">No charge for 7 days. Cancel anytime.</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ CULTURAL GAMES ═══ -->
+    <div class="games-section">
+      <div class="games-title" data-en="Cultural Games — Free" data-es="Juegos Culturales — Gratis">Cultural Games — Free</div>
+      <div class="games-grid">
+        <a href="/the-conga.html" class="game-card">
+          <span class="game-icon">🥁</span>
+          <div class="game-name">Conga</div>
+          <div class="game-desc" data-en="Rhythm & reflex" data-es="Ritmo y reflejos">Rhythm & reflex</div>
+        </a>
+        <a href="/the-lelolai.html" class="game-card">
+          <span class="game-icon">🔤</span>
+          <div class="game-name">LeLoLai Letras</div>
+          <div class="game-desc" data-en="Word scramble" data-es="Palabras revueltas">Word scramble</div>
+        </a>
+        <a href="/the-domino.html" class="game-card">
+          <span class="game-icon">🎲</span>
+          <div class="game-name">La Marquesina</div>
+          <div class="game-desc" data-en="Classic dominoes" data-es="Dominó clásico">Classic dominoes</div>
+        </a>
+        <a href="/the-isla.html" class="game-card">
+          <span class="game-icon">🧩</span>
+          <div class="game-name">La Isla</div>
+          <div class="game-desc" data-en="Island puzzle" data-es="Rompecabezas isleño">Island puzzle</div>
+        </a>
+      </div>
+      <div class="games-free-note" data-en="✨ All games free — no subscription needed" data-es="✨ Todos los juegos gratis — sin suscripción">✨ All games free — no subscription needed</div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ BOTTOM CTA ═══ -->
+    <div class="bottom-cta" style="padding-top:28px">
+      <button class="btn-primary" id="bottomCTA" onclick="goToCheckout()" data-en="Start 7-Day Free Trial" data-es="Prueba Gratis — 7 Días">Start 7-Day Free Trial</button>
+      <div class="hero-trial-note" style="margin-top:10px" data-en="No charge for 7 days. Cancel anytime." data-es="Sin cargos por 7 días. Cancela cuando quieras.">No charge for 7 days. Cancel anytime.</div>
+    </div>
+
+    <!-- ═══ FOOTER ═══ -->
     <footer>
       <p>© 2026 GoStar Digital LLC. All Rights Reserved.</p>
       <p class="tm">"Puerto Rico is Spanish USA"™ GoStar Digital LLC · San Juan, PR 🇵🇷</p>
@@ -256,9 +368,16 @@
     </footer>
   </div>
 
+  <div class="toast" id="toast"></div>
+
   <script>
-    var lang='en';
-    var cocoCracked=false;
+    var lang = localStorage.getItem('bori-lang') || 'en';
+    var cocoCracked = false;
+
+    // Init language
+    (function(){
+      setLang(lang);
+    })();
 
     function toggleMenu(){
       document.getElementById('burger').classList.toggle('open');
@@ -267,82 +386,106 @@
     }
 
     function setLang(l){
-      lang=l;
-      document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');
-      document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');
-      var els=document.querySelectorAll('[data-'+l+']');
-      for(var i=0;i<els.length;i++){
-        var el=els[i],val=el.getAttribute('data-'+l);
-        if(val&&!el.classList.contains('lang-btn')){
-          if(el.tagName==='A'||el.tagName==='BUTTON')el.textContent=val;
-          else el.innerHTML=val;
+      lang = l;
+      localStorage.setItem('bori-lang', l);
+      document.getElementById('btn-en').className = 'lang-btn' + (l === 'en' ? ' active' : '');
+      document.getElementById('btn-es').className = 'lang-btn' + (l === 'es' ? ' active' : '');
+      var els = document.querySelectorAll('[data-' + l + ']');
+      for(var i = 0; i < els.length; i++){
+        var el = els[i], val = el.getAttribute('data-' + l);
+        if(val && !el.classList.contains('lang-btn')){
+          if(el.tagName === 'BUTTON' || el.tagName === 'A') el.textContent = val;
+          else el.innerHTML = val;
         }
       }
-      if(cocoCracked)loadFortune();
+      if(cocoCracked) loadFortune();
     }
 
+    // ═══ CHECKOUT — STRAIGHT TO STRIPE ═══
+    function goToCheckout(){
+      // Disable all CTA buttons
+      var btns = document.querySelectorAll('.btn-primary, .price-card-btn');
+      var origTexts = [];
+      btns.forEach(function(b,i){
+        origTexts[i] = b.textContent;
+        b.disabled = true;
+        b.textContent = '...';
+      });
+
+      fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({lang: lang})
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if(data.url){
+          window.location.href = data.url;
+        } else {
+          btns.forEach(function(b,i){ b.disabled = false; b.textContent = origTexts[i]; });
+          showToast(lang === 'es' ? 'Algo salió mal. Intenta de nuevo.' : 'Something went wrong. Try again.');
+        }
+      })
+      .catch(function(){
+        btns.forEach(function(b,i){ b.disabled = false; b.textContent = origTexts[i]; });
+        showToast(lang === 'es' ? 'Error de conexión. Intenta de nuevo.' : 'Connection error. Try again.');
+      });
+    }
+
+    // ═══ FORTUNE COCO ═══
     function crackCoco(){
-      if(cocoCracked)return;
-      cocoCracked=true;
-      var el=document.getElementById('coco');
+      if(cocoCracked) return;
+      cocoCracked = true;
+      var el = document.getElementById('coco');
       el.classList.add('cracking');
       setTimeout(function(){
         el.classList.remove('cracking');
         el.classList.add('cracked');
         loadFortune();
-      },500);
+      }, 500);
     }
 
     function loadFortune(){
-      var today=new Date().toISOString().split('T')[0];
-      var key='fortune_'+lang+'_'+today;
-      try{var saved=localStorage.getItem(key);if(saved){document.getElementById('cocoText').textContent=saved;return;}}catch(e){}
-      document.getElementById('cocoText').innerHTML='<div class="coco-loading"><div class="coco-spinner"></div></div>';
-      fetch('/api/fortune?lang='+lang)
-        .then(function(r){return r.json();})
+      var today = new Date().toISOString().split('T')[0];
+      var key = 'fortune_' + lang + '_' + today;
+      try{
+        var saved = localStorage.getItem(key);
+        if(saved){ document.getElementById('cocoText').textContent = saved; return; }
+      } catch(e){}
+      document.getElementById('cocoText').innerHTML = '<div class="coco-loading"><div class="coco-spinner"></div></div>';
+      fetch('/api/fortune?lang=' + lang)
+        .then(function(r){ return r.json(); })
         .then(function(data){
-          var text=data.fortune||data.message||(lang==='es'?'Hoy es tu día. Créelo.':'Today is your day. Believe it.');
-          try{localStorage.setItem(key,text);}catch(e){}
-          document.getElementById('cocoText').textContent=text;
+          var text = data.fortune || (lang === 'es' ? 'Hoy es tu día. Créelo.' : 'Today is your day. Believe it.');
+          try{ localStorage.setItem(key, text); } catch(e){}
+          document.getElementById('cocoText').textContent = text;
         })
         .catch(function(){
-          var fallbacks=[
-            lang==='es'?'El coco dice: hoy es un buen día pa\' brillar. 🥥✨':'The coco says: today is a good day to shine. 🥥✨',
-            lang==='es'?'Algo bueno viene pa\' ti hoy. Lo siento en el aire. 🌴':'Something good is coming your way today. I can feel it. 🌴',
-            lang==='es'?'Tu energía hoy está fuego. Úsala bien. 🔥':'Your energy today is fire. Use it well. 🔥'
+          var fallbacks = [
+            lang === 'es' ? 'Algo bueno viene hoy. Lo siento en el aire. 🌴' : 'Something good is coming your way today. 🌴',
+            lang === 'es' ? 'Tu energía hoy está fuego. Úsala bien. 🔥' : 'Your energy today is fire. Use it well. 🔥'
           ];
-          document.getElementById('cocoText').textContent=fallbacks[Math.floor(Math.random()*fallbacks.length)];
+          document.getElementById('cocoText').textContent = fallbacks[Math.floor(Math.random() * fallbacks.length)];
         });
     }
 
     function shareFortune(){
-      var text=document.getElementById('cocoText').textContent;
-      var shareText='🥥 '+text+' — heybori.com';
-      if(navigator.share){navigator.share({title:'Fortune Coco™ — Hey Bori',text:shareText,url:'https://heybori.com'}).catch(function(){});}
-      else{navigator.clipboard.writeText(shareText).then(function(){
-        var btn=document.querySelector('.coco-share');btn.textContent='✓ Copied!';setTimeout(function(){btn.innerHTML='<span>↗ SHARE</span>';},2000);
-      }).catch(function(){});}
+      var text = document.getElementById('cocoText').textContent;
+      var shareText = '🥥 ' + text + ' — heybori.com';
+      if(navigator.share){
+        navigator.share({title: 'Fortune Coco™ — Hey Bori', text: shareText, url: 'https://heybori.com'}).catch(function(){});
+      } else {
+        navigator.clipboard.writeText(shareText).then(function(){
+          showToast(lang === 'es' ? '¡Copiado!' : 'Copied!');
+        }).catch(function(){});
+      }
     }
 
-    function joinBoriPlus(){
-      var btn=document.querySelector('.plan-btn-plus');
-      var origText=btn.textContent;
-      btn.textContent=lang==='es'?'Cargando...':'Loading...';
-      btn.disabled=true;
-      fetch('/api/stripe/checkout',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({lang:lang})
-      })
-      .then(function(r){return r.json();})
-      .then(function(data){
-        if(data.url){window.location.href=data.url;}
-        else{btn.textContent=origText;btn.disabled=false;alert(lang==='es'?'Error. Intenta de nuevo.':'Error. Try again.');}
-      })
-      .catch(function(){
-        btn.textContent=origText;btn.disabled=false;
-        alert(lang==='es'?'Error de conexión. Intenta de nuevo.':'Connection error. Try again.');
-      });
+    function showToast(msg){
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show';
+      setTimeout(function(){ t.className = 'toast'; }, 2500);
     }
   </script>
 </body>
