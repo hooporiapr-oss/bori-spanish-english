@@ -2,335 +2,384 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Solitario Boricua — Hey Bori</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="/icon-01F.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0a0f0a;
-  --felt: #0d1f12;
-  --card-white: #faf8f0;
-  --card-shadow: rgba(0,0,0,0.4);
-  --palma: #00C853;
-  --ritmo: #FF6D00;
-  --cocina: #D50000;
-  --costa: #0091EA;
+  --felt: #0e1a10;
+  --tile-bg: #FAF7F0;
+  --tile-border: #C8C0B0;
+  --tile-shadow: rgba(0,0,0,0.35);
+  --tile-selected: #FFD700;
+  --tile-match: #2ECC40;
   --gold: #FFD700;
-  --gold-dim: #b8981a;
+  --gold-dark: #D4A800;
   --text: #e8e4d9;
   --text-dim: #8a8677;
-  --success: #00E676;
-  --card-w: 75px;
-  --card-h: 108px;
-  --card-radius: 8px;
-  --stack-offset: 22px;
-  --face-down-offset: 8px;
+  --pip: #1a1a1a;
+  --sun: #FF6B35;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
-  background: var(--bg);
-  font-family: 'Outfit', sans-serif;
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-  user-select: none;
-  -webkit-user-select: none;
+html, body {
+  height: 100%;
+  overflow: hidden;
+  touch-action: manipulation;
 }
 
-/* HEADER */
+body {
+  background: var(--felt);
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(34,70,22,0.25) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(34,70,22,0.15) 0%, transparent 50%);
+  font-family: 'Outfit', sans-serif;
+  color: var(--text);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: fixed;
+  width: 100%;
+}
+
+/* ═══ HEADER ═══ */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
-  background: linear-gradient(180deg, rgba(13,31,18,0.95), rgba(10,15,10,0.8));
-  border-bottom: 1px solid rgba(255,215,0,0.15);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: 0 12px;
+  background: linear-gradient(180deg, rgba(10,18,10,0.97), rgba(10,15,10,0.9));
+  border-bottom: 1px solid rgba(255,215,0,0.1);
+  height: 50px;
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-back {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 6px;
+  line-height: 1;
+}
+
+.header-brand {
+  display: flex;
+  flex-direction: column;
 }
 
 .header-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
+  font-size: 19px;
   letter-spacing: 2px;
   background: linear-gradient(135deg, var(--gold), #FFA000);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
 }
 
-.header-subtitle {
-  font-size: 10px;
+.header-sub {
+  font-size: 8px;
   color: var(--text-dim);
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
 }
 
-.header-stats {
+.header-right {
   display: flex;
-  gap: 16px;
   align-items: center;
-  font-size: 13px;
+  gap: 12px;
 }
 
-.stat-label { color: var(--text-dim); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
-.stat-value { color: var(--gold); font-family: 'Bebas Neue', sans-serif; font-size: 20px; }
+.stat {
+  text-align: center;
+}
 
-.btn-new {
+.stat-label {
+  font-size: 7px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.stat-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  color: var(--gold);
+  line-height: 1.1;
+}
+
+.btn {
   background: linear-gradient(135deg, var(--gold), #FFA000);
   color: #000;
   border: none;
-  padding: 6px 14px;
+  padding: 7px 14px;
   border-radius: 20px;
   font-family: 'Outfit', sans-serif;
-  font-weight: 700;
-  font-size: 12px;
+  font-weight: 800;
+  font-size: 11px;
   cursor: pointer;
   letter-spacing: 1px;
   text-transform: uppercase;
-  transition: transform 0.15s;
 }
-.btn-new:hover { transform: scale(1.05); }
-.btn-new:active { transform: scale(0.97); }
+.btn:active { transform: scale(0.93); }
 
-/* GAME AREA */
-.game-area {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 12px 8px 40px;
-  position: relative;
-  min-height: calc(100vh - 60px);
-}
-
-/* TOP ROW: stock, waste, gap, 4 foundations */
-.top-row {
+/* ═══ GAME AREA ═══ */
+.game-wrap {
+  height: calc(100vh - 50px);
+  height: calc(100dvh - 50px);
   display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.top-row .spacer { width: var(--card-w); }
-
-/* TABLEAU */
-.tableau {
+/* ═══ BOARD — scrollable grid of dominos ═══ */
+.board {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 8px 100px;
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  align-content: flex-start;
   justify-content: center;
+  gap: 8px;
 }
 
-/* CARD SLOTS */
-.slot {
-  width: var(--card-w);
-  height: var(--card-h);
-  border-radius: var(--card-radius);
-  border: 2px dashed rgba(255,215,0,0.15);
-  position: relative;
-  flex-shrink: 0;
-}
-
-.slot.foundation::after {
-  content: attr(data-suit-icon);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 28px;
-  opacity: 0.2;
-}
-
-/* TABLEAU COLUMN */
-.column {
-  width: var(--card-w);
-  position: relative;
-  min-height: var(--card-h);
-  flex-shrink: 0;
-}
-
-/* CARDS */
-.card {
-  width: var(--card-w);
-  height: var(--card-h);
-  border-radius: var(--card-radius);
-  position: absolute;
+/* ═══ DOMINO TILE ═══ */
+.domino {
+  width: 72px;
+  height: 120px;
+  background: var(--tile-bg);
+  border-radius: 10px;
+  border: 2px solid var(--tile-border);
+  box-shadow: 0 3px 10px var(--tile-shadow), inset 0 1px 0 rgba(255,255,255,0.6);
+  display: flex;
+  flex-direction: column;
   cursor: pointer;
-  transition: box-shadow 0.15s, transform 0.15s;
-  z-index: 1;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
 }
 
-.card.face-down {
-  background: linear-gradient(145deg, #1a3a20, #0f2415);
-  border: 1.5px solid rgba(255,215,0,0.2);
+.domino:active:not(.matched):not(.removing) {
+  transform: scale(0.95);
+}
+
+.domino.selected {
+  border-color: var(--tile-selected);
+  box-shadow: 0 0 0 3px var(--tile-selected), 0 6px 24px rgba(255,215,0,0.4);
+  transform: translateY(-6px) scale(1.03);
+  z-index: 10;
+}
+
+.domino.hint {
+  border-color: var(--sun);
+  box-shadow: 0 0 0 2px var(--sun), 0 4px 16px rgba(255,107,53,0.3);
+  animation: hintPulse 0.8s ease-in-out 2;
+}
+@keyframes hintPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.domino.matched {
+  border-color: var(--tile-match);
+  box-shadow: 0 0 0 3px var(--tile-match), 0 6px 24px rgba(46,204,64,0.3);
+}
+
+.domino.removing {
+  animation: dominoRemove 0.4s ease-in forwards;
+  pointer-events: none;
+}
+@keyframes dominoRemove {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1) rotate(3deg); opacity: 0.8; }
+  100% { transform: scale(0) rotate(10deg); opacity: 0; }
+}
+
+.domino.face-down {
+  background: linear-gradient(145deg, #1c3d22, #122916);
+  border-color: rgba(255,215,0,0.15);
   cursor: default;
-  box-shadow: 0 2px 6px var(--card-shadow);
 }
 
-.card.face-down::before {
+.domino.face-down::after {
   content: '🌴';
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 22px;
-  opacity: 0.4;
+  font-size: 24px;
+  opacity: 0.3;
 }
 
-.card.face-down::after {
-  content: '';
-  position: absolute;
-  inset: 4px;
-  border-radius: 4px;
-  border: 1px solid rgba(255,215,0,0.1);
-}
-
-.card.face-up {
-  background: var(--card-white);
-  border: 1px solid #d4d0c4;
-  box-shadow: 0 2px 8px var(--card-shadow);
-}
-
-.card.face-up:hover {
-  box-shadow: 0 4px 16px rgba(255,215,0,0.25);
-}
-
-.card.dragging {
-  box-shadow: 0 12px 32px rgba(0,0,0,0.6);
-  z-index: 1000 !important;
-  cursor: grabbing;
-  transform: rotate(2deg);
-}
-
-.card.highlight {
-  box-shadow: 0 0 0 3px var(--gold), 0 4px 16px rgba(255,215,0,0.4);
-}
-
-/* Card inner layout */
-.card-inner {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 5px 6px;
-  position: relative;
-}
-
-.card-corner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1;
-}
-
-.card-corner-bottom {
-  position: absolute;
-  bottom: 5px;
-  right: 6px;
-  transform: rotate(180deg);
-}
-
-.card-rank {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-  line-height: 1;
-}
-
-.card-suit-small {
-  font-size: 12px;
-  line-height: 1;
-}
-
-.card-center {
+/* ═══ DOMINO HALVES ═══ */
+.domino-half {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  position: relative;
 }
 
-/* Suit colors */
-.suit-palma .card-rank, .suit-palma .card-suit-small { color: var(--palma); }
-.suit-ritmo .card-rank, .suit-ritmo .card-suit-small { color: var(--ritmo); }
-.suit-cocina .card-rank, .suit-cocina .card-suit-small { color: var(--cocina); }
-.suit-costa .card-rank, .suit-costa .card-suit-small { color: var(--costa); }
-
-/* STOCK PILE */
-.stock {
-  cursor: pointer;
+.domino-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 8%, #B0A890 8%, #B0A890 92%, transparent 92%);
+  flex-shrink: 0;
 }
 
-.stock.empty {
-  cursor: pointer;
-  border-style: dashed;
+/* ═══ PIP LAYOUTS ═══ */
+.pip-area {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 1px;
+  align-items: center;
+  justify-items: center;
 }
 
-.stock.empty::after {
-  content: '↻';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 28px;
-  color: var(--gold-dim);
-  opacity: 0.5;
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--pip);
+  box-shadow: inset 0 -1px 1px rgba(255,255,255,0.15), 0 1px 1px rgba(0,0,0,0.2);
 }
 
-/* WASTE */
-.waste {
+/* Blank (0) — no pips */
+
+/* ═══ BOTTOM BAR ═══ */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: linear-gradient(180deg, rgba(10,18,10,0.95), rgba(8,12,8,0.98));
+  border-top: 1px solid rgba(255,215,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 12px;
+  z-index: 50;
+}
+
+.bar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: none;
   border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 12px;
+  transition: all 0.15s;
+  font-family: 'Outfit', sans-serif;
+}
+.bar-btn:active { background: rgba(255,215,0,0.08); }
+.bar-btn-icon { font-size: 22px; }
+.bar-btn-label { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+
+.bar-btn.active { color: var(--gold); }
+
+.bar-remaining {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.bar-remaining-count {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: var(--gold);
+  line-height: 1;
+}
+.bar-remaining-label {
+  font-size: 8px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
 }
 
-/* WIN SCREEN */
-.win-overlay {
+/* ═══ WIN OVERLAY ═══ */
+.overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.88);
   z-index: 9999;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
+.overlay.show { display: flex; }
 
-.win-overlay.show { display: flex; }
-
-.win-title {
+.overlay-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 64px;
+  font-size: 52px;
   background: linear-gradient(135deg, var(--gold), #FFA000, var(--gold));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
   letter-spacing: 4px;
-  animation: winPulse 1.5s ease infinite;
+  animation: pulse 1.5s ease infinite;
 }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
 
-@keyframes winPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-.win-stats {
+.overlay-stats {
   color: var(--text-dim);
-  font-size: 16px;
+  font-size: 15px;
   text-align: center;
   line-height: 2;
 }
+.overlay-stats span { color: var(--gold); font-weight: 700; }
 
-.win-stats span { color: var(--gold); font-weight: 700; }
+.overlay-btn {
+  background: linear-gradient(135deg, var(--gold), #FFA000);
+  color: #000;
+  border: none;
+  padding: 14px 36px;
+  border-radius: 30px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
 
-/* FACT TOAST */
-.fact-toast {
+/* ═══ FACT TOAST ═══ */
+.toast {
   position: fixed;
-  bottom: 20px;
+  bottom: 84px;
   left: 50%;
-  transform: translateX(-50%) translateY(100px);
+  transform: translateX(-50%) translateY(80px);
   background: linear-gradient(135deg, rgba(13,31,18,0.97), rgba(0,0,0,0.95));
-  border: 1px solid rgba(255,215,0,0.3);
+  border: 1px solid rgba(255,215,0,0.2);
   border-radius: 12px;
-  padding: 10px 18px;
-  max-width: 360px;
+  padding: 10px 16px;
+  max-width: min(340px, 88vw);
   text-align: center;
   font-size: 12px;
   color: var(--text);
@@ -338,109 +387,311 @@ body {
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   pointer-events: none;
 }
-
-.fact-toast.show {
-  transform: translateX(-50%) translateY(0);
-}
-
-.fact-toast .fact-label {
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast-label {
   color: var(--gold);
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 2px;
   margin-bottom: 2px;
 }
 
-/* RESPONSIVE */
-@media (max-width: 580px) {
-  :root {
-    --card-w: 46px;
-    --card-h: 66px;
-    --stack-offset: 18px;
-    --face-down-offset: 6px;
-    --card-radius: 5px;
-  }
-  .card-rank { font-size: 13px; }
-  .card-suit-small { font-size: 9px; }
-  .card-center { font-size: 18px; }
-  .header-title { font-size: 17px; }
-  .stat-value { font-size: 16px; }
-  .header-stats { gap: 10px; }
-  .top-row, .tableau { gap: 5px; }
-  .card.face-down::before { font-size: 14px; }
-  .fact-toast { max-width: 90vw; }
-  .slot.foundation::after { font-size: 18px; }
+/* ═══ HOW TO PLAY DROPDOWN ═══ */
+.help-dropdown {
+  position: fixed;
+  bottom: 72px;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  transform: translateY(120%);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.help-dropdown.show {
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
-@media (max-width: 380px) {
-  :root {
-    --card-w: 40px;
-    --card-h: 58px;
-    --stack-offset: 15px;
-    --face-down-offset: 5px;
-  }
-  .game-area { padding: 8px 4px 30px; }
-  .header { padding: 8px 10px; }
-  .btn-new { padding: 5px 10px; font-size: 10px; }
+.help-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 199;
+}
+.help-backdrop.show { display: block; }
+
+.help-box {
+  background: linear-gradient(180deg, rgba(14,26,16,0.98), rgba(8,14,8,0.99));
+  border-top: 1.5px solid rgba(255,215,0,0.2);
+  border-radius: 20px 20px 0 0;
+  padding: 20px 20px 28px;
+  max-height: 65vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.help-handle {
+  width: 36px;
+  height: 4px;
+  background: rgba(255,215,0,0.25);
+  border-radius: 2px;
+  margin: 0 auto 14px;
+}
+
+.help-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+/* Language toggle inside help */
+.help-lang {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255,215,0,0.2);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.help-lang-btn {
+  padding: 6px 20px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-dim);
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.help-lang-btn.active {
+  background: var(--gold);
+  color: #000;
+}
+
+.help-content { display: none; }
+.help-content.active { display: block; }
+
+.help-text {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.8;
+  font-weight: 600;
+  text-align: center;
+}
+
+.help-text strong { color: var(--gold); }
+
+.help-example {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 14px 0;
+  padding: 12px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  border: 1px solid rgba(255,215,0,0.08);
+}
+
+.help-mini-tile {
+  background: var(--tile-bg);
+  border-radius: 6px;
+  border: 1.5px solid var(--tile-border);
+  padding: 6px 10px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--pip);
+  text-align: center;
+  line-height: 1.3;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.help-mini-tile .hd { 
+  border-top: 1.5px solid #B0A890; 
+  margin-top: 4px; 
+  padding-top: 4px; 
+}
+
+.help-plus {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--gold);
+}
+
+.help-equals {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  color: var(--tile-match);
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (min-width: 420px) {
+  .domino { width: 80px; height: 132px; }
+  .pip-area { width: 50px; height: 50px; }
+  .pip { width: 12px; height: 12px; }
+}
+
+@media (min-width: 520px) {
+  .domino { width: 88px; height: 144px; border-radius: 12px; }
+  .pip-area { width: 54px; height: 54px; }
+  .pip { width: 13px; height: 13px; }
 }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div>
-    <div class="header-title">SOLITARIO BORICUA</div>
-    <div class="header-subtitle">Hey Bori Games</div>
-  </div>
-  <div class="header-stats">
-    <div>
-      <div class="stat-label">Moves</div>
-      <div class="stat-value" id="moveCount">0</div>
+  <div class="header-left">
+    <button class="header-back" onclick="window.location.href='/'">←</button>
+    <div class="header-brand">
+      <div class="header-title">SOLITARIO BORICUA</div>
+      <div class="header-sub">Hey Bori Games</div>
     </div>
-    <div>
+  </div>
+  <div class="header-right">
+    <div class="stat">
+      <div class="stat-label">Pairs</div>
+      <div class="stat-value" id="pairsCount">0</div>
+    </div>
+    <div class="stat">
       <div class="stat-label">Time</div>
       <div class="stat-value" id="timer">0:00</div>
     </div>
-    <button class="btn-new" onclick="newGame()">NUEVA</button>
+    <button class="btn" onclick="newGame()">NUEVA</button>
   </div>
 </div>
 
-<div class="game-area" id="gameArea">
-  <!-- Top row: stock, waste, spacer, 4 foundations -->
-  <div class="top-row" id="topRow"></div>
-  <!-- Tableau: 7 columns -->
-  <div class="tableau" id="tableau"></div>
+<div class="game-wrap">
+  <div class="board" id="board"></div>
 </div>
 
-<div class="win-overlay" id="winOverlay">
-  <div class="win-title">¡WEPA!</div>
-  <div class="win-stats">
-    Moves: <span id="winMoves">0</span><br>
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <button class="bar-btn" onclick="undoMove()">
+    <span class="bar-btn-icon">↩</span>
+    <span class="bar-btn-label">Undo</span>
+  </button>
+  <div class="bar-remaining">
+    <div class="bar-remaining-count" id="remaining">28</div>
+    <div class="bar-remaining-label">Tiles Left</div>
+  </div>
+  <button class="bar-btn" onclick="showHint()">
+    <span class="bar-btn-icon">💡</span>
+    <span class="bar-btn-label">Hint</span>
+  </button>
+  <button class="bar-btn" onclick="toggleHelp()">
+    <span class="bar-btn-icon">?</span>
+    <span class="bar-btn-label">How</span>
+  </button>
+</div>
+
+<!-- WIN -->
+<div class="overlay" id="winOverlay">
+  <div class="overlay-title">¡WEPA!</div>
+  <div class="overlay-stats">
+    Pairs: <span id="winPairs">0</span><br>
     Time: <span id="winTime">0:00</span>
   </div>
-  <button class="btn-new" onclick="newGame()" style="font-size:16px; padding:10px 28px;">JUGAR OTRA VEZ</button>
+  <button class="overlay-btn" onclick="newGame()">JUGAR OTRA VEZ</button>
 </div>
 
-<div class="fact-toast" id="factToast">
-  <div class="fact-label">¿SABÍAS?</div>
-  <div id="factText"></div>
+<!-- STUCK -->
+<div class="overlay" id="stuckOverlay">
+  <div class="overlay-title" style="font-size:36px">NO MOVES LEFT</div>
+  <div class="overlay-stats">
+    You cleared <span id="stuckPairs">0</span> pairs!<br>
+    <span id="stuckLeft">0</span> tiles remained
+  </div>
+  <button class="overlay-btn" onclick="newGame()">TRY AGAIN</button>
+</div>
+
+<!-- HOW TO PLAY DROPDOWN -->
+<div class="help-backdrop" id="helpBackdrop" onclick="toggleHelp()"></div>
+<div class="help-dropdown" id="helpDropdown">
+  <div class="help-box">
+    <div class="help-handle"></div>
+    <div class="help-title">HOW TO PLAY</div>
+    <div class="help-lang">
+      <button class="help-lang-btn active" id="helpEn" onclick="setHelpLang('en')">English</button>
+      <button class="help-lang-btn" id="helpEs" onclick="setHelpLang('es')">Español</button>
+    </div>
+
+    <!-- ENGLISH -->
+    <div class="help-content active" id="helpContentEn">
+      <div class="help-text">
+        Tap two dominoes whose<br><strong>total pips add up to 12</strong>.
+      </div>
+      <div class="help-example">
+        <div class="help-mini-tile">4<div class="hd">2</div></div>
+        <div class="help-plus">+</div>
+        <div class="help-mini-tile">5<div class="hd">1</div></div>
+        <div class="help-equals">= 12 ✓</div>
+      </div>
+      <div class="help-text">
+        The first tile has <strong>6 pips</strong> (4+2).<br>
+        The second has <strong>6 pips</strong> (5+1).<br>
+        6 + 6 = 12. <strong>¡Match!</strong><br><br>
+        <strong>Doubles totaling 12</strong> (like 6|6)<br>remove with a single tap.<br><br>
+        Use <strong>💡 Hint</strong> if you're stuck.<br>
+        Use <strong>↩ Undo</strong> to take back a move.<br><br>
+        Clear all <strong>28 dominoes</strong> to win. 🇵🇷
+      </div>
+    </div>
+
+    <!-- ESPAÑOL -->
+    <div class="help-content" id="helpContentEs">
+      <div class="help-text">
+        Toca dos fichas de dominó cuyo<br><strong>total de puntos sume 12</strong>.
+      </div>
+      <div class="help-example">
+        <div class="help-mini-tile">4<div class="hd">2</div></div>
+        <div class="help-plus">+</div>
+        <div class="help-mini-tile">5<div class="hd">1</div></div>
+        <div class="help-equals">= 12 ✓</div>
+      </div>
+      <div class="help-text">
+        La primera ficha tiene <strong>6 puntos</strong> (4+2).<br>
+        La segunda tiene <strong>6 puntos</strong> (5+1).<br>
+        6 + 6 = 12. <strong>¡Match!</strong><br><br>
+        <strong>Dobles que sumen 12</strong> (como 6|6)<br>se quitan con un solo toque.<br><br>
+        Usa <strong>💡 Pista</strong> si te trabas.<br>
+        Usa <strong>↩ Deshacer</strong> para retroceder.<br><br>
+        Elimina las <strong>28 fichas</strong> para ganar. 🇵🇷
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-label">¿SABÍAS?</div>
+  <div id="toastText"></div>
 </div>
 
 <script>
-// ═══ SUITS & RANKS ═══
-const SUITS = [
-  { id: 'palma', icon: '🌴', name: 'Palma', color: 'green' },
-  { id: 'ritmo', icon: '🎵', name: 'Ritmo', color: 'orange' },
-  { id: 'cocina', icon: '🍽️', name: 'Cocina', color: 'red' },
-  { id: 'costa', icon: '🏝️', name: 'Costa', color: 'blue' }
-];
-
-// Color groups for tableau stacking (alternating colors)
-const COLOR_GROUP = { palma: 'A', costa: 'A', ritmo: 'B', cocina: 'B' };
-
-const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-const RANK_VALUE = {};
-RANKS.forEach((r, i) => RANK_VALUE[r] = i + 1);
+// ═══ PIP POSITIONS ═══
+// Grid: 3x3. Positions are [row, col] (0-indexed)
+const PIP_POSITIONS = {
+  0: [],
+  1: [[1,1]],
+  2: [[0,2],[2,0]],
+  3: [[0,2],[1,1],[2,0]],
+  4: [[0,0],[0,2],[2,0],[2,2]],
+  5: [[0,0],[0,2],[1,1],[2,0],[2,2]],
+  6: [[0,0],[0,2],[1,0],[1,2],[2,0],[2,2]]
+};
 
 // ═══ PR FACTS ═══
 const FACTS = [
@@ -449,52 +700,39 @@ const FACTS = [
   "The coquí frog is found nowhere else on Earth.",
   "Ponce is known as 'La Perla del Sur' — The Pearl of the South.",
   "Mofongo was created by enslaved Africans adapting West African fufu.",
-  "Puerto Rico's first governor was Juan Ponce de León in 1509.",
   "Arecibo once housed the world's largest radio telescope.",
   "Bomba y plena originated in Loíza and Ponce respectively.",
   "San Juan is the oldest city under US jurisdiction, founded in 1521.",
   "Piña colada was invented in San Juan in 1954.",
   "Puerto Rico has over 270 miles of coastline.",
   "Camuy has one of the largest cave systems in the Western Hemisphere.",
-  "The Puerto Rican parrot is one of the rarest birds in the world.",
-  "Barranquitas is known as 'La Cuna de Próceres' — Cradle of Patriots.",
   "Café from Yauco is considered among the finest in the world.",
   "Vieques has Mosquito Bay — the brightest bioluminescent bay on Earth.",
   "Roberto Clemente was the first Latino in the Baseball Hall of Fame.",
-  "The vejigante mask tradition comes from Loíza and Ponce festivals.",
   "Culebra's Flamenco Beach is consistently ranked among the world's best.",
   "Puerto Rico's national tree is the ceiba."
 ];
-
-let factIndex = 0;
-function showFact() {
-  const toast = document.getElementById('factToast');
-  const text = document.getElementById('factText');
-  text.textContent = FACTS[factIndex % FACTS.length];
-  factIndex++;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 4000);
-}
+let factIdx = 0;
 
 // ═══ GAME STATE ═══
-let stock = [];
-let waste = [];
-let foundations = [[], [], [], []];
-let columns = [[], [], [], [], [], [], []];
-let moves = 0;
+const TARGET = 12;
+let tiles = [];
+let selectedIdx = null;
+let pairs = 0;
 let timerInterval = null;
 let seconds = 0;
-let dragData = null;
+let undoStack = [];
+let gameOver = false;
 
-// ═══ DECK ═══
-function createDeck() {
-  const deck = [];
-  for (const suit of SUITS) {
-    for (const rank of RANKS) {
-      deck.push({ suit, rank, faceUp: false });
+// ═══ CREATE DOMINO SET ═══
+function createDominoes() {
+  const set = [];
+  for (let a = 0; a <= 6; a++) {
+    for (let b = a; b <= 6; b++) {
+      set.push({ top: a, bottom: b, total: a + b, removed: false, id: `${a}-${b}` });
     }
   }
-  return deck;
+  return set;
 }
 
 function shuffle(arr) {
@@ -508,432 +746,300 @@ function shuffle(arr) {
 // ═══ NEW GAME ═══
 function newGame() {
   document.getElementById('winOverlay').classList.remove('show');
+  document.getElementById('stuckOverlay').classList.remove('show');
   clearInterval(timerInterval);
-  
-  const deck = shuffle(createDeck());
-  stock = [];
-  waste = [];
-  foundations = [[], [], [], []];
-  columns = [[], [], [], [], [], [], []];
-  moves = 0;
+
+  tiles = shuffle(createDominoes());
+  selectedIdx = null;
+  pairs = 0;
   seconds = 0;
-  factIndex = 0;
-  
-  updateMoves(0);
-  document.getElementById('timer').textContent = '0:00';
-  
-  // Deal tableau
-  let idx = 0;
-  for (let col = 0; col < 7; col++) {
-    for (let row = 0; row <= col; row++) {
-      const card = deck[idx++];
-      card.faceUp = (row === col);
-      columns[col].push(card);
-    }
-  }
-  
-  // Remaining to stock
-  for (; idx < 52; idx++) {
-    deck[idx].faceUp = false;
-    stock.push(deck[idx]);
-  }
-  
-  startTimer();
+  undoStack = [];
+  gameOver = false;
+
+  updateUI();
   render();
-  
-  setTimeout(showFact, 1500);
+  startTimer();
+
+  setTimeout(showFact, 2000);
 }
 
 function startTimer() {
   timerInterval = setInterval(() => {
     seconds++;
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    document.getElementById('timer').textContent = `${m}:${s.toString().padStart(2, '0')}`;
+    document.getElementById('timer').textContent =
+      Math.floor(seconds/60) + ':' + String(seconds%60).padStart(2,'0');
   }, 1000);
 }
 
-function updateMoves(n) {
-  moves = n;
-  document.getElementById('moveCount').textContent = moves;
+function updateUI() {
+  document.getElementById('pairsCount').textContent = pairs;
+  const left = tiles.filter(t => !t.removed).length;
+  document.getElementById('remaining').textContent = left;
 }
 
 // ═══ RENDER ═══
 function render() {
-  renderTopRow();
-  renderTableau();
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+
+  tiles.forEach((tile, idx) => {
+    if (tile.removed) return;
+
+    const el = document.createElement('div');
+    el.className = 'domino';
+    if (idx === selectedIdx) el.classList.add('selected');
+    el.dataset.idx = idx;
+
+    // Top half
+    const topHalf = document.createElement('div');
+    topHalf.className = 'domino-half';
+    topHalf.appendChild(createPipArea(tile.top));
+
+    // Divider
+    const divider = document.createElement('div');
+    divider.className = 'domino-divider';
+
+    // Bottom half
+    const bottomHalf = document.createElement('div');
+    bottomHalf.className = 'domino-half';
+    bottomHalf.appendChild(createPipArea(tile.bottom));
+
+    el.appendChild(topHalf);
+    el.appendChild(divider);
+    el.appendChild(bottomHalf);
+
+    el.addEventListener('click', () => onTileTap(idx));
+
+    board.appendChild(el);
+  });
+
+  updateUI();
 }
 
-function renderTopRow() {
-  const topRow = document.getElementById('topRow');
-  topRow.innerHTML = '';
-  
-  // Stock
-  const stockEl = document.createElement('div');
-  stockEl.className = `slot stock ${stock.length === 0 ? 'empty' : ''}`;
-  if (stock.length > 0) {
-    const cardEl = createCardEl(stock[stock.length - 1], false);
-    cardEl.style.position = 'absolute';
-    cardEl.style.top = '0';
-    cardEl.style.left = '0';
-    stockEl.appendChild(cardEl);
-  }
-  stockEl.addEventListener('click', onStockClick);
-  topRow.appendChild(stockEl);
-  
-  // Waste
-  const wasteEl = document.createElement('div');
-  wasteEl.className = 'slot waste';
-  if (waste.length > 0) {
-    const card = waste[waste.length - 1];
-    const cardEl = createCardEl(card, true);
-    cardEl.style.position = 'absolute';
-    cardEl.style.top = '0';
-    cardEl.style.left = '0';
-    addDragEvents(cardEl, { source: 'waste', index: waste.length - 1 });
-    wasteEl.appendChild(cardEl);
-  }
-  topRow.appendChild(wasteEl);
-  
-  // Spacer
-  const spacer = document.createElement('div');
-  spacer.className = 'spacer';
-  topRow.appendChild(spacer);
-  
-  // Foundations
-  for (let f = 0; f < 4; f++) {
-    const fEl = document.createElement('div');
-    fEl.className = 'slot foundation';
-    fEl.dataset.suitIcon = SUITS[f].icon;
-    fEl.dataset.foundation = f;
-    
-    if (foundations[f].length > 0) {
-      const card = foundations[f][foundations[f].length - 1];
-      const cardEl = createCardEl(card, true);
-      cardEl.style.position = 'absolute';
-      cardEl.style.top = '0';
-      cardEl.style.left = '0';
-      fEl.appendChild(cardEl);
-    }
-    
-    addDropEvents(fEl, { target: 'foundation', index: f });
-    fEl.addEventListener('click', () => {});
-    topRow.appendChild(fEl);
-  }
-}
+function createPipArea(n) {
+  const area = document.createElement('div');
+  area.className = 'pip-area';
 
-function renderTableau() {
-  const tableau = document.getElementById('tableau');
-  tableau.innerHTML = '';
-  
-  for (let c = 0; c < 7; c++) {
-    const col = columns[c];
-    const colEl = document.createElement('div');
-    colEl.className = 'column';
-    colEl.dataset.column = c;
-    
-    // Set min height
-    if (col.length === 0) {
-      colEl.style.minHeight = `var(--card-h)`;
-    } else {
-      const lastOffset = col.reduce((acc, card, i) => {
-        if (i === 0) return 0;
-        return acc + (col[i-1].faceUp ? parseInt(getComputedStyle(document.documentElement).getPropertyValue('--stack-offset')) : parseInt(getComputedStyle(document.documentElement).getPropertyValue('--face-down-offset')));
-      }, 0);
-      colEl.style.minHeight = `calc(var(--card-h) + ${lastOffset}px)`;
-    }
-    
-    let yOffset = 0;
-    for (let i = 0; i < col.length; i++) {
-      const card = col[i];
-      const cardEl = createCardEl(card, card.faceUp);
-      cardEl.style.top = yOffset + 'px';
-      cardEl.style.left = '0';
-      cardEl.style.zIndex = i + 1;
-      
-      if (card.faceUp) {
-        addDragEvents(cardEl, { source: 'column', colIndex: c, cardIndex: i });
-        cardEl.addEventListener('dblclick', () => tryAutoFoundation(c, i));
+  // Create 9 cells (3x3)
+  const positions = PIP_POSITIONS[n] || [];
+  for (let r = 0; r < 3; r++) {
+    for (let c = 0; c < 3; c++) {
+      const cell = document.createElement('div');
+      const hasPip = positions.some(p => p[0] === r && p[1] === c);
+      if (hasPip) {
+        cell.className = 'pip';
       }
-      
-      colEl.appendChild(cardEl);
-      
-      if (card.faceUp) {
-        yOffset += 22; // stack-offset
-      } else {
-        yOffset += 8; // face-down-offset
-      }
+      area.appendChild(cell);
     }
-    
-    addDropEvents(colEl, { target: 'column', index: c });
-    tableau.appendChild(colEl);
   }
+
+  return area;
 }
 
-function createCardEl(card, faceUp) {
-  const el = document.createElement('div');
-  el.className = `card ${faceUp ? 'face-up suit-' + card.suit.id : 'face-down'}`;
-  
-  if (faceUp) {
-    el.innerHTML = `
-      <div class="card-inner">
-        <div class="card-corner">
-          <span class="card-rank">${card.rank}</span>
-          <span class="card-suit-small">${card.suit.icon}</span>
-        </div>
-        <div class="card-center">${card.suit.icon}</div>
-        <div class="card-corner card-corner-bottom">
-          <span class="card-rank">${card.rank}</span>
-          <span class="card-suit-small">${card.suit.icon}</span>
-        </div>
-      </div>
-    `;
-  }
-  
-  return el;
-}
+// ═══ TAP LOGIC ═══
+function onTileTap(idx) {
+  if (gameOver) return;
 
-// ═══ STOCK CLICK ═══
-function onStockClick() {
-  if (stock.length === 0) {
-    // Reset stock from waste
-    if (waste.length === 0) return;
-    stock = waste.reverse().map(c => { c.faceUp = false; return c; });
-    waste = [];
+  const tile = tiles[idx];
+  if (tile.removed) return;
+
+  // Self-match: double that equals TARGET
+  if (tile.total === TARGET) {
+    // save for undo
+    undoStack.push({ type: 'single', idx, tile: {...tile} });
+    if (undoStack.length > 30) undoStack.shift();
+
+    tile.removed = true;
+    pairs++;
+    animateRemove(idx);
+    selectedIdx = null;
+    return;
+  }
+
+  // Nothing selected yet — select this tile
+  if (selectedIdx === null) {
+    selectedIdx = idx;
+    render();
+    return;
+  }
+
+  // Tapped same tile — deselect
+  if (selectedIdx === idx) {
+    selectedIdx = null;
+    render();
+    return;
+  }
+
+  // Check match
+  const other = tiles[selectedIdx];
+  if (tile.total + other.total === TARGET) {
+    // Match!
+    undoStack.push({
+      type: 'pair',
+      idx1: selectedIdx, tile1: {...other},
+      idx2: idx, tile2: {...tile}
+    });
+    if (undoStack.length > 30) undoStack.shift();
+
+    other.removed = true;
+    tile.removed = true;
+    pairs++;
+    animateRemove(selectedIdx, idx);
+    selectedIdx = null;
   } else {
-    const card = stock.pop();
-    card.faceUp = true;
-    waste.push(card);
+    // No match — select new tile
+    selectedIdx = idx;
+    render();
   }
-  updateMoves(moves + 1);
+}
+
+function animateRemove(...indices) {
+  const board = document.getElementById('board');
+  const els = board.querySelectorAll('.domino');
+
+  els.forEach(el => {
+    const i = parseInt(el.dataset.idx);
+    if (indices.includes(i)) {
+      el.classList.add('matched');
+      setTimeout(() => {
+        el.classList.add('removing');
+      }, 200);
+    }
+  });
+
+  setTimeout(() => {
+    render();
+    checkWin();
+    if (pairs % 3 === 0 && pairs > 0) showFact();
+  }, 600);
+}
+
+// ═══ UNDO ═══
+function undoMove() {
+  if (undoStack.length === 0 || gameOver) return;
+
+  const last = undoStack.pop();
+  if (last.type === 'single') {
+    tiles[last.idx].removed = false;
+    pairs--;
+  } else {
+    tiles[last.idx1].removed = false;
+    tiles[last.idx2].removed = false;
+    pairs--;
+  }
+  selectedIdx = null;
   render();
 }
 
-// ═══ DRAG & DROP ═══
-function addDragEvents(el, data) {
-  el.addEventListener('mousedown', (e) => startDrag(e, data, el));
-  el.addEventListener('touchstart', (e) => startDrag(e, data, el), { passive: false });
-}
+// ═══ HINT ═══
+function showHint() {
+  if (gameOver) return;
 
-function addDropEvents(el, data) {
-  el.dataset.dropTarget = JSON.stringify(data);
-}
+  const active = tiles.map((t, i) => ({...t, i})).filter(t => !t.removed);
 
-let dragCards = [];
-let dragEls = [];
-let dragOffsetX = 0;
-let dragOffsetY = 0;
-let dragStartX = 0;
-let dragStartY = 0;
-
-function startDrag(e, data, el) {
-  e.preventDefault();
-  
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  
-  dragData = data;
-  dragStartX = clientX;
-  dragStartY = clientY;
-  
-  // Gather cards being dragged
-  if (data.source === 'waste') {
-    dragCards = [waste[waste.length - 1]];
-  } else if (data.source === 'column') {
-    dragCards = columns[data.colIndex].slice(data.cardIndex);
-  }
-  
-  // Create visual drag elements
-  const rect = el.getBoundingClientRect();
-  dragOffsetX = clientX - rect.left;
-  dragOffsetY = clientY - rect.top;
-  
-  // Find all card elements to drag (for column, include all cards below)
-  dragEls = [el];
-  if (data.source === 'column') {
-    const colEl = el.parentElement;
-    const allCards = colEl.querySelectorAll('.card.face-up');
-    const cardArr = Array.from(allCards);
-    const startIdx = cardArr.indexOf(el);
-    if (startIdx >= 0) {
-      dragEls = cardArr.slice(startIdx);
-    }
-  }
-  
-  dragEls.forEach(de => de.classList.add('dragging'));
-  
-  document.addEventListener('mousemove', onDragMove);
-  document.addEventListener('mouseup', onDragEnd);
-  document.addEventListener('touchmove', onDragMove, { passive: false });
-  document.addEventListener('touchend', onDragEnd);
-}
-
-function onDragMove(e) {
-  e.preventDefault();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  
-  const dx = clientX - dragStartX;
-  const dy = clientY - dragStartY;
-  
-  dragEls.forEach(el => {
-    el.style.transform = `translate(${dx}px, ${dy}px)`;
-  });
-}
-
-function onDragEnd(e) {
-  document.removeEventListener('mousemove', onDragMove);
-  document.removeEventListener('mouseup', onDragEnd);
-  document.removeEventListener('touchmove', onDragMove);
-  document.removeEventListener('touchend', onDragEnd);
-  
-  const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-  const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-  
-  // Find drop target
-  dragEls.forEach(el => {
-    el.style.pointerEvents = 'none';
-  });
-  
-  const dropEl = document.elementFromPoint(clientX, clientY);
-  
-  dragEls.forEach(el => {
-    el.style.pointerEvents = '';
-    el.classList.remove('dragging');
-    el.style.transform = '';
-  });
-  
-  if (dropEl && dragData) {
-    // Find the drop target
-    let targetEl = dropEl.closest('[data-drop-target]');
-    if (targetEl) {
-      const target = JSON.parse(targetEl.dataset.dropTarget);
-      attemptMove(dragData, target);
-    }
-  }
-  
-  dragData = null;
-  dragCards = [];
-  dragEls = [];
-}
-
-// ═══ MOVE LOGIC ═══
-function attemptMove(from, to) {
-  let cards;
-  
-  if (from.source === 'waste') {
-    cards = [waste[waste.length - 1]];
-  } else if (from.source === 'column') {
-    cards = columns[from.colIndex].slice(from.cardIndex);
-  } else return;
-  
-  if (!cards.length) return;
-  
-  let success = false;
-  
-  if (to.target === 'foundation') {
-    if (cards.length === 1) {
-      success = tryMoveToFoundation(cards[0], to.index);
-    }
-  } else if (to.target === 'column') {
-    success = tryMoveToColumn(cards, to.index);
-  }
-  
-  if (success) {
-    // Remove cards from source
-    if (from.source === 'waste') {
-      waste.pop();
-    } else if (from.source === 'column') {
-      columns[from.colIndex].splice(from.cardIndex);
-      // Flip new top card
-      const col = columns[from.colIndex];
-      if (col.length > 0 && !col[col.length - 1].faceUp) {
-        col[col.length - 1].faceUp = true;
-      }
-    }
-    
-    updateMoves(moves + 1);
-    
-    // Show fact every 10 moves
-    if (moves % 10 === 0) showFact();
-    
-    render();
-    checkWin();
-  } else {
-    render();
-  }
-}
-
-function tryMoveToFoundation(card, fIndex) {
-  const f = foundations[fIndex];
-  const suit = SUITS[fIndex];
-  
-  if (card.suit.id !== suit.id) return false;
-  
-  if (f.length === 0) {
-    if (card.rank !== 'A') return false;
-  } else {
-    const topCard = f[f.length - 1];
-    if (RANK_VALUE[card.rank] !== RANK_VALUE[topCard.rank] + 1) return false;
-  }
-  
-  f.push(card);
-  return true;
-}
-
-function tryMoveToColumn(cards, colIndex) {
-  const col = columns[colIndex];
-  const movingCard = cards[0];
-  
-  if (col.length === 0) {
-    if (movingCard.rank !== 'K') return false;
-  } else {
-    const topCard = col[col.length - 1];
-    if (!topCard.faceUp) return false;
-    // Must be alternating color group and one rank lower
-    if (COLOR_GROUP[movingCard.suit.id] === COLOR_GROUP[topCard.suit.id]) return false;
-    if (RANK_VALUE[movingCard.rank] !== RANK_VALUE[topCard.rank] - 1) return false;
-  }
-  
-  col.push(...cards);
-  return true;
-}
-
-// ═══ DOUBLE CLICK → AUTO FOUNDATION ═══
-function tryAutoFoundation(colIndex, cardIndex) {
-  // Only top card of column
-  if (cardIndex !== columns[colIndex].length - 1) return;
-  
-  const card = columns[colIndex][cardIndex];
-  
-  for (let f = 0; f < 4; f++) {
-    if (tryMoveToFoundation(card, f)) {
-      columns[colIndex].pop();
-      const col = columns[colIndex];
-      if (col.length > 0 && !col[col.length - 1].faceUp) {
-        col[col.length - 1].faceUp = true;
-      }
-      updateMoves(moves + 1);
-      if (moves % 10 === 0) showFact();
-      render();
-      checkWin();
+  // Find a self-match first
+  for (const t of active) {
+    if (t.total === TARGET) {
+      highlightHint(t.i);
       return;
     }
   }
-}
 
-// ═══ WIN CHECK ═══
-function checkWin() {
-  const total = foundations.reduce((sum, f) => sum + f.length, 0);
-  if (total === 52) {
-    clearInterval(timerInterval);
-    document.getElementById('winMoves').textContent = moves;
-    document.getElementById('winTime').textContent = document.getElementById('timer').textContent;
-    document.getElementById('winOverlay').classList.add('show');
+  // Find a pair
+  for (let a = 0; a < active.length; a++) {
+    for (let b = a + 1; b < active.length; b++) {
+      if (active[a].total + active[b].total === TARGET) {
+        highlightHint(active[a].i, active[b].i);
+        return;
+      }
+    }
   }
+
+  // No moves
+  showToast("No moves available!");
 }
 
-// ═══ INIT ═══
+function highlightHint(...indices) {
+  const board = document.getElementById('board');
+  board.querySelectorAll('.domino').forEach(el => {
+    const i = parseInt(el.dataset.idx);
+    if (indices.includes(i)) {
+      el.classList.add('hint');
+      setTimeout(() => el.classList.remove('hint'), 1600);
+    }
+  });
+}
+
+// ═══ WIN / STUCK CHECK ═══
+function checkWin() {
+  const remaining = tiles.filter(t => !t.removed);
+
+  if (remaining.length === 0) {
+    gameOver = true;
+    clearInterval(timerInterval);
+    document.getElementById('winPairs').textContent = pairs;
+    document.getElementById('winTime').textContent = document.getElementById('timer').textContent;
+    setTimeout(() => document.getElementById('winOverlay').classList.add('show'), 300);
+    return;
+  }
+
+  // Check if any moves exist
+  const active = remaining;
+
+  for (const t of active) {
+    if (t.total === TARGET) return; // self-match exists
+  }
+
+  for (let a = 0; a < active.length; a++) {
+    for (let b = a + 1; b < active.length; b++) {
+      if (active[a].total + active[b].total === TARGET) return; // pair exists
+    }
+  }
+
+  // No moves left
+  gameOver = true;
+  clearInterval(timerInterval);
+  document.getElementById('stuckPairs').textContent = pairs;
+  document.getElementById('stuckLeft').textContent = remaining.length;
+  setTimeout(() => document.getElementById('stuckOverlay').classList.add('show'), 500);
+}
+
+// ═══ HELP ═══
+function toggleHelp() {
+  const dropdown = document.getElementById('helpDropdown');
+  const backdrop = document.getElementById('helpBackdrop');
+  dropdown.classList.toggle('show');
+  backdrop.classList.toggle('show');
+}
+
+function setHelpLang(lang) {
+  document.getElementById('helpEn').className = 'help-lang-btn' + (lang === 'en' ? ' active' : '');
+  document.getElementById('helpEs').className = 'help-lang-btn' + (lang === 'es' ? ' active' : '');
+  document.getElementById('helpContentEn').className = 'help-content' + (lang === 'en' ? ' active' : '');
+  document.getElementById('helpContentEs').className = 'help-content' + (lang === 'es' ? ' active' : '');
+}
+
+// ═══ FACTS ═══
+function showFact() {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastText').textContent = FACTS[factIdx % FACTS.length];
+  factIdx++;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastText').textContent = msg;
+  toast.querySelector('.toast-label').textContent = '';
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+    toast.querySelector('.toast-label').textContent = '¿SABÍAS?';
+  }, 2500);
+}
+
+// ═══ START ═══
 newGame();
 </script>
 </body>
