@@ -6,9 +6,6 @@ const rateLimit = require('express-rate-limit');
 const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const http = require('http');
-const { WebSocketServer, WebSocket } = require('ws');
-const multer = require('multer');
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,10 +21,6 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const STRIPE_VOICE_PRICE_ID = 'price_1T52eCKBiHyt2NsQNXIipi73';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 const BASE_URL = process.env.BASE_URL || 'https://heybori.com';
-
-// ═══ DEEPGRAM CONFIG ═══
-const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
-const DEEPGRAM_VOICE = 'aura-2-aquila-es';
 
 // ═══ ADMIN BYPASS ═══
 const ADMIN_EMAILS = [
@@ -173,75 +166,6 @@ app.post('/api/voice/access', async (req, res) => {
     console.error('[Voice Access Error]', err.message);
     return res.json({ access: false, reason: 'error' });
   }
-});
-
-// ═══ DEEPGRAM: TEXT-TO-SPEECH (REST) ═══
-app.post('/api/voice/tts', async (req, res) => {
-  try {
-    const { text, lang } = req.body;
-    if (!text || typeof text !== 'string') {
-      return res.status(400).json({ error: 'Text is required.' });
-    }
-
-    if (!DEEPGRAM_API_KEY) {
-      return res.status(500).json({ error: 'Voice not configured.' });
-    }
-
-    const trimmedText = text.slice(0, 2000);
-    const voice = DEEPGRAM_VOICE;
-
-    const ttsRes = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}&encoding=mp3`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Token ${DEEPGRAM_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text: trimmedText }),
-    });
-
-    if (!ttsRes.ok) {
-      const errText = await ttsRes.text();
-      console.error('[Deepgram TTS Error]', ttsRes.status, errText);
-      return res.status(500).json({ error: 'Voice generation failed.' });
-    }
-
-    res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('Cache-Control', 'no-cache');
-
-    const arrayBuffer = await ttsRes.arrayBuffer();
-    res.send(Buffer.from(arrayBuffer));
-  } catch (err) {
-    console.error('[Deepgram TTS Error]', err.message);
-    res.status(500).json({ error: 'Voice generation failed.' });
-  }
-});
-
-// ═══ DEEPGRAM: SPEECH-TO-TEXT (REST) ═══
-app.post('/api/voice/stt', upload.single('audio'), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: 'No audio file provided.' });
-    if (!DEEPGRAM_API_KEY) return res.status(500).json({ error: 'Voice not configured.' });
-    const lang = req.body.lang === 'es' ? 'es' : 'en';
-    console.log(`[Deepgram STT] Transcribing ${req.file.size} bytes, lang=${lang}`);
-    const dgRes = await fetch(`https://api.deepgram.com/v1/listen?model=nova-3&language=${lang}&punctuate=true&smart_format=true`, {
-      method: 'POST',
-      headers: { 'Authorization': `Token ${DEEPGRAM_API_KEY}`, 'Content-Type': req.file.mimetype || 'audio/webm' },
-      body: req.file.buffer,
-    });
-    if (!dgRes.ok) { const errText = await dgRes.text(); console.error('[Deepgram STT Error]', dgRes.status, errText); return res.status(500).json({ error: 'Transcription failed.' }); }
-    const data = await dgRes.json();
-    const transcript = data?.results?.channels?.[0]?.alternatives?.[0]?.transcript || '';
-    console.log(`[Deepgram STT] Result: "${transcript}"`);
-    res.json({ transcript });
-  } catch (err) { console.error('[Deepgram STT Error]', err.message); res.status(500).json({ error: 'Transcription failed.' }); }
-});
-
-app.get('/api/voice/status', (req, res) => {
-  res.json({
-    stt: DEEPGRAM_API_KEY ? 'ready' : 'not_configured',
-    tts: DEEPGRAM_API_KEY ? 'ready' : 'not_configured',
-    provider: 'deepgram',
-  });
 });
 
 // ═══ STRIPE: CREATE CHECKOUT SESSION (VOICE — WITH 7-DAY TRIAL) ═══
@@ -458,97 +382,13 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ═══ HTTP SERVER + WEBSOCKET PROXY FOR DEEPGRAM STT ═══
-const server = http.createServer(app);
-const wss = new WebSocketServer({ server, path: '/ws/deepgram-stt' });
-
-wss.on('connection', (clientWS, req) => {
-  if (!DEEPGRAM_API_KEY) {
-    clientWS.close(4001, 'Voice not configured');
-    return;
-  }
-
-  // Parse language from query string: /ws/deepgram-stt?lang=es
-  const url = new URL(req.url, 'http://localhost');
-  const lang = url.searchParams.get('lang') || 'en';
-  const dgLang = lang === 'es' ? 'es' : 'en';
-
-  console.log(`[Deepgram STT] Client connected, lang=${dgLang}`);
-
-  // Open upstream WebSocket to Deepgram Nova-3
-  const dgUrl = `wss://api.deepgram.com/v1/listen?model=nova-3&language=${dgLang}&punctuate=true&interim_results=true&utterance_end_ms=1500&endpointing=300&encoding=linear16&sample_rate=16000&channels=1`;
-
-  const dgWS = new WebSocket(dgUrl, {
-    headers: { 'Authorization': `Token ${DEEPGRAM_API_KEY}` },
-  });
-
-  let dgReady = false;
-
-  dgWS.on('open', () => {
-    dgReady = true;
-    console.log('[Deepgram STT] Upstream connected');
-    clientWS.send(JSON.stringify({ type: 'connected' }));
-  });
-
-  dgWS.on('message', (data) => {
-    if (clientWS.readyState === WebSocket.OPEN) {
-      clientWS.send(data.toString());
-    }
-  });
-
-  dgWS.on('error', (err) => {
-    console.error('[Deepgram STT] Upstream error:', err.message);
-    if (clientWS.readyState === WebSocket.OPEN) {
-      clientWS.send(JSON.stringify({ type: 'error', message: err.message }));
-    }
-  });
-
-  dgWS.on('close', (code, reason) => {
-    console.log(`[Deepgram STT] Upstream closed: ${code} ${reason}`);
-    if (clientWS.readyState === WebSocket.OPEN) {
-      clientWS.close(1000, 'Deepgram session ended');
-    }
-  });
-
-  // Forward raw binary audio from browser to Deepgram
-  clientWS.on('message', (data) => {
-    if (dgReady && dgWS.readyState === WebSocket.OPEN) {
-      dgWS.send(data);
-    }
-  });
-
-  clientWS.on('close', () => {
-    console.log('[Deepgram STT] Client disconnected');
-    if (dgWS.readyState === WebSocket.OPEN) {
-      try { dgWS.send(JSON.stringify({ type: 'CloseStream' })); } catch(e) {}
-      dgWS.close();
-    }
-  });
-
-  clientWS.on('error', (err) => {
-    console.error('[Deepgram STT] Client error:', err.message);
-    if (dgWS.readyState === WebSocket.OPEN) {
-      dgWS.close();
-    }
-  });
-
-  // KeepAlive every 8 seconds
-  const keepAlive = setInterval(() => {
-    if (dgWS.readyState === WebSocket.OPEN) {
-      dgWS.send(JSON.stringify({ type: 'KeepAlive' }));
-    } else {
-      clearInterval(keepAlive);
-    }
-  }, 8000);
-
-  clientWS.on('close', () => clearInterval(keepAlive));
-});
-
 // ═══ START ═══
+const server = http.createServer(app);
+
 server.listen(PORT, () => {
   console.log(`[Hey Bori] Live on port ${PORT}`);
   console.log(`[Hey Bori] Stripe: ${process.env.STRIPE_SECRET_KEY ? 'Connected' : 'NOT configured'}`);
   console.log(`[Hey Bori] Voice Price: ${STRIPE_VOICE_PRICE_ID}`);
-  console.log(`[Hey Bori] Deepgram: ${DEEPGRAM_API_KEY ? 'Connected' : 'NOT configured'}`);
   console.log(`[Hey Bori] Voice gating: admin bypass + Stripe subscription/trial`);
+  console.log(`[Hey Bori] ElevenLabs voice — powered by Claude`);
 });
