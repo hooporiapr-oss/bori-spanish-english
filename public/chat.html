@@ -59,6 +59,15 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);-webkit-font
 .bg-image{position:absolute;inset:0;z-index:0}
 .bg-image img{width:100%;height:100%;object-fit:cover}
 
+/* Chrome banner */
+.chrome-banner{display:none;position:absolute;bottom:24px;left:16px;right:16px;z-index:5;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:16px;padding:20px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.15)}
+.chrome-banner-icon{font-size:32px;margin-bottom:8px}
+.chrome-banner-title{font-size:16px;font-weight:800;color:var(--dark);margin-bottom:4px}
+.chrome-banner-text{font-size:13px;font-weight:600;color:var(--text-2);line-height:1.5}
+.chrome-banner-text span{color:var(--sun);font-weight:800}
+.is-chrome .chrome-banner{display:block}
+.is-chrome elevenlabs-convai{display:none !important}
+
 /* Force the ElevenLabs widget to fill our container and sit above background */
 elevenlabs-convai{
   position:absolute !important;
@@ -100,7 +109,13 @@ elevenlabs-convai{
     <div class="widget-area">
       <!-- Full-bleed Puerto Rico background -->
       <div class="bg-image"><img src="/boriosj.png" alt="Puerto Rico"></div>
-      <!-- ElevenLabs widget sits on top -->
+      <!-- Chrome users see this instead of the broken widget -->
+      <div class="chrome-banner">
+        <div class="chrome-banner-icon">🎙️</div>
+        <div class="chrome-banner-title">Voice works best in Safari</div>
+        <div class="chrome-banner-text">Open <span>heybori.com</span> in Safari for the full voice experience with Bori. Just copy the link and paste it in Safari!</div>
+      </div>
+      <!-- ElevenLabs widget sits on top (hidden on Chrome) -->
       <elevenlabs-convai agent-id="agent_6201kjbe2epdev59wq92kgn49n0r" variant="expanded"></elevenlabs-convai>
     </div>
   </div>
@@ -109,6 +124,10 @@ elevenlabs-convai{
   <div class="toast" id="toast"></div>
 
   <script>
+// Detect Chrome on iOS (CriOS) or Chrome on Android/desktop
+var isChrome = /CriOS/i.test(navigator.userAgent) || (/Chrome/i.test(navigator.userAgent) && /Mobile/i.test(navigator.userAgent) && !/Safari/i.test(navigator.userAgent));
+if(isChrome){document.querySelector('.app').classList.add('is-chrome');}
+
 function toggleMenu(){document.getElementById('burger').classList.toggle('open');document.getElementById('menu').classList.toggle('open');document.getElementById('menuOverlay').classList.toggle('open');}
 function doShare(){var url=window.location.origin;var t='I\'m learning Spanish & English with Hey Bori — try it! 🇵🇷 '+url;if(navigator.share){navigator.share({title:'Hey Bori',text:t,url:url}).catch(function(){});}else{navigator.clipboard.writeText(t).then(function(){showToast('Link copied!');}).catch(function(){});}}
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show';setTimeout(function(){t.className='toast';},2500);}
