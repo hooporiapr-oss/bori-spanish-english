@@ -104,6 +104,13 @@ const chatLimiter = rateLimit({
 });
 
 // ═══ STATIC FILES ═══
+// Block direct access to chat.html — must go through /chat route
+app.use((req, res, next) => {
+  if (req.path.toLowerCase() === '/chat.html') {
+    return res.redirect(301, '/chat');
+  }
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ═══ VOICE ACCESS GATING ═══
@@ -376,6 +383,11 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
 // ═══ CHAT PAGE ═══
 app.get('/chat', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'chat.html'));
+});
+
+// ═══ LA RUTA PAGE ═══
+app.get('/laruta', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'laruta.html'));
 });
 
 // ═══ CATCH-ALL ═══
