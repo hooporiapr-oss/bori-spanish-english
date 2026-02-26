@@ -125,7 +125,7 @@ elevenlabs-convai{
 
   <script>
 // Detect Chrome on iOS (CriOS) or Chrome on Android/desktop
-var isChrome = /CriOS/i.test(navigator.userAgent) || (/Chrome/i.test(navigator.userAgent) && /Mobile/i.test(navigator.userAgent) && !/Safari/i.test(navigator.userAgent));
+var isChrome = /CriOS|EdgiOS|EdgA|Edg/i.test(navigator.userAgent) || (/Chrome/i.test(navigator.userAgent) && /Mobile/i.test(navigator.userAgent) && !/Safari/i.test(navigator.userAgent));
 if(isChrome){document.querySelector('.app').classList.add('is-chrome');}
 
 function toggleMenu(){document.getElementById('burger').classList.toggle('open');document.getElementById('menu').classList.toggle('open');document.getElementById('menuOverlay').classList.toggle('open');}
