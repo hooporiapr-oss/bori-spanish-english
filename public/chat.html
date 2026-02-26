@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Hey Bori — Chat</title>
+  <title>Hey Bori — Real Conversations</title>
   <link rel="icon" type="image/png" href="/icon-01F.png">
   <link rel="apple-touch-icon" href="/icon-01F.png">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -80,46 +80,46 @@ elevenlabs-convai{
   z-index:1 !important;
 }
 
-/* ═══ EMAIL GATE MODAL ═══ */
+/* ═══ GATE CARD ═══ */
 .gate-overlay{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px}
 .gate-overlay.hidden{display:none}
-.gate-card{background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-radius:24px;padding:32px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.18);animation:gateIn .4s ease}
+.gate-card{background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-radius:24px;padding:32px 24px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.18);animation:gateIn .4s ease}
 @keyframes gateIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.gate-icon{font-size:48px;margin-bottom:12px}
-.gate-title{font-size:22px;font-weight:900;color:var(--dark);margin-bottom:4px}
+
+/* Language toggle */
+.lang-toggle{display:flex;justify-content:center;margin-bottom:18px}
+.lang-toggle-track{display:flex;background:var(--warm);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.lang-toggle-opt{padding:7px 18px;font-size:13px;font-weight:800;color:var(--text-3);cursor:pointer;transition:all .2s;border:none;background:none;font-family:var(--body)}
+.lang-toggle-opt.active{background:var(--sun);color:var(--white);border-radius:9px}
+
+.gate-icon{font-size:48px;margin-bottom:10px}
+.gate-title{font-size:20px;font-weight:900;color:var(--dark);margin-bottom:2px}
 .gate-title .hey{color:var(--sun)}
-.gate-subtitle{font-size:14px;font-weight:600;color:var(--text-2);margin-bottom:20px;line-height:1.5}
-.gate-input{width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:14px;font-family:var(--body);font-size:16px;font-weight:700;color:var(--dark);background:var(--white);outline:none;transition:border-color .2s}
-.gate-input:focus{border-color:var(--sun)}
-.gate-input::placeholder{color:var(--text-3);font-weight:600}
-.gate-btn{width:100%;margin-top:14px;padding:15px;border:none;border-radius:14px;background:var(--sun);color:var(--white);font-family:var(--body);font-size:16px;font-weight:800;cursor:pointer;transition:all .2s}
+.gate-subtitle{font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:14px}
+.gate-price{font-size:32px;font-weight:900;color:var(--sun);margin-bottom:2px}
+.gate-price-sub{font-size:13px;font-weight:600;color:var(--text-3);margin-bottom:16px}
+.gate-features{text-align:left;margin-bottom:18px;padding:0 8px}
+.gate-feat{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px}
+.gate-feat-check{color:var(--green);font-size:18px;flex-shrink:0}
+.gate-btn{width:100%;padding:16px;border:none;border-radius:14px;background:var(--sun);color:var(--white);font-family:var(--body);font-size:17px;font-weight:800;cursor:pointer;transition:all .2s}
 .gate-btn:hover{background:var(--sun-dark)}
 .gate-btn:active{transform:scale(.98)}
 .gate-btn:disabled{opacity:.6;cursor:not-allowed}
+.gate-trial-note{font-size:12px;font-weight:700;color:var(--green-dark);margin-top:10px}
+.gate-divider{display:flex;align-items:center;gap:12px;margin:18px 0 14px}
+.gate-divider-line{flex:1;height:1px;background:var(--border)}
+.gate-divider-text{font-size:12px;font-weight:700;color:var(--text-3)}
+.gate-input{width:100%;padding:13px 16px;border:2px solid var(--border);border-radius:14px;font-family:var(--body);font-size:15px;font-weight:700;color:var(--dark);background:var(--white);outline:none;transition:border-color .2s}
+.gate-input:focus{border-color:var(--sun)}
+.gate-input::placeholder{color:var(--text-3);font-weight:600}
+.gate-login-btn{width:100%;margin-top:10px;padding:14px;border:2px solid var(--border);border-radius:14px;background:var(--white);color:var(--text);font-family:var(--body);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s}
+.gate-login-btn:hover{border-color:var(--sun);color:var(--sun)}
+.gate-login-btn:active{transform:scale(.98)}
+.gate-login-btn:disabled{opacity:.6;cursor:not-allowed}
 .gate-error{font-size:12px;color:#EF4444;font-weight:700;margin-top:8px;display:none}
-.gate-loading{display:none;margin-top:14px}
+.gate-loading{display:none}
 .gate-loading .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--sun);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* ═══ UPGRADE CARD ═══ */
-.upgrade-overlay{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px}
-.upgrade-overlay.hidden{display:none}
-.upgrade-card{background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-radius:24px;padding:32px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.18);animation:gateIn .4s ease}
-.upgrade-icon{font-size:48px;margin-bottom:12px}
-.upgrade-title{font-size:22px;font-weight:900;color:var(--dark);margin-bottom:6px}
-.upgrade-price{font-size:32px;font-weight:900;color:var(--sun);margin-bottom:2px}
-.upgrade-price-sub{font-size:13px;font-weight:600;color:var(--text-3);margin-bottom:16px}
-.upgrade-features{text-align:left;margin-bottom:20px;padding:0 8px}
-.upgrade-feat{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px}
-.upgrade-feat-check{color:var(--green);font-size:18px;flex-shrink:0}
-.upgrade-btn{width:100%;padding:16px;border:none;border-radius:14px;background:var(--sun);color:var(--white);font-family:var(--body);font-size:17px;font-weight:800;cursor:pointer;transition:all .2s}
-.upgrade-btn:hover{background:var(--sun-dark)}
-.upgrade-btn:active{transform:scale(.98)}
-.upgrade-btn:disabled{opacity:.6;cursor:not-allowed}
-.upgrade-trial-note{font-size:12px;font-weight:700;color:var(--green-dark);margin-top:10px}
-.upgrade-login{font-size:13px;font-weight:600;color:var(--text-3);margin-top:16px}
-.upgrade-login a{color:var(--sun);text-decoration:none;font-weight:700;cursor:pointer}
-.upgrade-login a:hover{text-decoration:underline}
 
 /* ═══ TRIAL BANNER ═══ */
 .trial-banner{display:none;position:absolute;top:12px;left:16px;right:16px;z-index:5;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:12px;padding:10px 16px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.1);font-size:13px;font-weight:700;color:var(--text)}
@@ -162,55 +162,58 @@ elevenlabs-convai{
     </div>
 
     <div class="widget-area">
-      <!-- Full-bleed Puerto Rico background -->
       <div class="bg-image"><img src="/boriosj.png" alt="Puerto Rico"></div>
 
-      <!-- Chrome users see this instead of the broken widget -->
       <div class="chrome-banner">
         <div class="chrome-banner-icon">🎙️</div>
         <div class="chrome-banner-title">Voice works best in Safari</div>
         <div class="chrome-banner-text">Open <span>heybori.com</span> in Safari for the full voice experience with Bori. Just copy the link and paste it in Safari!</div>
       </div>
 
-      <!-- TRIAL BANNER (shown when on active trial) -->
       <div class="trial-banner" id="trialBanner">
-        🎙️ Free trial: <span class="days" id="trialDays">7</span> days left
-        <a href="#" class="manage-link" onclick="openPortal();return false;">Manage</a>
+        🎙️ <span id="trialBannerText">Free trial:</span> <span class="days" id="trialDays">7</span> <span id="trialBannerDays">days left</span>
+        <a href="#" class="manage-link" onclick="openPortal();return false;" id="trialManageLink">Manage</a>
       </div>
 
-      <!-- EMAIL GATE (shown first for new users) -->
+      <!-- ═══ GATE CARD ═══ -->
       <div class="gate-overlay" id="gateOverlay">
         <div class="gate-card">
+
+          <!-- Language Toggle -->
+          <div class="lang-toggle">
+            <div class="lang-toggle-track">
+              <button class="lang-toggle-opt active" id="langEN" onclick="setLang('en')">English</button>
+              <button class="lang-toggle-opt" id="langES" onclick="setLang('es')">Español</button>
+            </div>
+          </div>
+
           <div class="gate-icon">🎙️</div>
-          <div class="gate-title"><span class="hey">Hey</span> Bori Voice</div>
-          <div class="gate-subtitle">Talk with Bori in real-time — bilingual conversations in Puerto Rican Spanish and English.</div>
+          <div class="gate-title"><span class="hey">Hey</span> Bori</div>
+          <div class="gate-subtitle" id="gateSubtitle">Real Conversations</div>
+          <div class="gate-price">$14.99<span style="font-size:16px;color:var(--text-3)">/mo</span></div>
+          <div class="gate-price-sub" id="gatePriceSub">Cancel anytime</div>
+          <div class="gate-features">
+            <div class="gate-feat"><span class="gate-feat-check">✓</span><span class="feat-text" data-en="Unlimited voice conversations" data-es="Conversaciones de voz ilimitadas">Unlimited voice conversations</span></div>
+            <div class="gate-feat"><span class="gate-feat-check">✓</span><span class="feat-text" data-en="Bilingual — Spanish &amp; English" data-es="Bilingüe — Español e Inglés">Bilingual — Spanish &amp; English</span></div>
+            <div class="gate-feat"><span class="gate-feat-check">✓</span><span class="feat-text" data-en="Authentic Puerto Rican companion" data-es="Compañero auténtico puertorriqueño">Authentic Puerto Rican companion</span></div>
+            <div class="gate-feat"><span class="gate-feat-check">✓</span><span class="feat-text" data-en="Cultural games included free" data-es="Juegos culturales incluidos gratis">Cultural games included free</span></div>
+          </div>
+          <button class="gate-btn" id="trialBtn" onclick="startCheckout()">Start 7-Day Free Trial</button>
+          <div class="gate-trial-note" id="gateTrialNote">No charge for 7 days. Cancel anytime.</div>
+
+          <div class="gate-divider">
+            <div class="gate-divider-line"></div>
+            <div class="gate-divider-text" id="gateDividerText">Already a member?</div>
+            <div class="gate-divider-line"></div>
+          </div>
+
           <input type="email" class="gate-input" id="gateEmail" placeholder="Enter your email" autocomplete="email" autocapitalize="off">
+          <button class="gate-login-btn" id="loginBtn" onclick="checkAccess()">Sign In</button>
           <div class="gate-error" id="gateError"></div>
-          <button class="gate-btn" id="gateBtn" onclick="checkAccess()">Continue</button>
           <div class="gate-loading" id="gateLoading"><div class="spinner"></div></div>
         </div>
       </div>
 
-      <!-- UPGRADE CARD (shown when no subscription) -->
-      <div class="upgrade-overlay hidden" id="upgradeOverlay">
-        <div class="upgrade-card">
-          <div class="upgrade-icon">🎙️</div>
-          <div class="upgrade-title">Bori Voice</div>
-          <div class="upgrade-price">$14.99<span style="font-size:16px;color:var(--text-3)">/mo</span></div>
-          <div class="upgrade-price-sub">Cancel anytime</div>
-          <div class="upgrade-features">
-            <div class="upgrade-feat"><span class="upgrade-feat-check">✓</span>Unlimited voice conversations</div>
-            <div class="upgrade-feat"><span class="upgrade-feat-check">✓</span>Bilingual — Spanish & English</div>
-            <div class="upgrade-feat"><span class="upgrade-feat-check">✓</span>Authentic Puerto Rican companion</div>
-            <div class="upgrade-feat"><span class="upgrade-feat-check">✓</span>Cultural games included free</div>
-          </div>
-          <button class="upgrade-btn" id="upgradeBtn" onclick="startCheckout()">Start 7-Day Free Trial</button>
-          <div class="upgrade-trial-note">No charge for 7 days. Cancel anytime.</div>
-          <div class="upgrade-login">Already subscribed? <a onclick="switchToLogin()">Sign in with a different email</a></div>
-        </div>
-      </div>
-
-      <!-- ElevenLabs widget — inserted dynamically after access granted -->
       <div id="widgetContainer"></div>
     </div>
   </div>
@@ -220,7 +223,77 @@ elevenlabs-convai{
   <script>
 // ═══ STATE ═══
 var boriEmail = localStorage.getItem('bori-email') || '';
-var boriAccess = null; // {access, reason, plan, trialDaysLeft}
+var boriLang = localStorage.getItem('bori-lang') || 'en';
+var boriAccess = null;
+
+// ═══ BILINGUAL TEXT MAP ═══
+var i18n = {
+  en: {
+    subtitle: 'Real Conversations',
+    priceSub: 'Cancel anytime',
+    trialBtn: 'Start 7-Day Free Trial',
+    trialNote: 'No charge for 7 days. Cancel anytime.',
+    divider: 'Already a member?',
+    emailPlaceholder: 'Enter your email',
+    loginBtn: 'Sign In',
+    errorEmail: 'Please enter a valid email.',
+    errorNoSub: 'No active subscription found for this email.',
+    errorGeneric: 'Something went wrong. Try again.',
+    trialBannerText: 'Free trial:',
+    trialBannerDays: 'days left',
+    trialManage: 'Manage',
+    toastWelcome: 'Welcome to Bori Voice! 🎙️',
+    headerSub: 'Real Conversations'
+  },
+  es: {
+    subtitle: 'Conversaciones Reales',
+    priceSub: 'Cancela cuando quieras',
+    trialBtn: 'Prueba Gratis — 7 Días',
+    trialNote: 'Sin cargos por 7 días. Cancela cuando quieras.',
+    divider: '¿Ya eres miembro?',
+    emailPlaceholder: 'Tu correo electrónico',
+    loginBtn: 'Iniciar Sesión',
+    errorEmail: 'Por favor ingresa un correo válido.',
+    errorNoSub: 'No se encontró suscripción activa con este correo.',
+    errorGeneric: 'Algo salió mal. Intenta de nuevo.',
+    trialBannerText: 'Prueba gratis:',
+    trialBannerDays: 'días restantes',
+    trialManage: 'Administrar',
+    toastWelcome: '¡Bienvenido a Bori Voice! 🎙️',
+    headerSub: 'Conversaciones Reales'
+  }
+};
+
+// ═══ LANGUAGE TOGGLE ═══
+function setLang(lang){
+  boriLang = lang;
+  localStorage.setItem('bori-lang', lang);
+
+  // Toggle buttons
+  document.getElementById('langEN').classList.toggle('active', lang === 'en');
+  document.getElementById('langES').classList.toggle('active', lang === 'es');
+
+  // Update all text
+  var t = i18n[lang];
+  document.getElementById('gateSubtitle').textContent = t.subtitle;
+  document.getElementById('gatePriceSub').textContent = t.priceSub;
+  document.getElementById('trialBtn').textContent = t.trialBtn;
+  document.getElementById('gateTrialNote').textContent = t.trialNote;
+  document.getElementById('gateDividerText').textContent = t.divider;
+  document.getElementById('gateEmail').placeholder = t.emailPlaceholder;
+  document.getElementById('loginBtn').textContent = t.loginBtn;
+  document.getElementById('hdrSub').textContent = t.headerSub;
+
+  // Feature list
+  document.querySelectorAll('.feat-text').forEach(function(el){
+    el.textContent = el.getAttribute('data-' + lang);
+  });
+
+  // Trial banner
+  document.getElementById('trialBannerText').textContent = t.trialBannerText;
+  document.getElementById('trialBannerDays').textContent = t.trialBannerDays;
+  document.getElementById('trialManageLink').textContent = t.trialManage;
+}
 
 // ═══ CHROME DETECTION ═══
 var isChrome = /CriOS|EdgiOS|EdgA|Edg/i.test(navigator.userAgent) || (/Chrome/i.test(navigator.userAgent) && /Mobile/i.test(navigator.userAgent) && !/Safari/i.test(navigator.userAgent));
@@ -228,31 +301,51 @@ if(isChrome){document.querySelector('.app').classList.add('is-chrome');}
 
 // ═══ INIT ═══
 (function init(){
-  // If returning from successful checkout
+  // Set saved language
+  setLang(boriLang);
+
+  // Returning from checkout
   if(window.location.search.includes('upgraded=true')){
-    showToast('Welcome to Bori Voice! 🎙️');
+    showToast(i18n[boriLang].toastWelcome);
     history.replaceState(null,'','/chat');
   }
   if(window.location.search.includes('canceled=true')){
     history.replaceState(null,'','/chat');
   }
-  // If we have a saved email, auto-check access
+  // Auto-check for returning users
   if(boriEmail){
-    document.getElementById('gateEmail').value = boriEmail;
-    checkAccess();
+    checkAccessSilent(boriEmail);
   }
 })();
 
-// ═══ CHECK ACCESS ═══
+// ═══ SILENT ACCESS CHECK (returning users) ═══
+async function checkAccessSilent(email){
+  try{
+    var res = await fetch('/api/voice/access',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:email})
+    });
+    var data = await res.json();
+    boriAccess = data;
+    if(data.access){
+      grantAccess(data);
+    }
+  }catch(err){
+    console.error('[Voice Access Silent]', err);
+  }
+}
+
+// ═══ CHECK ACCESS (sign-in button) ═══
 async function checkAccess(){
+  var t = i18n[boriLang];
   var email = document.getElementById('gateEmail').value.trim().toLowerCase();
   if(!email || !email.includes('@')){
-    showGateError('Please enter a valid email.');
+    showGateError(t.errorEmail);
     return;
   }
 
-  // Show loading
-  document.getElementById('gateBtn').style.display = 'none';
+  document.getElementById('loginBtn').style.display = 'none';
   document.getElementById('gateLoading').style.display = 'block';
   document.getElementById('gateError').style.display = 'none';
 
@@ -265,37 +358,31 @@ async function checkAccess(){
     var data = await res.json();
     boriAccess = data;
 
-    // Save email
-    localStorage.setItem('bori-email', email);
-    boriEmail = email;
-
     if(data.access){
-      // ✅ ACCESS GRANTED — load widget
+      localStorage.setItem('bori-email', email);
+      boriEmail = email;
       grantAccess(data);
     } else {
-      // ❌ NO ACCESS — show upgrade card
-      showUpgrade();
+      showGateError(t.errorNoSub);
+      document.getElementById('loginBtn').style.display = 'block';
+      document.getElementById('gateLoading').style.display = 'none';
     }
   }catch(err){
     console.error('[Voice Access]', err);
-    showGateError('Something went wrong. Try again.');
-    document.getElementById('gateBtn').style.display = 'block';
+    showGateError(t.errorGeneric);
+    document.getElementById('loginBtn').style.display = 'block';
     document.getElementById('gateLoading').style.display = 'none';
   }
 }
 
 // ═══ GRANT ACCESS — LOAD WIDGET ═══
 function grantAccess(data){
-  // Hide gate and upgrade
   document.getElementById('gateOverlay').classList.add('hidden');
-  document.getElementById('upgradeOverlay').classList.add('hidden');
 
-  // Update header badge
   var badge = document.getElementById('hdrBadge');
   if(data.reason === 'trial'){
     badge.textContent = data.trialDaysLeft + 'd trial';
     badge.className = 'hdr-badge trial';
-    // Show trial banner
     document.getElementById('trialDays').textContent = data.trialDaysLeft;
     document.getElementById('trialBanner').style.display = 'block';
   } else if(data.reason === 'subscriber'){
@@ -306,13 +393,11 @@ function grantAccess(data){
     badge.className = 'hdr-badge active';
   }
 
-  // Show account links in menu
   if(data.reason !== 'admin'){
     document.getElementById('menuManage').style.display = 'flex';
   }
   document.getElementById('menuLogout').style.display = 'flex';
 
-  // Load ElevenLabs widget
   loadVoiceWidget();
 }
 
@@ -324,7 +409,6 @@ function loadVoiceWidget(){
   widget.setAttribute('variant','expanded');
   container.appendChild(widget);
 
-  // Load the script if not already loaded
   if(!document.querySelector('script[src*="elevenlabs"]')){
     var s = document.createElement('script');
     s.src = 'https://unpkg.com/@elevenlabs/convai-widget-embed';
@@ -333,48 +417,33 @@ function loadVoiceWidget(){
   }
 }
 
-// ═══ SHOW UPGRADE CARD ═══
-function showUpgrade(){
-  document.getElementById('gateOverlay').classList.add('hidden');
-  document.getElementById('upgradeOverlay').classList.remove('hidden');
-}
-
-// ═══ START CHECKOUT ═══
+// ═══ START CHECKOUT (Stripe collects email) ═══
 async function startCheckout(){
-  var btn = document.getElementById('upgradeBtn');
+  var btn = document.getElementById('trialBtn');
+  var originalText = btn.textContent;
   btn.disabled = true;
-  btn.textContent = 'Loading...';
+  btn.textContent = '...';
 
   try{
     var res = await fetch('/api/stripe/checkout',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email:boriEmail})
+      body:JSON.stringify({lang: boriLang})
     });
     var data = await res.json();
     if(data.url){
       window.location.href = data.url;
     } else {
       btn.disabled = false;
-      btn.textContent = 'Start 7-Day Free Trial';
-      showToast('Something went wrong. Try again.');
+      btn.textContent = originalText;
+      showToast(i18n[boriLang].errorGeneric);
     }
   }catch(err){
     console.error('[Checkout]',err);
     btn.disabled = false;
-    btn.textContent = 'Start 7-Day Free Trial';
-    showToast('Something went wrong. Try again.');
+    btn.textContent = originalText;
+    showToast(i18n[boriLang].errorGeneric);
   }
-}
-
-// ═══ SWITCH BACK TO EMAIL LOGIN ═══
-function switchToLogin(){
-  document.getElementById('upgradeOverlay').classList.add('hidden');
-  document.getElementById('gateOverlay').classList.remove('hidden');
-  document.getElementById('gateBtn').style.display = 'block';
-  document.getElementById('gateLoading').style.display = 'none';
-  document.getElementById('gateEmail').value = '';
-  document.getElementById('gateEmail').focus();
 }
 
 // ═══ OPEN STRIPE PORTAL ═══
@@ -388,9 +457,9 @@ async function openPortal(){
     });
     var data = await res.json();
     if(data.url) window.location.href = data.url;
-    else showToast('Could not open billing portal.');
+    else showToast(i18n[boriLang].errorGeneric);
   }catch(err){
-    showToast('Could not open billing portal.');
+    showToast(i18n[boriLang].errorGeneric);
   }
 }
 
@@ -418,7 +487,7 @@ document.getElementById('gateEmail').addEventListener('keydown', function(e){
 function toggleMenu(){document.getElementById('burger').classList.toggle('open');document.getElementById('menu').classList.toggle('open');document.getElementById('menuOverlay').classList.toggle('open');}
 
 // ═══ SHARE ═══
-function doShare(){var url=window.location.origin;var t='Talk to Bori — your bilingual Puerto Rican AI companion! 🇵🇷🎙️ '+url;if(navigator.share){navigator.share({title:'Hey Bori',text:t,url:url}).catch(function(){});}else{navigator.clipboard.writeText(t).then(function(){showToast('Link copied!');}).catch(function(){});}}
+function doShare(){var url=window.location.origin;var t=boriLang==='es'?'Habla con Bori — tu compañero bilingüe puertorriqueño! 🇵🇷🎙️ '+url:'Talk to Bori — your bilingual Puerto Rican AI companion! 🇵🇷🎙️ '+url;if(navigator.share){navigator.share({title:'Hey Bori',text:t,url:url}).catch(function(){});}else{navigator.clipboard.writeText(t).then(function(){showToast(boriLang==='es'?'¡Enlace copiado!':'Link copied!');}).catch(function(){});}}
 
 // ═══ TOAST ═══
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show';setTimeout(function(){t.className='toast';},2500);}
