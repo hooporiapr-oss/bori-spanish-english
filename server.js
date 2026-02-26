@@ -21,7 +21,7 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ═══ STRIPE CLIENT ═══
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const STRIPE_PRODUCT_ID = 'prod_U2NT53dHR4yPPJ';
+const STRIPE_VOICE_PRICE_ID = 'price_1T52eCKBiHyt2NsQNXIipi73';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 const BASE_URL = process.env.BASE_URL || 'https://heybori.com';
 
@@ -113,6 +113,68 @@ const chatLimiter = rateLimit({
 // ═══ STATIC FILES ═══
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ═══ VOICE ACCESS GATING ═══
+app.post('/api/voice/access', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email || typeof email !== 'string') {
+      return res.json({ access: false, reason: 'no_email' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. Admin bypass — always free
+    if (ADMIN_EMAILS.includes(cleanEmail)) {
+      console.log(`[Voice Access] ADMIN: ${cleanEmail}`);
+      return res.json({ access: true, reason: 'admin', plan: 'admin' });
+    }
+
+    // 2. Check Stripe for active subscription OR active trial
+    const customers = await stripe.customers.list({ email: cleanEmail, limit: 1 });
+    if (customers.data.length > 0) {
+      const customer = customers.data[0];
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customer.id,
+        limit: 5,
+      });
+
+      for (const sub of subscriptions.data) {
+        // Active paid subscription
+        if (sub.status === 'active') {
+          console.log(`[Voice Access] SUBSCRIBER: ${cleanEmail}`);
+          return res.json({
+            access: true,
+            reason: 'subscriber',
+            plan: 'bori-voice',
+            customerId: customer.id,
+          });
+        }
+        // Active trial (Stripe status = 'trialing')
+        if (sub.status === 'trialing') {
+          const trialEnd = new Date(sub.trial_end * 1000);
+          const daysLeft = Math.max(0, Math.ceil((trialEnd - Date.now()) / (1000 * 60 * 60 * 24)));
+          console.log(`[Voice Access] TRIAL: ${cleanEmail} (${daysLeft} days left)`);
+          return res.json({
+            access: true,
+            reason: 'trial',
+            plan: 'bori-voice-trial',
+            trialDaysLeft: daysLeft,
+            trialEnd: trialEnd.toISOString(),
+          });
+        }
+      }
+    }
+
+    // 3. No access
+    console.log(`[Voice Access] DENIED: ${cleanEmail}`);
+    return res.json({ access: false, reason: 'no_subscription' });
+
+  } catch (err) {
+    console.error('[Voice Access Error]', err.message);
+    return res.json({ access: false, reason: 'error' });
+  }
+});
+
 // ═══ DEEPGRAM: TEXT-TO-SPEECH (REST) ═══
 app.post('/api/voice/tts', async (req, res) => {
   try {
@@ -182,30 +244,17 @@ app.get('/api/voice/status', (req, res) => {
   });
 });
 
-// ═══ STRIPE: CREATE CHECKOUT SESSION ═══
+// ═══ STRIPE: CREATE CHECKOUT SESSION (VOICE — WITH 7-DAY TRIAL) ═══
 app.post('/api/stripe/checkout', async (req, res) => {
   try {
     const { email, lang } = req.body;
 
-    const prices = await stripe.prices.list({
-      product: STRIPE_PRODUCT_ID,
-      active: true,
-      type: 'recurring',
-      limit: 1,
-    });
-
-    if (!prices.data.length) {
-      return res.status(500).json({ error: 'No active price found for Bori Plus.' });
-    }
-
-    const priceId = prices.data[0].id;
-
     const sessionParams = {
       mode: 'subscription',
       payment_method_types: ['card'],
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price: STRIPE_VOICE_PRICE_ID, quantity: 1 }],
       success_url: `${BASE_URL}/chat?upgraded=true`,
-      cancel_url: `${BASE_URL}/?canceled=true`,
+      cancel_url: `${BASE_URL}/chat?canceled=true`,
       allow_promotion_codes: true,
       billing_address_collection: 'auto',
       metadata: { source: 'heybori', lang: lang || 'en' },
@@ -239,15 +288,15 @@ app.post('/api/stripe/status', async (req, res) => {
     const customer = customers.data[0];
     const subscriptions = await stripe.subscriptions.list({
       customer: customer.id,
-      status: 'active',
-      limit: 1,
+      limit: 5,
     });
 
-    const isSubscribed = subscriptions.data.length > 0;
+    const activeSub = subscriptions.data.find(s => s.status === 'active' || s.status === 'trialing');
+    const isSubscribed = !!activeSub;
     res.json({
       subscribed: isSubscribed,
       customerId: customer.id,
-      plan: isSubscribed ? 'bori-plus' : 'libre',
+      plan: isSubscribed ? (activeSub.status === 'trialing' ? 'bori-voice-trial' : 'bori-voice') : 'libre',
     });
   } catch (err) {
     console.error('[Stripe Status Error]', err.message);
@@ -499,8 +548,7 @@ wss.on('connection', (clientWS, req) => {
 server.listen(PORT, () => {
   console.log(`[Hey Bori] Live on port ${PORT}`);
   console.log(`[Hey Bori] Stripe: ${process.env.STRIPE_SECRET_KEY ? 'Connected' : 'NOT configured'}`);
+  console.log(`[Hey Bori] Voice Price: ${STRIPE_VOICE_PRICE_ID}`);
   console.log(`[Hey Bori] Deepgram: ${DEEPGRAM_API_KEY ? 'Connected' : 'NOT configured'}`);
-  console.log(`[Hey Bori] STT: Nova-3 WebSocket Proxy (/ws/deepgram-stt)`);
-  console.log(`[Hey Bori] TTS: Aura-2 Aquila (Latin American bilingual code-switcher)`);
-  console.log(`[Hey Bori] Language learning companion ready`);
+  console.log(`[Hey Bori] Voice gating: admin bypass + Stripe subscription/trial`);
 });
