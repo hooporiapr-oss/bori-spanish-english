@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>La Ruta — Experience Puerto Rico 🇵🇷</title>
+  <link rel="icon" type="image/png" href="/icon-01F.png">
+  <link rel="apple-touch-icon" href="/icon-01F.png">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--body:'Nunito',sans-serif;--bg:#FFFDF8;--white:#FFF;--dark:#1A1A1A;--text:#2A2A2A;--text-2:#5A5A5A;--text-3:#999;--border:#EDE8DF;--warm:#F8F4ED;--sun:#FF6B35;--sun-dark:#E55A25;--ruta:#2D5016;--ruta-light:#EBF2E3;--ruta-border:#C2D4A8}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+.app{display:flex;flex-direction:column;height:100dvh;max-width:700px;margin:0 auto}
+
+/* Header */
+.hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+.hdr-back{text-decoration:none;font-size:24px;color:var(--text-2);padding:2px 6px;border-radius:8px}
+.hdr-av{width:52px;height:52px;flex-shrink:0;overflow:hidden}
+.hdr-av img{width:100%;height:100%;object-fit:contain}
+.hdr-info{flex:1}
+.hdr-name{font-size:18px;font-weight:800;color:var(--ruta)}
+.hdr-sub{font-size:12px;color:var(--text-3);font-weight:600}
+.share-btn{width:38px;height:38px;border-radius:50%;background:var(--warm);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .2s;flex-shrink:0}
+.share-btn:hover{background:rgba(45,80,22,0.1);border-color:var(--ruta)}
+.burger{width:38px;height:38px;border-radius:50%;background:var(--warm);border:1px solid var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;-webkit-tap-highlight-color:transparent}
+.burger:active{transform:scale(.95)}
+.burger-line{width:16px;height:2.5px;background:var(--ruta);border-radius:2px;transition:all .3s}
+.burger.open .burger-line:nth-child(1){transform:rotate(45deg) translate(4px,4px)}
+.burger.open .burger-line:nth-child(2){opacity:0}
+.burger.open .burger-line:nth-child(3){transform:rotate(-45deg) translate(4px,-4px)}
+
+/* Menu */
+.menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;opacity:0;pointer-events:none;transition:opacity .3s}
+.menu-overlay.open{opacity:1;pointer-events:auto}
+.menu{position:fixed;top:0;right:-280px;width:280px;height:100%;background:var(--white);z-index:101;transition:right .3s cubic-bezier(.22,1,.36,1);box-shadow:-4px 0 24px rgba(0,0,0,0.1);display:flex;flex-direction:column;padding:28px 0;overflow-y:auto}
+.menu.open{right:0}
+.menu-header{padding:0 24px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.menu-header img{width:40px;height:40px;object-fit:contain}
+.menu-header-text{flex:1}
+.menu-header-title{font-size:18px;font-weight:900;color:var(--ruta)}
+.menu-header-sub{font-size:11px;color:var(--text-3);font-weight:600}
+.menu-section{padding:18px 24px 8px;font-size:10px;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:1.5px}
+.menu-link{display:flex;align-items:center;gap:14px;padding:14px 24px;text-decoration:none;color:var(--text);font-size:16px;font-weight:700;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.menu-link:active{background:var(--warm)}
+.menu-link-icon{font-size:22px;width:30px;text-align:center}
+.menu-link-arrow{color:var(--text-3);font-size:14px;margin-left:auto}
+.menu-spacer{flex:1}
+.menu-footer{padding:16px 24px;border-top:1px solid var(--border)}
+.menu-footer a{font-size:12px;color:var(--text-3);text-decoration:none;font-weight:600;margin-right:14px}
+.menu-footer a:active{color:var(--ruta)}
+.menu-footer p{font-size:10px;color:var(--text-3);margin-top:8px;opacity:.5}
+
+/* Widget area */
+.widget-area{flex:1;position:relative;overflow:hidden}
+
+/* Full-bleed background */
+.bg-image{position:absolute;inset:0;z-index:0}
+.bg-image img{width:100%;height:100%;object-fit:cover}
+
+/* Chrome banner */
+.chrome-banner{display:none;position:absolute;bottom:24px;left:16px;right:16px;z-index:5;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:16px;padding:20px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.15)}
+.chrome-banner-icon{font-size:32px;margin-bottom:8px}
+.chrome-banner-title{font-size:16px;font-weight:800;color:var(--dark);margin-bottom:4px}
+.chrome-banner-text{font-size:13px;font-weight:600;color:var(--text-2);line-height:1.5}
+.chrome-banner-text span{color:var(--ruta);font-weight:800}
+.is-chrome .chrome-banner{display:block}
+.is-chrome elevenlabs-convai{display:none !important}
+
+/* ElevenLabs widget */
+elevenlabs-convai{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  z-index:1 !important;
+}
+
+/* Bori upsell banner */
+.upsell-banner{position:absolute;bottom:12px;left:16px;right:16px;z-index:5;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);cursor:pointer;transition:all .2s;text-decoration:none}
+.upsell-banner:hover{box-shadow:0 4px 20px rgba(0,0,0,0.15);transform:translateY(-1px)}
+.upsell-banner:active{transform:scale(.98)}
+.upsell-icon{font-size:28px;flex-shrink:0}
+.upsell-text{flex:1}
+.upsell-title{font-size:13px;font-weight:800;color:var(--dark)}
+.upsell-sub{font-size:11px;font-weight:600;color:var(--text-3)}
+.upsell-arrow{font-size:18px;color:var(--sun);font-weight:900;flex-shrink:0}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:var(--white);padding:12px 28px;border-radius:50px;font-size:14px;font-weight:700;opacity:0;transition:all .3s;z-index:300;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  </style>
+</head>
+<body>
+  <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+  <div class="menu" id="menu">
+    <div class="menu-header"><img src="/icon.png" alt="Hey Bori"><div class="menu-header-text"><div class="menu-header-title">La Ruta</div><div class="menu-header-sub">Experience Puerto Rico</div></div></div>
+    <div class="menu-section">EXPERIENCE</div>
+    <a href="/laruta" class="menu-link"><span class="menu-link-icon">🌿</span>La Ruta<span class="menu-link-arrow">›</span></a>
+    <a href="/chat" class="menu-link"><span class="menu-link-icon">🎙️</span>Hey Bori<span class="menu-link-arrow">›</span></a>
+    <div class="menu-section">CULTURAL GAMES</div>
+    <a href="/the-conga.html" class="menu-link"><span class="menu-link-icon">🥁</span>Conga<span class="menu-link-arrow">›</span></a>
+    <a href="/the-lelolai.html" class="menu-link"><span class="menu-link-icon">🔤</span>LeLoLai Letras<span class="menu-link-arrow">›</span></a>
+    <a href="/the-domino.html" class="menu-link"><span class="menu-link-icon">🎲</span>La Marquesina<span class="menu-link-arrow">›</span></a>
+    <a href="/the-isla.html" class="menu-link"><span class="menu-link-icon">🧩</span>La Isla<span class="menu-link-arrow">›</span></a>
+    <div class="menu-spacer"></div>
+    <div class="menu-footer"><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><p>© 2026 GoStar Digital LLC 🇵🇷</p></div>
+  </div>
+
+  <div class="app">
+    <div class="hdr">
+      <a href="/" class="hdr-back">←</a>
+      <div class="hdr-av"><img src="/icon.png" alt="Hey Bori"></div>
+      <div class="hdr-info">
+        <div class="hdr-name">🌿 La Ruta</div>
+        <div class="hdr-sub">Experience Puerto Rico</div>
+      </div>
+      <button class="share-btn" onclick="doShare()">📤</button>
+      <button class="burger" id="burger" onclick="toggleMenu()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div></button>
+    </div>
+
+    <div class="widget-area">
+      <!-- Puerto Rico background -->
+      <div class="bg-image"><img src="/boriosj.png" alt="Puerto Rico"></div>
+
+      <!-- Chrome banner -->
+      <div class="chrome-banner">
+        <div class="chrome-banner-icon">🌿</div>
+        <div class="chrome-banner-title">Voice works best in Safari</div>
+        <div class="chrome-banner-text">Open <span>heybori.com/laruta</span> in Safari for the full experience. Just copy the link and paste it in Safari!</div>
+      </div>
+
+      <!-- ElevenLabs La Ruta widget -->
+      <elevenlabs-convai agent-id="agent_5801kjdgm1zwe65843rj9r29zmj1" variant="expanded"></elevenlabs-convai>
+
+      <!-- Bori upsell banner at bottom -->
+      <a href="/chat" class="upsell-banner" id="upsellBanner">
+        <div class="upsell-icon">🎙️</div>
+        <div class="upsell-text">
+          <div class="upsell-title">Want to keep talking? Meet Bori.</div>
+          <div class="upsell-sub">Real Conversations — Try free for 7 days</div>
+        </div>
+        <div class="upsell-arrow">›</div>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+  <div class="toast" id="toast"></div>
+
+  <script>
+// Chrome detection
+var isChrome = /CriOS|EdgiOS|EdgA|Edg/i.test(navigator.userAgent) || (/Chrome/i.test(navigator.userAgent) && /Mobile/i.test(navigator.userAgent) && !/Safari/i.test(navigator.userAgent));
+if(isChrome){document.querySelector('.app').classList.add('is-chrome');}
+
+function toggleMenu(){document.getElementById('burger').classList.toggle('open');document.getElementById('menu').classList.toggle('open');document.getElementById('menuOverlay').classList.toggle('open');}
+
+function doShare(){
+  var lang = localStorage.getItem('bori-lang') || 'en';
+  var url = window.location.origin + '/laruta';
+  var t = lang === 'es'
+    ? 'Experimenta Puerto Rico con La Ruta — un viaje guiado por voz. Gratis. 🇵🇷🌿 ' + url
+    : 'Experience Puerto Rico through La Ruta — a voice-guided journey. Free. 🇵🇷🌿 ' + url;
+  if(navigator.share){navigator.share({title:'La Ruta — Hey Bori',text:t,url:url}).catch(function(){});}
+  else{navigator.clipboard.writeText(t).then(function(){showToast(lang==='es'?'¡Enlace copiado!':'Link copied!');}).catch(function(){});}
+}
+
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show';setTimeout(function(){t.className='toast';},2500);}
+  </script>
+</body>
+</html>
