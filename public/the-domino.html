@@ -797,7 +797,7 @@ function buildBoard() {
   board.innerHTML = '';
   FULL_SET.forEach((tile, idx) => {
     const el = document.createElement('div');
-    el.className = 'domino-tile disabled';
+    el.className = 'domino-tile';
     el.dataset.index = idx;
     el.innerHTML = `
       <div class="dot-half">${dotsHTML(tile[0])}</div>
@@ -893,8 +893,7 @@ function setStatus(key, extra = '') {
 }
 
 function setTilesDisabled(disabled) {
-  document.querySelectorAll('.domino-tile').forEach(el =>
-    el.classList.toggle('disabled', disabled));
+  document.getElementById('dominoBoard').style.pointerEvents = disabled ? 'none' : 'auto';
 }
 
 function clearTileStates() {
