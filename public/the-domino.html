@@ -118,15 +118,23 @@
     content: ''; position: absolute; top: 48%; left: 12%; right: 12%;
     height: 2px; background: var(--tile-divider); border-radius: 1px;
   }
-  .domino-tile.disabled { pointer-events: none; opacity: 0.5; }
+  .domino-tile.disabled { pointer-events: none; }
   .domino-tile.flashing {
-    border-color: var(--tile-flash); background: #FFF8DC;
-    transform: scale(1.08); box-shadow: 0 0 18px rgba(255,215,0,0.6), 0 2px 4px rgba(0,0,0,0.3);
+    border-color: var(--tile-flash); border-width: 3px;
+    background: #FFF8DC;
+    transform: scale(1.12);
+    box-shadow: 0 0 24px rgba(255,215,0,0.7), 0 0 48px rgba(255,215,0,0.3), 0 2px 4px rgba(0,0,0,0.3);
+    animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 2;
   }
   .domino-tile.flashing::after { background: rgba(255,215,0,0.4); }
   .domino-tile.flash-orange {
-    border-color: #FF8C00; background: #FFF0E0;
-    transform: scale(1.08); box-shadow: 0 0 18px rgba(255,140,0,0.6), 0 2px 4px rgba(0,0,0,0.3);
+    border-color: #FF8C00; border-width: 3px;
+    background: #FFF0E0;
+    transform: scale(1.12);
+    box-shadow: 0 0 24px rgba(255,140,0,0.7), 0 0 48px rgba(255,140,0,0.3), 0 2px 4px rgba(0,0,0,0.3);
+    animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 2;
   }
   .domino-tile.flash-orange::after { background: rgba(255,140,0,0.3); }
   .domino-tile.selected {
@@ -321,6 +329,11 @@
     25% { transform: translateX(-6px); }
     50% { transform: translateX(6px); }
     75% { transform: translateX(-4px); }
+  }
+  @keyframes popIn {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.18); }
+    100% { transform: scale(1.12); }
   }
 
   /* ── TIMER BAR ── */
