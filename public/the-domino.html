@@ -1044,10 +1044,10 @@ async function startTrampaRound() {
     const tileEl = document.querySelector(`[data-index="${trampaModified[i]}"]`);
     tileEl.classList.add('flash-orange');
     await sleep(spd);
-    tileEl.classList.remove('flash-orange');
     if (i < trampaModified.length - 1) await sleep(gap);
   }
 
+  // Keep second pass tiles highlighted — player picks the impostor from these
   isFlashing = false; isPlayerTurn = true;
   setStatus('status-your-turn-tra');
   setTilesDisabled(false);
