@@ -71,19 +71,11 @@
     flex: 1;
   }
   .top-bar .help-btn {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 2px solid var(--bori-gold);
-    background: transparent;
-    color: var(--bori-gold);
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Fredoka', sans-serif;
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2px solid var(--bori-gold); background: transparent;
+    color: var(--bori-gold); font-size: 16px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; font-family: 'Fredoka', sans-serif;
   }
 
   /* ── INFO STRIP ── */
@@ -98,23 +90,17 @@
   }
   .info-item { text-align: center; flex: 1; }
   .info-label {
-    font-size: 9px;
-    color: var(--bori-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 9px; color: var(--bori-muted);
+    text-transform: uppercase; letter-spacing: 1px;
   }
   .info-value { font-size: 16px; font-weight: 700; color: var(--bori-gold); }
   .info-value.teal { color: var(--bori-teal); }
 
   /* ── STATUS ── */
   .status-bar {
-    text-align: center;
-    padding: 4px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--bori-muted);
-    flex-shrink: 0;
-    min-height: 24px;
+    text-align: center; padding: 4px;
+    font-size: 13px; font-weight: 600;
+    color: var(--bori-muted); flex-shrink: 0; min-height: 24px;
   }
   .status-bar.watching { color: var(--bori-gold); }
   .status-bar.your-turn { color: var(--bori-teal); }
@@ -123,20 +109,15 @@
 
   /* ── BOARD ── */
   .board-area {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    min-height: 0;
+    flex: 1; display: flex;
+    align-items: center; justify-content: center;
+    overflow: hidden; min-height: 0;
   }
   .domino-board {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-    width: 100%;
-    max-width: 400px;
-    padding: 4px;
+    gap: 4px; width: 100%;
+    max-width: 400px; padding: 4px;
   }
 
   /* ── TILE ── */
@@ -146,25 +127,16 @@
     border: 2.5px solid var(--tile-border);
     border-radius: 8px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 3px rgba(0,0,0,0.3);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: space-around;
     cursor: pointer;
     transition: transform 0.1s, border-color 0.2s, background 0.2s;
-    position: relative;
-    padding: 3px 2px;
-    user-select: none;
+    position: relative; padding: 3px 2px; user-select: none;
   }
   .domino-tile::after {
-    content: '';
-    position: absolute;
-    top: 48%;
-    left: 15%;
-    right: 15%;
-    height: 2px;
-    background: var(--tile-border);
-    border-radius: 1px;
+    content: ''; position: absolute;
+    top: 48%; left: 15%; right: 15%;
+    height: 2px; background: var(--tile-border); border-radius: 1px;
   }
   .domino-tile.disabled { pointer-events: none; opacity: 0.6; }
   .domino-tile.flashing {
@@ -190,57 +162,38 @@
 
   /* ── DOTS ── */
   .dot-half {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    width: 80%;
-    height: 42%;
-    position: relative;
+    display: flex; flex-wrap: wrap;
+    align-items: center; justify-content: center;
+    width: 80%; height: 42%; position: relative;
   }
   .dot {
-    width: 7px;
-    height: 7px;
+    width: 7px; height: 7px;
     background: var(--bori-text);
-    border-radius: 50%;
-    position: absolute;
+    border-radius: 50%; position: absolute;
   }
   .domino-tile.flashing .dot { background: var(--bori-gold); }
   .domino-tile.selected .dot { background: var(--bori-teal); }
 
   /* ── BOTTOM ── */
   .bottom-controls {
-    flex-shrink: 0;
-    padding: 6px 4px 4px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    flex-shrink: 0; padding: 6px 4px 4px;
+    display: flex; flex-direction: column; gap: 6px;
   }
   .sequence-dots {
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-    min-height: 14px;
-    flex-wrap: wrap;
+    display: flex; justify-content: center;
+    gap: 5px; min-height: 14px; flex-wrap: wrap;
   }
   .seq-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--tile-border);
-    transition: background 0.2s;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--tile-border); transition: background 0.2s;
   }
   .seq-dot.filled { background: var(--bori-teal); }
   .seq-dot.current { background: var(--bori-gold); box-shadow: 0 0 6px var(--bori-gold); }
   .btn-row { display: flex; gap: 8px; justify-content: center; }
   .game-btn {
-    padding: 10px 24px;
-    border: none;
-    border-radius: 25px;
+    padding: 10px 24px; border: none; border-radius: 25px;
     font-family: 'Fredoka', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
+    font-size: 14px; font-weight: 600; cursor: pointer;
     transition: transform 0.1s;
   }
   .game-btn:active { transform: scale(0.95); }
@@ -249,37 +202,64 @@
 
   /* ── WELCOME ── */
   .welcome-screen {
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background: var(--bori-bg);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
-    padding: 20px;
-    text-align: center;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 50; padding: 20px; text-align: center;
+    overflow-y: auto;
   }
   .welcome-screen.hidden { display: none; }
-  .welcome-icon { font-size: 56px; margin-bottom: 12px; margin-top: 48px; }
+  .welcome-icon { font-size: 48px; margin-bottom: 8px; margin-top: 48px; }
   .welcome-title { font-size: 26px; font-weight: 700; color: var(--bori-gold); margin-bottom: 2px; }
-  .welcome-subtitle { font-size: 14px; font-weight: 600; color: var(--bori-text); margin-bottom: 4px; letter-spacing: 0.5px; }
-  .welcome-sub { font-size: 13px; color: var(--bori-muted); margin-bottom: 24px; }
-  .setting-group { width: 100%; max-width: 300px; margin-bottom: 16px; }
-  .setting-label { font-size: 11px; color: var(--bori-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .welcome-subtitle { font-size: 14px; font-weight: 600; color: var(--bori-text); margin-bottom: 2px; letter-spacing: 0.5px; }
+  .welcome-sub { font-size: 12px; color: var(--bori-muted); margin-bottom: 14px; }
+
+  /* ── MODE SELECTOR ── */
+  .mode-selector {
+    display: flex; gap: 8px;
+    width: 100%; max-width: 300px;
+    margin-bottom: 14px;
+  }
+  .mode-btn {
+    flex: 1; padding: 12px 8px;
+    border-radius: 14px;
+    border: 2.5px solid var(--tile-border);
+    background: var(--bori-surface);
+    color: var(--bori-text);
+    font-family: 'Fredoka', sans-serif;
+    font-size: 13px; font-weight: 700;
+    text-align: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .mode-btn .mode-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+  .mode-btn .mode-name { display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+  .mode-btn .mode-desc {
+    display: block; font-size: 9px; font-weight: 500;
+    color: var(--bori-muted); margin-top: 2px;
+  }
+  .mode-btn.active {
+    border-color: var(--bori-gold);
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--bori-gold);
+  }
+  .mode-btn.active .mode-desc { color: var(--bori-gold); opacity: 0.7; }
+
+  /* ── SETTINGS ── */
+  .setting-group { width: 100%; max-width: 300px; margin-bottom: 12px; }
+  .setting-label {
+    font-size: 11px; color: var(--bori-muted);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+  }
   .setting-options { display: flex; gap: 6px; }
   .setting-opt {
-    flex: 1;
-    padding: 10px 6px;
-    border-radius: 12px;
+    flex: 1; padding: 8px 6px; border-radius: 12px;
     border: 2px solid var(--tile-border);
     background: var(--bori-surface);
     color: var(--bori-text);
     font-family: 'Fredoka', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-    cursor: pointer;
+    font-size: 12px; font-weight: 600;
+    text-align: center; cursor: pointer;
     transition: border-color 0.2s, background 0.2s;
   }
   .setting-opt.active {
@@ -287,44 +267,32 @@
     background: rgba(255, 215, 0, 0.1);
     color: var(--bori-gold);
   }
-  .setting-opt .opt-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+  .setting-opt .opt-icon { font-size: 16px; display: block; margin-bottom: 2px; }
+
   .start-btn {
-    margin-top: 12px;
-    padding: 14px 48px;
-    border-radius: 30px;
-    border: none;
+    margin-top: 8px; padding: 14px 48px;
+    border-radius: 30px; border: none;
     background: linear-gradient(135deg, var(--bori-gold), #FFA500);
-    color: #1a1128;
-    font-family: 'Fredoka', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    color: #1a1128; font-family: 'Fredoka', sans-serif;
+    font-size: 18px; font-weight: 700; cursor: pointer;
+    text-transform: uppercase; letter-spacing: 1px;
   }
   .start-btn:active { transform: scale(0.95); }
 
   /* ── WELCOME TOP BAR ── */
   .welcome-top-bar {
-    position: absolute;
-    top: 12px; left: 12px; right: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 10;
+    position: absolute; top: 12px; left: 12px; right: 12px;
+    display: flex; justify-content: space-between;
+    align-items: center; z-index: 10;
   }
   .welcome-back-btn {
-    background: none; border: none;
-    color: var(--bori-gold);
+    background: none; border: none; color: var(--bori-gold);
     font-family: 'Fredoka', sans-serif;
     font-size: 16px; font-weight: 600;
-    text-decoration: none;
-    padding: 6px 10px;
+    text-decoration: none; padding: 6px 10px;
     display: flex; align-items: center; gap: 4px;
   }
-  .welcome-top-right {
-    display: flex; align-items: center; gap: 8px;
-  }
+  .welcome-top-right { display: flex; align-items: center; gap: 8px; }
   .welcome-lang-toggle {
     display: flex; gap: 3px;
     background: rgba(255,255,255,0.06);
@@ -337,41 +305,35 @@
     background: transparent; color: var(--bori-muted);
     transition: all 0.2s;
   }
-  .wlang-btn.active {
-    background: var(--bori-gold); color: #1a1128;
-  }
+  .wlang-btn.active { background: var(--bori-gold); color: #1a1128; }
   .welcome-help-btn {
     width: 32px; height: 32px; border-radius: 50%;
     background: rgba(255,215,0,0.12);
     border: 1.5px solid var(--bori-gold);
     color: var(--bori-gold);
     font-family: 'Fredoka', sans-serif;
-    font-size: 15px; font-weight: 700;
-    cursor: pointer;
+    font-size: 15px; font-weight: 700; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
 
+  /* ── SETTINGS VISIBILITY ── */
+  .secuencia-settings, .relampago-settings { display: none; }
+  .secuencia-settings.visible, .relampago-settings.visible { display: block; }
+
   /* ── HELP MODAL ── */
   .modal-overlay {
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background: rgba(10, 6, 20, 0.92);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
+    z-index: 100; display: flex;
+    align-items: center; justify-content: center; padding: 16px;
   }
   .modal-overlay.hidden { display: none; }
   .modal-box {
     background: var(--bori-surface);
     border: 2px solid var(--tile-border);
-    border-radius: 16px;
-    padding: 20px;
-    max-width: 360px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
+    border-radius: 16px; padding: 20px;
+    max-width: 360px; width: 100%;
+    max-height: 80vh; overflow-y: auto;
   }
   .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
   .modal-title { font-size: 18px; font-weight: 700; color: var(--bori-gold); }
@@ -383,11 +345,16 @@
   }
   .lang-toggle { display: flex; gap: 4px; margin-bottom: 14px; }
   .lang-btn {
-    padding: 5px 14px; border-radius: 20px; border: 2px solid var(--tile-border);
+    padding: 5px 14px; border-radius: 20px;
+    border: 2px solid var(--tile-border);
     background: transparent; color: var(--bori-muted);
-    font-family: 'Fredoka', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 12px; font-weight: 600; cursor: pointer;
   }
-  .lang-btn.active { border-color: var(--bori-teal); color: var(--bori-teal); background: rgba(0, 217, 165, 0.1); }
+  .lang-btn.active {
+    border-color: var(--bori-teal); color: var(--bori-teal);
+    background: rgba(0, 217, 165, 0.1);
+  }
   .rules-content h3 { font-size: 14px; font-weight: 600; color: var(--bori-teal); margin: 10px 0 4px; }
   .rules-content p { font-size: 12px; color: var(--bori-text); line-height: 1.5; margin-bottom: 6px; }
   .rules-content.hidden { display: none; }
@@ -401,19 +368,13 @@
 
   /* ── TIMER BAR ── */
   .timer-bar-container {
-    height: 4px;
-    background: var(--tile-border);
-    border-radius: 2px;
-    overflow: hidden;
-    flex-shrink: 0;
+    height: 4px; background: var(--tile-border);
+    border-radius: 2px; overflow: hidden; flex-shrink: 0;
   }
   .timer-bar-container.hidden { visibility: hidden; }
   .timer-bar {
-    height: 100%;
-    background: var(--bori-teal);
-    border-radius: 2px;
-    transition: width 0.1s linear;
-    width: 100%;
+    height: 100%; background: var(--bori-teal);
+    border-radius: 2px; transition: width 0.1s linear; width: 100%;
   }
   .timer-bar.warning { background: var(--bori-coral); }
 
@@ -426,6 +387,11 @@
     .game-btn { padding: 8px 20px; font-size: 13px; }
     .status-bar { font-size: 11px; min-height: 20px; padding: 2px; }
     .bottom-controls { padding: 4px; gap: 4px; }
+    .welcome-icon { font-size: 40px; margin-top: 44px; margin-bottom: 6px; }
+    .welcome-title { font-size: 22px; }
+    .mode-btn { padding: 8px 6px; }
+    .setting-opt { padding: 6px 4px; font-size: 11px; }
+    .start-btn { padding: 12px 40px; font-size: 16px; }
   }
 </style>
 </head>
@@ -442,7 +408,7 @@
   <!-- INFO STRIP -->
   <div class="info-strip">
     <div class="info-item">
-      <div class="info-label" data-i18n="label-seq">Secuencia</div>
+      <div class="info-label" id="lblCount">Secuencia</div>
       <div class="info-value" id="seqDisplay">3</div>
     </div>
     <div class="info-item">
@@ -481,7 +447,7 @@
     </div>
   </div>
 
-  <!-- WELCOME SCREEN -->
+  <!-- ═══ WELCOME SCREEN ═══ -->
   <div class="welcome-screen" id="welcomeScreen">
     <div class="welcome-top-bar">
       <a href="/" class="welcome-back-btn">← Bori</a>
@@ -498,38 +464,75 @@
     <div class="welcome-subtitle" data-i18n="welcome-game">Dominó Secuencia</div>
     <div class="welcome-sub" data-i18n="welcome-sub">Memoria · Secuencia · Dominó</div>
 
-    <div class="setting-group">
-      <div class="setting-label" data-i18n="setting-flash">Velocidad del Flash</div>
-      <div class="setting-options" id="speedOptions">
-        <div class="setting-opt" data-speed="slow" onclick="setSpeed('slow')">
-          <span class="opt-icon">🐢</span>
-          <span data-i18n="speed-slow">Lento</span>
+    <!-- MODE SELECTOR -->
+    <div class="mode-selector">
+      <div class="mode-btn active" data-mode="secuencia" onclick="selectMode('secuencia')">
+        <span class="mode-icon">🔢</span>
+        <span class="mode-name">Secuencia</span>
+        <span class="mode-desc" data-i18n="mode-sec-desc">Orden importa</span>
+      </div>
+      <div class="mode-btn" data-mode="relampago" onclick="selectMode('relampago')">
+        <span class="mode-icon">⚡</span>
+        <span class="mode-name">Relámpago</span>
+        <span class="mode-desc" data-i18n="mode-rel-desc">Recuerda cuáles</span>
+      </div>
+    </div>
+
+    <!-- SECUENCIA SETTINGS -->
+    <div class="secuencia-settings visible" id="secuenciaSettings">
+      <div class="setting-group">
+        <div class="setting-label" data-i18n="setting-flash">Velocidad del Flash</div>
+        <div class="setting-options" id="speedOptions">
+          <div class="setting-opt" data-speed="slow" onclick="setSpeed('slow')">
+            <span class="opt-icon">🐢</span>
+            <span data-i18n="speed-slow">Lento</span>
+          </div>
+          <div class="setting-opt active" data-speed="medium" onclick="setSpeed('medium')">
+            <span class="opt-icon">🏃</span>
+            <span data-i18n="speed-medium">Medio</span>
+          </div>
+          <div class="setting-opt" data-speed="fast" onclick="setSpeed('fast')">
+            <span class="opt-icon">⚡</span>
+            <span data-i18n="speed-fast">Rápido</span>
+          </div>
         </div>
-        <div class="setting-opt active" data-speed="medium" onclick="setSpeed('medium')">
-          <span class="opt-icon">🏃</span>
-          <span data-i18n="speed-medium">Medio</span>
-        </div>
-        <div class="setting-opt" data-speed="fast" onclick="setSpeed('fast')">
-          <span class="opt-icon">⚡</span>
-          <span data-i18n="speed-fast">Rápido</span>
+      </div>
+      <div class="setting-group">
+        <div class="setting-label" data-i18n="setting-response">Tiempo de Respuesta</div>
+        <div class="setting-options" id="responseOptions">
+          <div class="setting-opt" data-response="relaxed" onclick="setResponse('relaxed')">
+            <span class="opt-icon">😌</span>
+            <span data-i18n="resp-relaxed">Relajado</span>
+          </div>
+          <div class="setting-opt active" data-response="normal" onclick="setResponse('normal')">
+            <span class="opt-icon">😎</span>
+            <span data-i18n="resp-normal">Normal</span>
+          </div>
+          <div class="setting-opt" data-response="pressure" onclick="setResponse('pressure')">
+            <span class="opt-icon">🔥</span>
+            <span data-i18n="resp-pressure">Presión</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="setting-group">
-      <div class="setting-label" data-i18n="setting-response">Tiempo de Respuesta</div>
-      <div class="setting-options" id="responseOptions">
-        <div class="setting-opt" data-response="relaxed" onclick="setResponse('relaxed')">
-          <span class="opt-icon">😌</span>
-          <span data-i18n="resp-relaxed">Relajado</span>
-        </div>
-        <div class="setting-opt active" data-response="normal" onclick="setResponse('normal')">
-          <span class="opt-icon">😎</span>
-          <span data-i18n="resp-normal">Normal</span>
-        </div>
-        <div class="setting-opt" data-response="pressure" onclick="setResponse('pressure')">
-          <span class="opt-icon">🔥</span>
-          <span data-i18n="resp-pressure">Presión</span>
+    <!-- RELÁMPAGO SETTINGS -->
+    <div class="relampago-settings" id="relampagoSettings">
+      <div class="setting-group">
+        <div class="setting-label" data-i18n="setting-level">Nivel de Dificultad</div>
+        <div class="setting-options" id="levelOptions">
+          <div class="setting-opt active" data-level="1" onclick="setLevel(1)">
+            <span class="opt-icon">👁️</span>
+            <span data-i18n="level-1">Nivel 1</span>
+          </div>
+          <div class="setting-opt" data-level="2" onclick="setLevel(2)">
+            <span class="opt-icon">👀</span>
+            <span data-i18n="level-2">Nivel 2</span>
+          </div>
+          <div class="setting-opt" data-level="3" onclick="setLevel(3)">
+            <span class="opt-icon">⚡</span>
+            <span data-i18n="level-3">Nivel 3</span>
+          </div>
         </div>
       </div>
     </div>
@@ -537,7 +540,7 @@
     <button class="start-btn" onclick="closeWelcome()" data-i18n="btn-play">JUGAR</button>
   </div>
 
-  <!-- HELP MODAL -->
+  <!-- ═══ HELP MODAL ═══ -->
   <div class="modal-overlay hidden" id="helpModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -548,7 +551,10 @@
         <button class="lang-btn active" onclick="setLang('es')">ES</button>
         <button class="lang-btn" onclick="setLang('en')">EN</button>
       </div>
-      <div class="rules-content" id="rulesES">
+
+      <!-- SECUENCIA RULES ES -->
+      <div class="rules-content" id="rulesSecES">
+        <h3>🔢 Secuencia</h3>
         <h3>🎯 Objetivo</h3>
         <p>Observa la secuencia de fichas de dominó que se iluminan y repítela tocándolas en el mismo orden.</p>
         <h3>📈 Progresión</h3>
@@ -562,12 +568,14 @@
         <h3>⭐ Puntos</h3>
         <p>Más secuencia + más velocidad = más puntos.</p>
       </div>
-      <div class="rules-content hidden" id="rulesEN">
+      <!-- SECUENCIA RULES EN -->
+      <div class="rules-content hidden" id="rulesSecEN">
+        <h3>🔢 Secuencia</h3>
         <h3>🎯 Goal</h3>
         <p>Watch the domino tiles that light up and tap them back in the same order.</p>
         <h3>📈 Progression</h3>
         <p>Start with 3 tiles. Get it right 2 times in a row and the sequence grows to 4, then 5, up to 28.</p>
-        <h3>📉 If you fail</h3>
+        <h3>📉 If You Fail</h3>
         <p>Drop one level. Never below 3. No harsh penalties — climb back up.</p>
         <h3>⚡ Flash Speed</h3>
         <p>Slow, Medium, or Fast — how quickly tiles light up.</p>
@@ -575,6 +583,35 @@
         <p>Relaxed (no limit), Normal (5s per tile), or Pressure (2.5s per tile).</p>
         <h3>⭐ Points</h3>
         <p>Longer sequences + faster speed = more points.</p>
+      </div>
+
+      <!-- RELÁMPAGO RULES ES -->
+      <div class="rules-content hidden" id="rulesRelES">
+        <h3>⚡ Relámpago</h3>
+        <h3>🎯 Objetivo</h3>
+        <p>Varias fichas se iluminan al mismo tiempo. Recuerda cuáles eran y tócalas — el orden no importa.</p>
+        <h3>📈 Progresión</h3>
+        <p>Comienzas con 3 fichas. Aciertas 2 veces seguidas y sube a 4, luego 5, hasta un máximo de 10.</p>
+        <h3>📉 Si fallas</h3>
+        <p>Bajas un nivel. Nunca menos de 3. Siempre puedes escalar de vuelta.</p>
+        <h3>👁️ Niveles de Dificultad</h3>
+        <p>Nivel 1 — las fichas se muestran por más tiempo. Nivel 2 — menos tiempo. Nivel 3 — un destello rápido.</p>
+        <h3>⭐ Puntos</h3>
+        <p>Más fichas + nivel más alto = más puntos.</p>
+      </div>
+      <!-- RELÁMPAGO RULES EN -->
+      <div class="rules-content hidden" id="rulesRelEN">
+        <h3>⚡ Relámpago</h3>
+        <h3>🎯 Goal</h3>
+        <p>Several tiles flash at the same time. Remember which ones they were and tap them — order doesn't matter.</p>
+        <h3>📈 Progression</h3>
+        <p>Start with 3 tiles. Get it right 2 times in a row and it grows to 4, then 5, up to a max of 10.</p>
+        <h3>📉 If You Fail</h3>
+        <p>Drop one level. Never below 3. You can always climb back up.</p>
+        <h3>👁️ Difficulty Levels</h3>
+        <p>Level 1 — tiles show longer. Level 2 — less time. Level 3 — a quick flash.</p>
+        <h3>⭐ Points</h3>
+        <p>More tiles + higher level = more points.</p>
       </div>
     </div>
   </div>
@@ -584,19 +621,21 @@
 // ═══ FULL DOMINO SET (28 tiles) ═══
 const FULL_SET = [];
 for (let a = 0; a <= 6; a++) {
-  for (let b = a; b <= 6; b++) {
-    FULL_SET.push([a, b]);
-  }
+  for (let b = a; b <= 6; b++) FULL_SET.push([a, b]);
 }
 
 // ═══ CONFIG ═══
 const SPEEDS = { slow: 900, medium: 550, fast: 300 };
 const GAPS = { slow: 400, medium: 250, fast: 150 };
 const RESPONSE_TIMES = { relaxed: Infinity, normal: 5000, pressure: 2500 };
+const RELAMPAGO_FLASH = { 1: 2000, 2: 1000, 3: 450 };
+const RELAMPAGO_RESPONSE = 15000; // 15s to pick
 
 // ═══ STATE ═══
+let gameMode = 'secuencia'; // secuencia | relampago
 let speed = 'medium';
 let responseLevel = 'normal';
+let relampagoLevel = 1;
 let sequenceLength = 3;
 let currentSequence = [];
 let playerInput = [];
@@ -613,28 +652,46 @@ let lang = 'es';
 // ═══ i18n ═══
 const STRINGS = {
   es: {
-    'label-seq': 'Secuencia', 'label-streak': 'Racha', 'label-best': 'Récord', 'label-score': 'Puntos',
+    'label-seq': 'Secuencia', 'label-tiles': 'Fichas', 'label-streak': 'Racha',
+    'label-best': 'Récord', 'label-score': 'Puntos',
     'status-ready': '¡Prepárate!', 'status-watching': '👀 ¡Observa la secuencia!',
-    'status-your-turn': '🎯 ¡Tu turno!', 'status-correct': '✅ ¡Correcto!',
-    'status-wrong': '❌ ¡Fallaste!', 'status-levelup': '🔥 ¡Nivel arriba! Secuencia de',
-    'status-timeout': '⏱️ ¡Tiempo!', 'btn-reset': 'Reiniciar', 'btn-start': 'Empezar',
-    'btn-next': 'Siguiente', 'welcome-sub': 'Memoria · Secuencia · Dominó',
+    'status-watching-rel': '👀 ¡Observa las fichas!',
+    'status-your-turn': '🎯 ¡Tu turno!',
+    'status-your-turn-rel': '🎯 ¡Toca las fichas!',
+    'status-correct': '✅ ¡Correcto!',
+    'status-wrong': '❌ ¡Fallaste!', 'status-levelup': '🔥 ¡Nivel arriba!',
+    'status-timeout': '⏱️ ¡Tiempo!',
+    'btn-reset': 'Reiniciar', 'btn-start': 'Empezar', 'btn-next': 'Siguiente',
+    'welcome-sub': 'Memoria · Secuencia · Dominó',
+    'welcome-game': 'Dominó Secuencia',
     'setting-flash': 'Velocidad del Flash', 'setting-response': 'Tiempo de Respuesta',
+    'setting-level': 'Nivel de Dificultad',
     'speed-slow': 'Lento', 'speed-medium': 'Medio', 'speed-fast': 'Rápido',
     'resp-relaxed': 'Relajado', 'resp-normal': 'Normal', 'resp-pressure': 'Presión',
-    'btn-play': 'JUGAR', 'help-title': 'Cómo Jugar', 'welcome-game': 'Dominó Secuencia',
+    'level-1': 'Nivel 1', 'level-2': 'Nivel 2', 'level-3': 'Nivel 3',
+    'btn-play': 'JUGAR', 'help-title': 'Cómo Jugar',
+    'mode-sec-desc': 'Orden importa', 'mode-rel-desc': 'Recuerda cuáles',
   },
   en: {
-    'label-seq': 'Sequence', 'label-streak': 'Streak', 'label-best': 'Best', 'label-score': 'Score',
+    'label-seq': 'Sequence', 'label-tiles': 'Tiles', 'label-streak': 'Streak',
+    'label-best': 'Best', 'label-score': 'Score',
     'status-ready': 'Get ready!', 'status-watching': '👀 Watch the sequence!',
-    'status-your-turn': '🎯 Your turn!', 'status-correct': '✅ Correct!',
-    'status-wrong': '❌ Wrong!', 'status-levelup': '🔥 Level up! Sequence of',
-    'status-timeout': '⏱️ Time\'s up!', 'btn-reset': 'Reset', 'btn-start': 'Start',
-    'btn-next': 'Next', 'welcome-sub': 'Memory · Sequence · Dominoes',
+    'status-watching-rel': '👀 Watch the tiles!',
+    'status-your-turn': '🎯 Your turn!',
+    'status-your-turn-rel': '🎯 Tap the tiles!',
+    'status-correct': '✅ Correct!',
+    'status-wrong': '❌ Wrong!', 'status-levelup': '🔥 Level up!',
+    'status-timeout': '⏱️ Time\'s up!',
+    'btn-reset': 'Reset', 'btn-start': 'Start', 'btn-next': 'Next',
+    'welcome-sub': 'Memory · Sequence · Dominoes',
+    'welcome-game': 'Domino Sequence',
     'setting-flash': 'Flash Speed', 'setting-response': 'Response Time',
+    'setting-level': 'Difficulty Level',
     'speed-slow': 'Slow', 'speed-medium': 'Medium', 'speed-fast': 'Fast',
     'resp-relaxed': 'Relaxed', 'resp-normal': 'Normal', 'resp-pressure': 'Pressure',
-    'btn-play': 'PLAY', 'help-title': 'How to Play', 'welcome-game': 'Domino Sequence',
+    'level-1': 'Level 1', 'level-2': 'Level 2', 'level-3': 'Level 3',
+    'btn-play': 'PLAY', 'help-title': 'How to Play',
+    'mode-sec-desc': 'Order matters', 'mode-rel-desc': 'Remember which',
   }
 };
 
@@ -647,25 +704,38 @@ function applyLang() {
 
 function setLang(l) {
   lang = l;
-  // Sync help modal lang buttons
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
   const helpBtn = document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`);
   if (helpBtn) helpBtn.classList.add('active');
-  // Sync welcome lang buttons
   document.querySelectorAll('.wlang-btn').forEach(b => b.classList.remove('active'));
   const welcomeBtn = document.querySelector(`.wlang-btn[onclick="setLangWelcome('${l}')"]`);
   if (welcomeBtn) welcomeBtn.classList.add('active');
-  document.getElementById('rulesES').classList.toggle('hidden', l !== 'es');
-  document.getElementById('rulesEN').classList.toggle('hidden', l !== 'en');
+  syncHelpContent();
   applyLang();
   updateUI();
 }
 
-function setLangWelcome(l) {
-  setLang(l);
+function setLangWelcome(l) { setLang(l); }
+
+function syncHelpContent() {
+  const isSec = gameMode === 'secuencia';
+  document.getElementById('rulesSecES').classList.toggle('hidden', !(isSec && lang === 'es'));
+  document.getElementById('rulesSecEN').classList.toggle('hidden', !(isSec && lang === 'en'));
+  document.getElementById('rulesRelES').classList.toggle('hidden', !(!isSec && lang === 'es'));
+  document.getElementById('rulesRelEN').classList.toggle('hidden', !(!isSec && lang === 'en'));
 }
 
-// ═══ DOT POSITIONS (relative % within half) ═══
+// ═══ MODE SELECTOR ═══
+function selectMode(mode) {
+  gameMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode));
+  document.getElementById('secuenciaSettings').classList.toggle('visible', mode === 'secuencia');
+  document.getElementById('relampagoSettings').classList.toggle('visible', mode === 'relampago');
+  syncHelpContent();
+}
+
+// ═══ DOT POSITIONS ═══
 const DOT_POSITIONS = {
   0: [],
   1: [[50,50]],
@@ -710,16 +780,25 @@ function setResponse(r) {
   document.querySelectorAll('#responseOptions .setting-opt').forEach(el =>
     el.classList.toggle('active', el.dataset.response === r));
 }
+function setLevel(l) {
+  relampagoLevel = l;
+  document.querySelectorAll('#levelOptions .setting-opt').forEach(el =>
+    el.classList.toggle('active', parseInt(el.dataset.level) === l));
+}
 function closeWelcome() {
   document.getElementById('welcomeScreen').classList.add('hidden');
+  // Update count label based on mode
+  document.getElementById('lblCount').textContent = gameMode === 'secuencia' ? t('label-seq') : t('label-tiles');
   startRound();
 }
 
 // ═══ GAME LOGIC ═══
 function generateSequence() {
+  const max = gameMode === 'relampago' ? 10 : 28;
+  const len = Math.min(sequenceLength, max);
   const available = [...Array(28).keys()];
   const indices = [];
-  for (let i = 0; i < sequenceLength; i++) {
+  for (let i = 0; i < len; i++) {
     const pick = Math.floor(Math.random() * available.length);
     indices.push(available.splice(pick, 1)[0]);
   }
@@ -731,6 +810,7 @@ function updateUI() {
   document.getElementById('streakDisplay').textContent = `${consecutiveWins}/2`;
   document.getElementById('bestDisplay').textContent = bestSequence;
   document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('lblCount').textContent = gameMode === 'secuencia' ? t('label-seq') : t('label-tiles');
   updateSequenceDots();
 }
 
@@ -740,8 +820,12 @@ function updateSequenceDots() {
   for (let i = 0; i < sequenceLength; i++) {
     const d = document.createElement('div');
     d.className = 'seq-dot';
-    if (i < playerInput.length) d.classList.add('filled');
-    if (i === playerInput.length && isPlayerTurn) d.classList.add('current');
+    if (gameMode === 'secuencia') {
+      if (i < playerInput.length) d.classList.add('filled');
+      if (i === playerInput.length && isPlayerTurn) d.classList.add('current');
+    } else {
+      if (i < playerInput.length) d.classList.add('filled');
+    }
     c.appendChild(d);
   }
 }
@@ -769,10 +853,10 @@ function clearTileStates() {
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ═══ TIMER BAR ═══
-function showTimerBar() {
+function showTimerBar(duration) {
   const container = document.getElementById('timerBarContainer');
   const bar = document.getElementById('timerBar');
-  if (RESPONSE_TIMES[responseLevel] === Infinity) {
+  if (!duration || duration === Infinity) {
     container.classList.add('hidden');
     return;
   }
@@ -783,8 +867,7 @@ function showTimerBar() {
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     const elapsed = Date.now() - timerStart;
-    const total = RESPONSE_TIMES[responseLevel];
-    const pct = Math.max(0, 1 - elapsed / total) * 100;
+    const pct = Math.max(0, 1 - elapsed / duration) * 100;
     bar.style.width = pct + '%';
     if (pct < 30) bar.classList.add('warning');
     if (pct <= 0) clearInterval(timerInterval);
@@ -796,27 +879,21 @@ function hideTimerBar() {
   document.getElementById('timerBarContainer').classList.add('hidden');
 }
 
-function resetTimerBar() {
+function resetTimerBar(duration) {
   const bar = document.getElementById('timerBar');
   bar.style.width = '100%';
   bar.classList.remove('warning');
   timerStart = Date.now();
 }
 
-// ═══ ROUND ═══
-async function startRound() {
-  if (isFlashing || isPlayerTurn) return;
-
-  const btn = document.getElementById('actionBtn');
-  btn.style.display = 'none';
-
+// ═══ SECUENCIA ROUND ═══
+async function startSecuenciaRound() {
   clearTileStates();
   playerInput = [];
   currentSequence = generateSequence();
   updateUI();
   hideTimerBar();
 
-  // Flash
   isFlashing = true;
   setStatus('status-watching');
   setTilesDisabled(true);
@@ -835,14 +912,63 @@ async function startRound() {
   setStatus('status-your-turn');
   setTilesDisabled(false);
   updateSequenceDots();
-  startResponseTimer();
-  showTimerBar();
+
+  const time = RESPONSE_TIMES[responseLevel];
+  startResponseTimer(time);
+  showTimerBar(time);
 }
 
-function startResponseTimer() {
+// ═══ RELÁMPAGO ROUND ═══
+async function startRelampagoRound() {
+  clearTileStates();
+  playerInput = [];
+  currentSequence = generateSequence();
+  updateUI();
+  hideTimerBar();
+
+  isFlashing = true;
+  setStatus('status-watching-rel');
+  setTilesDisabled(true);
+  await sleep(500);
+
+  // Flash ALL tiles simultaneously
+  currentSequence.forEach(idx => {
+    document.querySelector(`[data-index="${idx}"]`).classList.add('flashing');
+  });
+
+  await sleep(RELAMPAGO_FLASH[relampagoLevel]);
+
+  currentSequence.forEach(idx => {
+    document.querySelector(`[data-index="${idx}"]`).classList.remove('flashing');
+  });
+
+  isFlashing = false;
+  isPlayerTurn = true;
+  setStatus('status-your-turn-rel');
+  setTilesDisabled(false);
+  updateSequenceDots();
+
+  startResponseTimer(RELAMPAGO_RESPONSE);
+  showTimerBar(RELAMPAGO_RESPONSE);
+}
+
+// ═══ START ROUND (dispatcher) ═══
+async function startRound() {
+  if (isFlashing || isPlayerTurn) return;
+  const btn = document.getElementById('actionBtn');
+  btn.style.display = 'none';
+
+  if (gameMode === 'secuencia') {
+    await startSecuenciaRound();
+  } else {
+    await startRelampagoRound();
+  }
+}
+
+// ═══ RESPONSE TIMER ═══
+function startResponseTimer(time) {
   clearTimeout(responseTimer);
-  const time = RESPONSE_TIMES[responseLevel];
-  if (time === Infinity) return;
+  if (!time || time === Infinity) return;
   responseTimer = setTimeout(() => {
     if (isPlayerTurn) {
       isPlayerTurn = false;
@@ -854,13 +980,22 @@ function startResponseTimer() {
   }, time);
 }
 
+// ═══ TAP HANDLER ═══
 function handleTap(idx) {
   if (!isPlayerTurn) return;
 
-  // Reset timer per tap
+  if (gameMode === 'secuencia') {
+    handleSecuenciaTap(idx);
+  } else {
+    handleRelampagoTap(idx);
+  }
+}
+
+function handleSecuenciaTap(idx) {
   clearTimeout(responseTimer);
-  startResponseTimer();
-  resetTimerBar();
+  const time = RESPONSE_TIMES[responseLevel];
+  startResponseTimer(time);
+  resetTimerBar(time);
 
   const expected = currentSequence[playerInput.length];
   const tileEl = document.querySelector(`[data-index="${idx}"]`);
@@ -879,8 +1014,7 @@ function handleTap(idx) {
     }
   } else {
     tileEl.classList.add('wrong-tile');
-    const correctEl = document.querySelector(`[data-index="${expected}"]`);
-    correctEl.classList.add('correct-tile');
+    document.querySelector(`[data-index="${expected}"]`).classList.add('correct-tile');
     isPlayerTurn = false;
     clearTimeout(responseTimer);
     setTilesDisabled(true);
@@ -890,17 +1024,90 @@ function handleTap(idx) {
   }
 }
 
+function handleRelampagoTap(idx) {
+  const tileEl = document.querySelector(`[data-index="${idx}"]`);
+
+  // Already picked? Deselect
+  if (playerInput.includes(idx)) {
+    playerInput = playerInput.filter(i => i !== idx);
+    tileEl.classList.remove('selected');
+    updateSequenceDots();
+    return;
+  }
+
+  // Can't pick more than needed
+  if (playerInput.length >= sequenceLength) return;
+
+  playerInput.push(idx);
+  tileEl.classList.add('selected');
+  updateSequenceDots();
+
+  // Auto-check when picked enough
+  if (playerInput.length === sequenceLength) {
+    setTimeout(() => checkRelampagoAnswer(), 300);
+  }
+}
+
+function checkRelampagoAnswer() {
+  isPlayerTurn = false;
+  clearTimeout(responseTimer);
+  setTilesDisabled(true);
+  hideTimerBar();
+
+  const correctSet = new Set(currentSequence);
+  const playerSet = new Set(playerInput);
+
+  let allCorrect = true;
+  playerInput.forEach(idx => {
+    const tileEl = document.querySelector(`[data-index="${idx}"]`);
+    if (correctSet.has(idx)) {
+      tileEl.classList.remove('selected');
+      tileEl.classList.add('correct-tile');
+    } else {
+      tileEl.classList.remove('selected');
+      tileEl.classList.add('wrong-tile');
+      allCorrect = false;
+    }
+  });
+
+  // Show missed tiles
+  currentSequence.forEach(idx => {
+    if (!playerSet.has(idx)) {
+      document.querySelector(`[data-index="${idx}"]`).classList.add('flashing');
+      allCorrect = false;
+    }
+  });
+
+  if (allCorrect) {
+    handleSuccess();
+  } else {
+    setStatus('status-wrong');
+    handleFailure();
+  }
+}
+
+// ═══ SUCCESS / FAILURE ═══
 function handleSuccess() {
-  const multiplier = speed === 'fast' ? 3 : speed === 'medium' ? 2 : 1;
-  const responseBonus = responseLevel === 'pressure' ? 2 : responseLevel === 'normal' ? 1.5 : 1;
+  const maxLen = gameMode === 'relampago' ? 10 : 28;
+
+  let multiplier, responseBonus;
+  if (gameMode === 'secuencia') {
+    multiplier = speed === 'fast' ? 3 : speed === 'medium' ? 2 : 1;
+    responseBonus = responseLevel === 'pressure' ? 2 : responseLevel === 'normal' ? 1.5 : 1;
+  } else {
+    multiplier = relampagoLevel === 3 ? 3 : relampagoLevel === 2 ? 2 : 1;
+    responseBonus = 1;
+  }
   score += Math.round(sequenceLength * multiplier * responseBonus);
   consecutiveWins++;
 
   currentSequence.forEach(idx => {
-    document.querySelector(`[data-index="${idx}"]`).classList.add('correct-tile');
+    const el = document.querySelector(`[data-index="${idx}"]`);
+    el.classList.remove('selected', 'flashing');
+    el.classList.add('correct-tile');
   });
 
-  if (consecutiveWins >= 2 && sequenceLength < 28) {
+  if (consecutiveWins >= 2 && sequenceLength < maxLen) {
     sequenceLength++;
     consecutiveWins = 0;
     if (sequenceLength > bestSequence) bestSequence = sequenceLength;
@@ -948,11 +1155,8 @@ function resetGame() {
 }
 
 function toggleHelp() {
-  const modal = document.getElementById('helpModal');
-  modal.classList.toggle('hidden');
-  // Sync rules content with current language
-  document.getElementById('rulesES').classList.toggle('hidden', lang !== 'es');
-  document.getElementById('rulesEN').classList.toggle('hidden', lang !== 'en');
+  document.getElementById('helpModal').classList.toggle('hidden');
+  syncHelpContent();
 }
 
 // ═══ INIT ═══
