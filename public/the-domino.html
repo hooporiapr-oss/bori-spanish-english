@@ -48,27 +48,18 @@
 
   /* ── TOP BAR ── */
   .top-bar {
-    display: flex;
-    align-items: center;
+    display: flex; align-items: center;
     justify-content: space-between;
-    padding: 4px 4px 6px;
-    flex-shrink: 0;
+    padding: 4px 4px 6px; flex-shrink: 0;
   }
   .top-bar .back-btn {
-    font-size: 22px;
-    color: var(--bori-gold);
-    text-decoration: none;
-    padding: 4px 8px;
-    line-height: 1;
+    font-size: 22px; color: var(--bori-gold);
+    text-decoration: none; padding: 4px 8px; line-height: 1;
   }
   .top-bar .title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--bori-gold);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    text-align: center;
-    flex: 1;
+    font-size: 15px; font-weight: 700; color: var(--bori-gold);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    text-align: center; flex: 1;
   }
   .top-bar .help-btn {
     width: 30px; height: 30px; border-radius: 50%;
@@ -80,27 +71,20 @@
 
   /* ── INFO STRIP ── */
   .info-strip {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 8px;
-    background: var(--bori-surface);
-    border-radius: 10px;
-    margin-bottom: 6px;
-    flex-shrink: 0;
+    display: flex; justify-content: space-between;
+    padding: 6px 8px; background: var(--bori-surface);
+    border-radius: 10px; margin-bottom: 6px; flex-shrink: 0;
   }
   .info-item { text-align: center; flex: 1; }
-  .info-label {
-    font-size: 9px; color: var(--bori-muted);
-    text-transform: uppercase; letter-spacing: 1px;
-  }
+  .info-label { font-size: 9px; color: var(--bori-muted); text-transform: uppercase; letter-spacing: 1px; }
   .info-value { font-size: 16px; font-weight: 700; color: var(--bori-gold); }
   .info-value.teal { color: var(--bori-teal); }
 
   /* ── STATUS ── */
   .status-bar {
-    text-align: center; padding: 4px;
-    font-size: 13px; font-weight: 600;
-    color: var(--bori-muted); flex-shrink: 0; min-height: 24px;
+    text-align: center; padding: 4px; font-size: 13px;
+    font-weight: 600; color: var(--bori-muted);
+    flex-shrink: 0; min-height: 24px;
   }
   .status-bar.watching { color: var(--bori-gold); }
   .status-bar.your-turn { color: var(--bori-teal); }
@@ -109,69 +93,60 @@
 
   /* ── BOARD ── */
   .board-area {
-    flex: 1; display: flex;
-    align-items: center; justify-content: center;
-    overflow: hidden; min-height: 0;
+    flex: 1; display: flex; align-items: center;
+    justify-content: center; overflow: hidden; min-height: 0;
   }
   .domino-board {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px; width: 100%;
-    max-width: 400px; padding: 4px;
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 4px; width: 100%; max-width: 400px; padding: 4px;
   }
 
   /* ── TILE ── */
   .domino-tile {
-    aspect-ratio: 1 / 1.55;
-    background: var(--tile-bg);
-    border: 2.5px solid var(--tile-border);
-    border-radius: 8px;
+    aspect-ratio: 1 / 1.55; background: var(--tile-bg);
+    border: 2.5px solid var(--tile-border); border-radius: 8px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 3px rgba(0,0,0,0.3);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: space-around;
-    cursor: pointer;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: space-around; cursor: pointer;
     transition: transform 0.1s, border-color 0.2s, background 0.2s;
     position: relative; padding: 3px 2px; user-select: none;
   }
   .domino-tile::after {
-    content: ''; position: absolute;
-    top: 48%; left: 15%; right: 15%;
+    content: ''; position: absolute; top: 48%; left: 15%; right: 15%;
     height: 2px; background: var(--tile-border); border-radius: 1px;
   }
   .domino-tile.disabled { pointer-events: none; opacity: 0.6; }
   .domino-tile.flashing {
-    border-color: var(--tile-flash);
-    background: rgba(255, 215, 0, 0.2);
-    transform: scale(1.08);
-    box-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+    border-color: var(--tile-flash); background: rgba(255,215,0,0.2);
+    transform: scale(1.08); box-shadow: 0 0 16px rgba(255,215,0,0.5);
+  }
+  .domino-tile.flash-orange {
+    border-color: #FF8C00; background: rgba(255,140,0,0.2);
+    transform: scale(1.08); box-shadow: 0 0 16px rgba(255,140,0,0.5);
   }
   .domino-tile.selected {
-    border-color: var(--tile-selected);
-    background: rgba(0, 217, 165, 0.15);
+    border-color: var(--tile-selected); background: rgba(0,217,165,0.15);
   }
   .domino-tile.correct-tile {
-    border-color: var(--tile-correct);
-    background: rgba(0, 217, 165, 0.25);
+    border-color: var(--tile-correct); background: rgba(0,217,165,0.25);
   }
   .domino-tile.wrong-tile {
-    border-color: var(--tile-wrong);
-    background: rgba(255, 107, 107, 0.25);
+    border-color: var(--tile-wrong); background: rgba(255,107,107,0.25);
     animation: shake 0.4s ease;
   }
   .domino-tile:active:not(.disabled) { transform: scale(0.95); }
 
   /* ── DOTS ── */
   .dot-half {
-    display: flex; flex-wrap: wrap;
-    align-items: center; justify-content: center;
-    width: 80%; height: 42%; position: relative;
+    display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: center; width: 80%; height: 42%; position: relative;
   }
   .dot {
-    width: 7px; height: 7px;
-    background: var(--bori-text);
+    width: 7px; height: 7px; background: var(--bori-text);
     border-radius: 50%; position: absolute;
   }
   .domino-tile.flashing .dot { background: var(--bori-gold); }
+  .domino-tile.flash-orange .dot { background: #FF8C00; }
   .domino-tile.selected .dot { background: var(--bori-teal); }
 
   /* ── BOTTOM ── */
@@ -180,8 +155,8 @@
     display: flex; flex-direction: column; gap: 6px;
   }
   .sequence-dots {
-    display: flex; justify-content: center;
-    gap: 5px; min-height: 14px; flex-wrap: wrap;
+    display: flex; justify-content: center; gap: 5px;
+    min-height: 14px; flex-wrap: wrap;
   }
   .seq-dot {
     width: 10px; height: 10px; border-radius: 50%;
@@ -192,9 +167,8 @@
   .btn-row { display: flex; gap: 8px; justify-content: center; }
   .game-btn {
     padding: 10px 24px; border: none; border-radius: 25px;
-    font-family: 'Fredoka', sans-serif;
-    font-size: 14px; font-weight: 600; cursor: pointer;
-    transition: transform 0.1s;
+    font-family: 'Fredoka', sans-serif; font-size: 14px;
+    font-weight: 600; cursor: pointer; transition: transform 0.1s;
   }
   .game-btn:active { transform: scale(0.95); }
   .btn-primary { background: linear-gradient(135deg, var(--bori-gold), #FFA500); color: #1a1128; }
@@ -202,51 +176,41 @@
 
   /* ── WELCOME ── */
   .welcome-screen {
-    position: absolute; inset: 0;
-    background: var(--bori-bg);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    z-index: 50; padding: 20px; text-align: center;
-    overflow-y: auto;
+    position: absolute; inset: 0; background: var(--bori-bg);
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; z-index: 50; padding: 20px;
+    text-align: center; overflow-y: auto;
   }
   .welcome-screen.hidden { display: none; }
-  .welcome-icon { font-size: 48px; margin-bottom: 8px; margin-top: 48px; }
+  .welcome-icon { font-size: 44px; margin-bottom: 6px; margin-top: 48px; }
   .welcome-title { font-size: 26px; font-weight: 700; color: var(--bori-gold); margin-bottom: 2px; }
-  .welcome-subtitle { font-size: 14px; font-weight: 600; color: var(--bori-text); margin-bottom: 2px; letter-spacing: 0.5px; }
-  .welcome-sub { font-size: 12px; color: var(--bori-muted); margin-bottom: 14px; }
+  .welcome-subtitle { font-size: 13px; font-weight: 600; color: var(--bori-text); margin-bottom: 2px; letter-spacing: 0.5px; }
+  .welcome-sub { font-size: 11px; color: var(--bori-muted); margin-bottom: 12px; }
 
   /* ── MODE SELECTOR ── */
   .mode-selector {
-    display: flex; gap: 8px;
-    width: 100%; max-width: 300px;
-    margin-bottom: 14px;
+    display: flex; gap: 6px; width: 100%; max-width: 320px; margin-bottom: 12px;
   }
   .mode-btn {
-    flex: 1; padding: 12px 8px;
-    border-radius: 14px;
-    border: 2.5px solid var(--tile-border);
-    background: var(--bori-surface);
-    color: var(--bori-text);
-    font-family: 'Fredoka', sans-serif;
-    font-size: 13px; font-weight: 700;
-    text-align: center; cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
+    flex: 1; padding: 10px 4px; border-radius: 12px;
+    border: 2.5px solid var(--tile-border); background: var(--bori-surface);
+    color: var(--bori-text); font-family: 'Fredoka', sans-serif;
+    font-size: 11px; font-weight: 700; text-align: center;
+    cursor: pointer; transition: border-color 0.2s, background 0.2s;
   }
-  .mode-btn .mode-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+  .mode-btn .mode-icon { font-size: 20px; display: block; margin-bottom: 2px; }
   .mode-btn .mode-name { display: block; text-transform: uppercase; letter-spacing: 0.5px; }
   .mode-btn .mode-desc {
-    display: block; font-size: 9px; font-weight: 500;
-    color: var(--bori-muted); margin-top: 2px;
+    display: block; font-size: 8px; font-weight: 500;
+    color: var(--bori-muted); margin-top: 1px;
   }
   .mode-btn.active {
-    border-color: var(--bori-gold);
-    background: rgba(255, 215, 0, 0.1);
-    color: var(--bori-gold);
+    border-color: var(--bori-gold); background: rgba(255,215,0,0.1); color: var(--bori-gold);
   }
   .mode-btn.active .mode-desc { color: var(--bori-gold); opacity: 0.7; }
 
   /* ── SETTINGS ── */
-  .setting-group { width: 100%; max-width: 300px; margin-bottom: 12px; }
+  .setting-group { width: 100%; max-width: 300px; margin-bottom: 10px; }
   .setting-label {
     font-size: 11px; color: var(--bori-muted);
     text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
@@ -254,24 +218,18 @@
   .setting-options { display: flex; gap: 6px; }
   .setting-opt {
     flex: 1; padding: 8px 6px; border-radius: 12px;
-    border: 2px solid var(--tile-border);
-    background: var(--bori-surface);
-    color: var(--bori-text);
-    font-family: 'Fredoka', sans-serif;
-    font-size: 12px; font-weight: 600;
-    text-align: center; cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
+    border: 2px solid var(--tile-border); background: var(--bori-surface);
+    color: var(--bori-text); font-family: 'Fredoka', sans-serif;
+    font-size: 12px; font-weight: 600; text-align: center;
+    cursor: pointer; transition: border-color 0.2s, background 0.2s;
   }
   .setting-opt.active {
-    border-color: var(--bori-gold);
-    background: rgba(255, 215, 0, 0.1);
-    color: var(--bori-gold);
+    border-color: var(--bori-gold); background: rgba(255,215,0,0.1); color: var(--bori-gold);
   }
   .setting-opt .opt-icon { font-size: 16px; display: block; margin-bottom: 2px; }
 
   .start-btn {
-    margin-top: 8px; padding: 14px 48px;
-    border-radius: 30px; border: none;
+    margin-top: 6px; padding: 14px 48px; border-radius: 30px; border: none;
     background: linear-gradient(135deg, var(--bori-gold), #FFA500);
     color: #1a1128; font-family: 'Fredoka', sans-serif;
     font-size: 18px; font-weight: 700; cursor: pointer;
@@ -282,58 +240,49 @@
   /* ── WELCOME TOP BAR ── */
   .welcome-top-bar {
     position: absolute; top: 12px; left: 12px; right: 12px;
-    display: flex; justify-content: space-between;
-    align-items: center; z-index: 10;
+    display: flex; justify-content: space-between; align-items: center; z-index: 10;
   }
   .welcome-back-btn {
     background: none; border: none; color: var(--bori-gold);
-    font-family: 'Fredoka', sans-serif;
-    font-size: 16px; font-weight: 600;
+    font-family: 'Fredoka', sans-serif; font-size: 16px; font-weight: 600;
     text-decoration: none; padding: 6px 10px;
     display: flex; align-items: center; gap: 4px;
   }
   .welcome-top-right { display: flex; align-items: center; gap: 8px; }
   .welcome-lang-toggle {
-    display: flex; gap: 3px;
-    background: rgba(255,255,255,0.06);
+    display: flex; gap: 3px; background: rgba(255,255,255,0.06);
     border-radius: 20px; padding: 3px;
   }
   .wlang-btn {
     padding: 4px 12px; border-radius: 16px; border: none;
-    font-family: 'Fredoka', sans-serif;
-    font-size: 12px; font-weight: 600; cursor: pointer;
-    background: transparent; color: var(--bori-muted);
+    font-family: 'Fredoka', sans-serif; font-size: 12px; font-weight: 600;
+    cursor: pointer; background: transparent; color: var(--bori-muted);
     transition: all 0.2s;
   }
   .wlang-btn.active { background: var(--bori-gold); color: #1a1128; }
   .welcome-help-btn {
     width: 32px; height: 32px; border-radius: 50%;
-    background: rgba(255,215,0,0.12);
-    border: 1.5px solid var(--bori-gold);
-    color: var(--bori-gold);
-    font-family: 'Fredoka', sans-serif;
+    background: rgba(255,215,0,0.12); border: 1.5px solid var(--bori-gold);
+    color: var(--bori-gold); font-family: 'Fredoka', sans-serif;
     font-size: 15px; font-weight: 700; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
 
   /* ── SETTINGS VISIBILITY ── */
-  .secuencia-settings, .relampago-settings { display: none; }
-  .secuencia-settings.visible, .relampago-settings.visible { display: block; }
+  .mode-settings { display: none; }
+  .mode-settings.visible { display: block; }
 
   /* ── HELP MODAL ── */
   .modal-overlay {
-    position: absolute; inset: 0;
-    background: rgba(10, 6, 20, 0.92);
-    z-index: 100; display: flex;
-    align-items: center; justify-content: center; padding: 16px;
+    position: absolute; inset: 0; background: rgba(10,6,20,0.92);
+    z-index: 100; display: flex; align-items: center;
+    justify-content: center; padding: 16px;
   }
   .modal-overlay.hidden { display: none; }
   .modal-box {
-    background: var(--bori-surface);
-    border: 2px solid var(--tile-border);
-    border-radius: 16px; padding: 20px;
-    max-width: 360px; width: 100%;
-    max-height: 80vh; overflow-y: auto;
+    background: var(--bori-surface); border: 2px solid var(--tile-border);
+    border-radius: 16px; padding: 20px; max-width: 360px;
+    width: 100%; max-height: 80vh; overflow-y: auto;
   }
   .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
   .modal-title { font-size: 18px; font-weight: 700; color: var(--bori-gold); }
@@ -345,15 +294,12 @@
   }
   .lang-toggle { display: flex; gap: 4px; margin-bottom: 14px; }
   .lang-btn {
-    padding: 5px 14px; border-radius: 20px;
-    border: 2px solid var(--tile-border);
+    padding: 5px 14px; border-radius: 20px; border: 2px solid var(--tile-border);
     background: transparent; color: var(--bori-muted);
-    font-family: 'Fredoka', sans-serif;
-    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: 'Fredoka', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
   }
   .lang-btn.active {
-    border-color: var(--bori-teal); color: var(--bori-teal);
-    background: rgba(0, 217, 165, 0.1);
+    border-color: var(--bori-teal); color: var(--bori-teal); background: rgba(0,217,165,0.1);
   }
   .rules-content h3 { font-size: 14px; font-weight: 600; color: var(--bori-teal); margin: 10px 0 4px; }
   .rules-content p { font-size: 12px; color: var(--bori-text); line-height: 1.5; margin-bottom: 6px; }
@@ -368,13 +314,13 @@
 
   /* ── TIMER BAR ── */
   .timer-bar-container {
-    height: 4px; background: var(--tile-border);
-    border-radius: 2px; overflow: hidden; flex-shrink: 0;
+    height: 4px; background: var(--tile-border); border-radius: 2px;
+    overflow: hidden; flex-shrink: 0;
   }
   .timer-bar-container.hidden { visibility: hidden; }
   .timer-bar {
-    height: 100%; background: var(--bori-teal);
-    border-radius: 2px; transition: width 0.1s linear; width: 100%;
+    height: 100%; background: var(--bori-teal); border-radius: 2px;
+    transition: width 0.1s linear; width: 100%;
   }
   .timer-bar.warning { background: var(--bori-coral); }
 
@@ -387,11 +333,14 @@
     .game-btn { padding: 8px 20px; font-size: 13px; }
     .status-bar { font-size: 11px; min-height: 20px; padding: 2px; }
     .bottom-controls { padding: 4px; gap: 4px; }
-    .welcome-icon { font-size: 40px; margin-top: 44px; margin-bottom: 6px; }
+    .welcome-icon { font-size: 36px; margin-top: 44px; margin-bottom: 4px; }
     .welcome-title { font-size: 22px; }
-    .mode-btn { padding: 8px 6px; }
+    .mode-btn { padding: 6px 3px; font-size: 10px; }
+    .mode-btn .mode-icon { font-size: 16px; }
     .setting-opt { padding: 6px 4px; font-size: 11px; }
     .start-btn { padding: 12px 40px; font-size: 16px; }
+    .welcome-sub { margin-bottom: 8px; }
+    .setting-group { margin-bottom: 8px; }
   }
 </style>
 </head>
@@ -461,7 +410,7 @@
     </div>
     <div class="welcome-icon">🁣</div>
     <div class="welcome-title">La Marquesina</div>
-    <div class="welcome-subtitle" data-i18n="welcome-game">Dominó Secuencia y Relámpago</div>
+    <div class="welcome-subtitle" data-i18n="welcome-game">Dominoes Cognitivo</div>
     <div class="welcome-sub" data-i18n="welcome-sub">Memoria · Secuencia · Dominó</div>
 
     <!-- MODE SELECTOR -->
@@ -476,24 +425,26 @@
         <span class="mode-name">Relámpago</span>
         <span class="mode-desc" data-i18n="mode-rel-desc">Recuerda cuáles</span>
       </div>
+      <div class="mode-btn" data-mode="trampa" onclick="selectMode('trampa')">
+        <span class="mode-icon">🎭</span>
+        <span class="mode-name">Trampa</span>
+        <span class="mode-desc" data-i18n="mode-tra-desc">Detecta el cambio</span>
+      </div>
     </div>
 
     <!-- SECUENCIA SETTINGS -->
-    <div class="secuencia-settings visible" id="secuenciaSettings">
+    <div class="mode-settings visible" id="secuenciaSettings">
       <div class="setting-group">
         <div class="setting-label" data-i18n="setting-flash">Velocidad del Flash</div>
         <div class="setting-options" id="speedOptions">
           <div class="setting-opt" data-speed="slow" onclick="setSpeed('slow')">
-            <span class="opt-icon">🐢</span>
-            <span data-i18n="speed-slow">Lento</span>
+            <span class="opt-icon">🐢</span><span data-i18n="speed-slow">Lento</span>
           </div>
           <div class="setting-opt active" data-speed="medium" onclick="setSpeed('medium')">
-            <span class="opt-icon">🏃</span>
-            <span data-i18n="speed-medium">Medio</span>
+            <span class="opt-icon">🏃</span><span data-i18n="speed-medium">Medio</span>
           </div>
           <div class="setting-opt" data-speed="fast" onclick="setSpeed('fast')">
-            <span class="opt-icon">⚡</span>
-            <span data-i18n="speed-fast">Rápido</span>
+            <span class="opt-icon">⚡</span><span data-i18n="speed-fast">Rápido</span>
           </div>
         </div>
       </div>
@@ -501,37 +452,49 @@
         <div class="setting-label" data-i18n="setting-response">Tiempo de Respuesta</div>
         <div class="setting-options" id="responseOptions">
           <div class="setting-opt" data-response="relaxed" onclick="setResponse('relaxed')">
-            <span class="opt-icon">😌</span>
-            <span data-i18n="resp-relaxed">Relajado</span>
+            <span class="opt-icon">😌</span><span data-i18n="resp-relaxed">Relajado</span>
           </div>
           <div class="setting-opt active" data-response="normal" onclick="setResponse('normal')">
-            <span class="opt-icon">😎</span>
-            <span data-i18n="resp-normal">Normal</span>
+            <span class="opt-icon">😎</span><span data-i18n="resp-normal">Normal</span>
           </div>
           <div class="setting-opt" data-response="pressure" onclick="setResponse('pressure')">
-            <span class="opt-icon">🔥</span>
-            <span data-i18n="resp-pressure">Presión</span>
+            <span class="opt-icon">🔥</span><span data-i18n="resp-pressure">Presión</span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- RELÁMPAGO SETTINGS -->
-    <div class="relampago-settings" id="relampagoSettings">
+    <div class="mode-settings" id="relampagoSettings">
       <div class="setting-group">
         <div class="setting-label" data-i18n="setting-level">Nivel de Dificultad</div>
         <div class="setting-options" id="levelOptions">
           <div class="setting-opt active" data-level="1" onclick="setLevel(1)">
-            <span class="opt-icon">👁️</span>
-            <span data-i18n="level-1">Nivel 1</span>
+            <span class="opt-icon">👁️</span><span data-i18n="level-1">Nivel 1</span>
           </div>
           <div class="setting-opt" data-level="2" onclick="setLevel(2)">
-            <span class="opt-icon">👀</span>
-            <span data-i18n="level-2">Nivel 2</span>
+            <span class="opt-icon">👀</span><span data-i18n="level-2">Nivel 2</span>
           </div>
           <div class="setting-opt" data-level="3" onclick="setLevel(3)">
-            <span class="opt-icon">⚡</span>
-            <span data-i18n="level-3">Nivel 3</span>
+            <span class="opt-icon">⚡</span><span data-i18n="level-3">Nivel 3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRAMPA SETTINGS -->
+    <div class="mode-settings" id="trampaSettings">
+      <div class="setting-group">
+        <div class="setting-label" data-i18n="setting-flash">Velocidad del Flash</div>
+        <div class="setting-options" id="trampaSpeedOptions">
+          <div class="setting-opt" data-tspeed="slow" onclick="setTrampaSpeed('slow')">
+            <span class="opt-icon">🐢</span><span data-i18n="speed-slow">Lento</span>
+          </div>
+          <div class="setting-opt active" data-tspeed="medium" onclick="setTrampaSpeed('medium')">
+            <span class="opt-icon">🏃</span><span data-i18n="speed-medium">Medio</span>
+          </div>
+          <div class="setting-opt" data-tspeed="fast" onclick="setTrampaSpeed('fast')">
+            <span class="opt-icon">⚡</span><span data-i18n="speed-fast">Rápido</span>
           </div>
         </div>
       </div>
@@ -552,7 +515,7 @@
         <button class="lang-btn" onclick="setLang('en')">EN</button>
       </div>
 
-      <!-- SECUENCIA RULES ES -->
+      <!-- SECUENCIA ES -->
       <div class="rules-content" id="rulesSecES">
         <h3>🔢 Secuencia</h3>
         <h3>🎯 Objetivo</h3>
@@ -568,7 +531,7 @@
         <h3>⭐ Puntos</h3>
         <p>Más secuencia + más velocidad = más puntos.</p>
       </div>
-      <!-- SECUENCIA RULES EN -->
+      <!-- SECUENCIA EN -->
       <div class="rules-content hidden" id="rulesSecEN">
         <h3>🔢 Secuencia</h3>
         <h3>🎯 Goal</h3>
@@ -585,7 +548,7 @@
         <p>Longer sequences + faster speed = more points.</p>
       </div>
 
-      <!-- RELÁMPAGO RULES ES -->
+      <!-- RELÁMPAGO ES -->
       <div class="rules-content hidden" id="rulesRelES">
         <h3>⚡ Relámpago</h3>
         <h3>🎯 Objetivo</h3>
@@ -599,7 +562,7 @@
         <h3>⭐ Puntos</h3>
         <p>Más fichas + nivel más alto = más puntos.</p>
       </div>
-      <!-- RELÁMPAGO RULES EN -->
+      <!-- RELÁMPAGO EN -->
       <div class="rules-content hidden" id="rulesRelEN">
         <h3>⚡ Relámpago</h3>
         <h3>🎯 Goal</h3>
@@ -612,6 +575,39 @@
         <p>Level 1 — tiles show longer. Level 2 — less time. Level 3 — a quick flash.</p>
         <h3>⭐ Points</h3>
         <p>More tiles + higher level = more points.</p>
+      </div>
+
+      <!-- TRAMPA ES -->
+      <div class="rules-content hidden" id="rulesTraES">
+        <h3>🎭 Trampa</h3>
+        <h3>🎯 Objetivo</h3>
+        <p>Observa una secuencia de fichas. Luego se repite — pero una ficha cambió. Toca la ficha impostora.</p>
+        <h3>📈 Progresión</h3>
+        <p>Comienzas con 4 fichas. Aciertas 2 veces seguidas y la secuencia crece a 5, luego 6, hasta las 28 fichas.</p>
+        <h3>📉 Si fallas</h3>
+        <p>Bajas un nivel. Nunca menos de 4. Siempre puedes escalar de vuelta.</p>
+        <h3>⚡ Velocidad del Flash</h3>
+        <p>Lento, Medio, o Rápido — controla la velocidad de ambas pasadas.</p>
+        <h3>🎭 Cómo funciona</h3>
+        <p>Primera pasada: la secuencia original (dorado). Segunda pasada: la misma secuencia pero con una trampa (naranja). Encuentra la ficha que no estaba antes.</p>
+        <h3>⭐ Puntos</h3>
+        <p>Más fichas + más velocidad = más puntos.</p>
+      </div>
+      <!-- TRAMPA EN -->
+      <div class="rules-content hidden" id="rulesTraEN">
+        <h3>🎭 Trampa</h3>
+        <h3>🎯 Goal</h3>
+        <p>Watch a sequence of tiles. Then it replays — but one tile changed. Tap the impostor tile.</p>
+        <h3>📈 Progression</h3>
+        <p>Start with 4 tiles. Get it right 2 times in a row and the sequence grows to 5, then 6, up to 28.</p>
+        <h3>📉 If You Fail</h3>
+        <p>Drop one level. Never below 4. You can always climb back up.</p>
+        <h3>⚡ Flash Speed</h3>
+        <p>Slow, Medium, or Fast — controls the speed of both passes.</p>
+        <h3>🎭 How It Works</h3>
+        <p>First pass: the original sequence (gold). Second pass: the same sequence but with a trap (orange). Find the tile that wasn't there before.</p>
+        <h3>⭐ Points</h3>
+        <p>More tiles + faster speed = more points.</p>
       </div>
     </div>
   </div>
@@ -629,15 +625,20 @@ const SPEEDS = { slow: 900, medium: 550, fast: 300 };
 const GAPS = { slow: 400, medium: 250, fast: 150 };
 const RESPONSE_TIMES = { relaxed: Infinity, normal: 5000, pressure: 2500 };
 const RELAMPAGO_FLASH = { 1: 2000, 2: 1000, 3: 450 };
-const RELAMPAGO_RESPONSE = 15000; // 15s to pick
+const RELAMPAGO_RESPONSE = 15000;
+const TRAMPA_RESPONSE = 10000;
 
 // ═══ STATE ═══
-let gameMode = 'secuencia'; // secuencia | relampago
+let gameMode = 'secuencia';
 let speed = 'medium';
 let responseLevel = 'normal';
 let relampagoLevel = 1;
+let trampaSpeed = 'medium';
 let sequenceLength = 3;
 let currentSequence = [];
+let trampaOriginal = [];
+let trampaModified = [];
+let trampaImpostor = -1;
 let playerInput = [];
 let consecutiveWins = 0;
 let bestSequence = 3;
@@ -652,18 +653,23 @@ let lang = 'es';
 // ═══ i18n ═══
 const STRINGS = {
   es: {
-    'label-seq': 'Secuencia', 'label-tiles': 'Fichas', 'label-streak': 'Racha',
-    'label-best': 'Récord', 'label-score': 'Puntos',
-    'status-ready': '¡Prepárate!', 'status-watching': '👀 ¡Observa la secuencia!',
+    'label-seq': 'Secuencia', 'label-tiles': 'Fichas', 'label-trampa': 'Fichas',
+    'label-streak': 'Racha', 'label-best': 'Récord', 'label-score': 'Puntos',
+    'status-ready': '¡Prepárate!',
+    'status-watching': '👀 ¡Observa la secuencia!',
     'status-watching-rel': '👀 ¡Observa las fichas!',
+    'status-watching-tra': '👀 ¡Observa — primera pasada!',
+    'status-watching-tra2': '🎭 ¡Segunda pasada — encuentra la trampa!',
     'status-your-turn': '🎯 ¡Tu turno!',
     'status-your-turn-rel': '🎯 ¡Toca las fichas!',
+    'status-your-turn-tra': '🎭 ¡Toca la impostora!',
     'status-correct': '✅ ¡Correcto!',
-    'status-wrong': '❌ ¡Fallaste!', 'status-levelup': '🔥 ¡Nivel arriba!',
+    'status-wrong': '❌ ¡Fallaste!',
+    'status-levelup': '🔥 ¡Nivel arriba!',
     'status-timeout': '⏱️ ¡Tiempo!',
     'btn-reset': 'Reiniciar', 'btn-start': 'Empezar', 'btn-next': 'Siguiente',
     'welcome-sub': 'Memoria · Secuencia · Dominó',
-    'welcome-game': 'Dominó Secuencia y Relámpago',
+    'welcome-game': 'Dominoes Cognitivo',
     'setting-flash': 'Velocidad del Flash', 'setting-response': 'Tiempo de Respuesta',
     'setting-level': 'Nivel de Dificultad',
     'speed-slow': 'Lento', 'speed-medium': 'Medio', 'speed-fast': 'Rápido',
@@ -671,20 +677,26 @@ const STRINGS = {
     'level-1': 'Nivel 1', 'level-2': 'Nivel 2', 'level-3': 'Nivel 3',
     'btn-play': 'JUGAR', 'help-title': 'Cómo Jugar',
     'mode-sec-desc': 'Orden importa', 'mode-rel-desc': 'Recuerda cuáles',
+    'mode-tra-desc': 'Detecta el cambio',
   },
   en: {
-    'label-seq': 'Sequence', 'label-tiles': 'Tiles', 'label-streak': 'Streak',
-    'label-best': 'Best', 'label-score': 'Score',
-    'status-ready': 'Get ready!', 'status-watching': '👀 Watch the sequence!',
+    'label-seq': 'Sequence', 'label-tiles': 'Tiles', 'label-trampa': 'Tiles',
+    'label-streak': 'Streak', 'label-best': 'Best', 'label-score': 'Score',
+    'status-ready': 'Get ready!',
+    'status-watching': '👀 Watch the sequence!',
     'status-watching-rel': '👀 Watch the tiles!',
+    'status-watching-tra': '👀 Watch — first pass!',
+    'status-watching-tra2': '🎭 Second pass — find the trap!',
     'status-your-turn': '🎯 Your turn!',
     'status-your-turn-rel': '🎯 Tap the tiles!',
+    'status-your-turn-tra': '🎭 Tap the impostor!',
     'status-correct': '✅ Correct!',
-    'status-wrong': '❌ Wrong!', 'status-levelup': '🔥 Level up!',
+    'status-wrong': '❌ Wrong!',
+    'status-levelup': '🔥 Level up!',
     'status-timeout': '⏱️ Time\'s up!',
     'btn-reset': 'Reset', 'btn-start': 'Start', 'btn-next': 'Next',
     'welcome-sub': 'Memory · Sequence · Dominoes',
-    'welcome-game': 'Domino Secuencia y Relámpago',
+    'welcome-game': 'Cognitive Dominoes',
     'setting-flash': 'Flash Speed', 'setting-response': 'Response Time',
     'setting-level': 'Difficulty Level',
     'speed-slow': 'Slow', 'speed-medium': 'Medium', 'speed-fast': 'Fast',
@@ -692,6 +704,7 @@ const STRINGS = {
     'level-1': 'Level 1', 'level-2': 'Level 2', 'level-3': 'Level 3',
     'btn-play': 'PLAY', 'help-title': 'How to Play',
     'mode-sec-desc': 'Order matters', 'mode-rel-desc': 'Remember which',
+    'mode-tra-desc': 'Spot the change',
   }
 };
 
@@ -718,11 +731,15 @@ function setLang(l) {
 function setLangWelcome(l) { setLang(l); }
 
 function syncHelpContent() {
-  const isSec = gameMode === 'secuencia';
-  document.getElementById('rulesSecES').classList.toggle('hidden', !(isSec && lang === 'es'));
-  document.getElementById('rulesSecEN').classList.toggle('hidden', !(isSec && lang === 'en'));
-  document.getElementById('rulesRelES').classList.toggle('hidden', !(!isSec && lang === 'es'));
-  document.getElementById('rulesRelEN').classList.toggle('hidden', !(!isSec && lang === 'en'));
+  const ids = ['rulesSecES','rulesSecEN','rulesRelES','rulesRelEN','rulesTraES','rulesTraEN'];
+  ids.forEach(id => document.getElementById(id).classList.add('hidden'));
+  if (gameMode === 'secuencia') {
+    document.getElementById(lang === 'es' ? 'rulesSecES' : 'rulesSecEN').classList.remove('hidden');
+  } else if (gameMode === 'relampago') {
+    document.getElementById(lang === 'es' ? 'rulesRelES' : 'rulesRelEN').classList.remove('hidden');
+  } else {
+    document.getElementById(lang === 'es' ? 'rulesTraES' : 'rulesTraEN').classList.remove('hidden');
+  }
 }
 
 // ═══ MODE SELECTOR ═══
@@ -732,16 +749,14 @@ function selectMode(mode) {
     b.classList.toggle('active', b.dataset.mode === mode));
   document.getElementById('secuenciaSettings').classList.toggle('visible', mode === 'secuencia');
   document.getElementById('relampagoSettings').classList.toggle('visible', mode === 'relampago');
+  document.getElementById('trampaSettings').classList.toggle('visible', mode === 'trampa');
   syncHelpContent();
 }
 
 // ═══ DOT POSITIONS ═══
 const DOT_POSITIONS = {
-  0: [],
-  1: [[50,50]],
-  2: [[25,25],[75,75]],
-  3: [[25,25],[50,50],[75,75]],
-  4: [[25,25],[75,25],[25,75],[75,75]],
+  0: [], 1: [[50,50]], 2: [[25,25],[75,75]],
+  3: [[25,25],[50,50],[75,75]], 4: [[25,25],[75,25],[25,75],[75,75]],
   5: [[25,25],[75,25],[50,50],[25,75],[75,75]],
   6: [[25,20],[75,20],[25,50],[75,50],[25,80],[75,80]],
 };
@@ -785,17 +800,28 @@ function setLevel(l) {
   document.querySelectorAll('#levelOptions .setting-opt').forEach(el =>
     el.classList.toggle('active', parseInt(el.dataset.level) === l));
 }
+function setTrampaSpeed(s) {
+  trampaSpeed = s;
+  document.querySelectorAll('#trampaSpeedOptions .setting-opt').forEach(el =>
+    el.classList.toggle('active', el.dataset.tspeed === s));
+}
+
 function closeWelcome() {
   document.getElementById('welcomeScreen').classList.add('hidden');
-  // Update count label based on mode
-  document.getElementById('lblCount').textContent = gameMode === 'secuencia' ? t('label-seq') : t('label-tiles');
+  // Set starting length based on mode
+  if (gameMode === 'trampa') {
+    sequenceLength = 4;
+    bestSequence = 4;
+  } else {
+    sequenceLength = 3;
+    bestSequence = 3;
+  }
+  updateUI();
   startRound();
 }
 
 // ═══ GAME LOGIC ═══
-function generateSequence() {
-  const max = gameMode === 'relampago' ? 10 : 28;
-  const len = Math.min(sequenceLength, max);
+function generateSequence(len) {
   const available = [...Array(28).keys()];
   const indices = [];
   for (let i = 0; i < len; i++) {
@@ -805,27 +831,29 @@ function generateSequence() {
   return indices;
 }
 
+function getCountLabel() {
+  if (gameMode === 'secuencia') return t('label-seq');
+  return t('label-tiles');
+}
+
 function updateUI() {
   document.getElementById('seqDisplay').textContent = sequenceLength;
   document.getElementById('streakDisplay').textContent = `${consecutiveWins}/2`;
   document.getElementById('bestDisplay').textContent = bestSequence;
   document.getElementById('scoreDisplay').textContent = score;
-  document.getElementById('lblCount').textContent = gameMode === 'secuencia' ? t('label-seq') : t('label-tiles');
+  document.getElementById('lblCount').textContent = getCountLabel();
   updateSequenceDots();
 }
 
 function updateSequenceDots() {
   const c = document.getElementById('sequenceDots');
   c.innerHTML = '';
+  if (gameMode === 'trampa') return; // No dots for trampa
   for (let i = 0; i < sequenceLength; i++) {
     const d = document.createElement('div');
     d.className = 'seq-dot';
-    if (gameMode === 'secuencia') {
-      if (i < playerInput.length) d.classList.add('filled');
-      if (i === playerInput.length && isPlayerTurn) d.classList.add('current');
-    } else {
-      if (i < playerInput.length) d.classList.add('filled');
-    }
+    if (i < playerInput.length) d.classList.add('filled');
+    if (gameMode === 'secuencia' && i === playerInput.length && isPlayerTurn) d.classList.add('current');
     c.appendChild(d);
   }
 }
@@ -847,7 +875,7 @@ function setTilesDisabled(disabled) {
 
 function clearTileStates() {
   document.querySelectorAll('.domino-tile').forEach(el =>
-    el.classList.remove('flashing', 'selected', 'correct-tile', 'wrong-tile'));
+    el.classList.remove('flashing', 'flash-orange', 'selected', 'correct-tile', 'wrong-tile'));
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -856,13 +884,9 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function showTimerBar(duration) {
   const container = document.getElementById('timerBarContainer');
   const bar = document.getElementById('timerBar');
-  if (!duration || duration === Infinity) {
-    container.classList.add('hidden');
-    return;
-  }
+  if (!duration || duration === Infinity) { container.classList.add('hidden'); return; }
   container.classList.remove('hidden');
-  bar.style.width = '100%';
-  bar.classList.remove('warning');
+  bar.style.width = '100%'; bar.classList.remove('warning');
   timerStart = Date.now();
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
@@ -879,20 +903,17 @@ function hideTimerBar() {
   document.getElementById('timerBarContainer').classList.add('hidden');
 }
 
-function resetTimerBar(duration) {
+function resetTimerBar() {
   const bar = document.getElementById('timerBar');
-  bar.style.width = '100%';
-  bar.classList.remove('warning');
+  bar.style.width = '100%'; bar.classList.remove('warning');
   timerStart = Date.now();
 }
 
 // ═══ SECUENCIA ROUND ═══
 async function startSecuenciaRound() {
-  clearTileStates();
-  playerInput = [];
-  currentSequence = generateSequence();
-  updateUI();
-  hideTimerBar();
+  clearTileStates(); playerInput = [];
+  currentSequence = generateSequence(sequenceLength);
+  updateUI(); hideTimerBar();
 
   isFlashing = true;
   setStatus('status-watching');
@@ -907,8 +928,7 @@ async function startSecuenciaRound() {
     if (i < currentSequence.length - 1) await sleep(GAPS[speed]);
   }
 
-  isFlashing = false;
-  isPlayerTurn = true;
+  isFlashing = false; isPlayerTurn = true;
   setStatus('status-your-turn');
   setTilesDisabled(false);
   updateSequenceDots();
@@ -920,30 +940,25 @@ async function startSecuenciaRound() {
 
 // ═══ RELÁMPAGO ROUND ═══
 async function startRelampagoRound() {
-  clearTileStates();
-  playerInput = [];
-  currentSequence = generateSequence();
-  updateUI();
-  hideTimerBar();
+  clearTileStates(); playerInput = [];
+  const max = Math.min(sequenceLength, 10);
+  currentSequence = generateSequence(max);
+  updateUI(); hideTimerBar();
 
   isFlashing = true;
   setStatus('status-watching-rel');
   setTilesDisabled(true);
   await sleep(500);
 
-  // Flash ALL tiles simultaneously
   currentSequence.forEach(idx => {
     document.querySelector(`[data-index="${idx}"]`).classList.add('flashing');
   });
-
   await sleep(RELAMPAGO_FLASH[relampagoLevel]);
-
   currentSequence.forEach(idx => {
     document.querySelector(`[data-index="${idx}"]`).classList.remove('flashing');
   });
 
-  isFlashing = false;
-  isPlayerTurn = true;
+  isFlashing = false; isPlayerTurn = true;
   setStatus('status-your-turn-rel');
   setTilesDisabled(false);
   updateSequenceDots();
@@ -952,17 +967,74 @@ async function startRelampagoRound() {
   showTimerBar(RELAMPAGO_RESPONSE);
 }
 
+// ═══ TRAMPA ROUND ═══
+async function startTrampaRound() {
+  clearTileStates(); playerInput = [];
+  hideTimerBar();
+
+  // Generate original sequence
+  trampaOriginal = generateSequence(sequenceLength);
+
+  // Pick a random position to swap
+  const swapPos = Math.floor(Math.random() * sequenceLength);
+  // Get a tile not in the original sequence
+  const usedSet = new Set(trampaOriginal);
+  const available = [...Array(28).keys()].filter(i => !usedSet.has(i));
+  trampaImpostor = available[Math.floor(Math.random() * available.length)];
+
+  // Build modified sequence
+  trampaModified = [...trampaOriginal];
+  trampaModified[swapPos] = trampaImpostor;
+
+  isFlashing = true;
+  setTilesDisabled(true);
+
+  // ── FIRST PASS (gold) ──
+  setStatus('status-watching-tra');
+  await sleep(600);
+
+  const spd = SPEEDS[trampaSpeed];
+  const gap = GAPS[trampaSpeed];
+
+  for (let i = 0; i < trampaOriginal.length; i++) {
+    const tileEl = document.querySelector(`[data-index="${trampaOriginal[i]}"]`);
+    tileEl.classList.add('flashing');
+    await sleep(spd);
+    tileEl.classList.remove('flashing');
+    if (i < trampaOriginal.length - 1) await sleep(gap);
+  }
+
+  // Brief pause between passes
+  await sleep(600);
+
+  // ── SECOND PASS (orange) ──
+  setStatus('status-watching-tra2');
+  await sleep(400);
+
+  for (let i = 0; i < trampaModified.length; i++) {
+    const tileEl = document.querySelector(`[data-index="${trampaModified[i]}"]`);
+    tileEl.classList.add('flash-orange');
+    await sleep(spd);
+    tileEl.classList.remove('flash-orange');
+    if (i < trampaModified.length - 1) await sleep(gap);
+  }
+
+  isFlashing = false; isPlayerTurn = true;
+  setStatus('status-your-turn-tra');
+  setTilesDisabled(false);
+
+  startResponseTimer(TRAMPA_RESPONSE);
+  showTimerBar(TRAMPA_RESPONSE);
+}
+
 // ═══ START ROUND (dispatcher) ═══
 async function startRound() {
   if (isFlashing || isPlayerTurn) return;
-  const btn = document.getElementById('actionBtn');
-  btn.style.display = 'none';
+  document.getElementById('actionBtn').style.display = 'none';
 
-  if (gameMode === 'secuencia') {
-    await startSecuenciaRound();
-  } else {
-    await startRelampagoRound();
-  }
+  if (gameMode === 'secuencia') await startSecuenciaRound();
+  else if (gameMode === 'relampago') await startRelampagoRound();
+  else await startTrampaRound();
 }
 
 // ═══ RESPONSE TIMER ═══
@@ -983,19 +1055,16 @@ function startResponseTimer(time) {
 // ═══ TAP HANDLER ═══
 function handleTap(idx) {
   if (!isPlayerTurn) return;
-
-  if (gameMode === 'secuencia') {
-    handleSecuenciaTap(idx);
-  } else {
-    handleRelampagoTap(idx);
-  }
+  if (gameMode === 'secuencia') handleSecuenciaTap(idx);
+  else if (gameMode === 'relampago') handleRelampagoTap(idx);
+  else handleTrampaTap(idx);
 }
 
 function handleSecuenciaTap(idx) {
   clearTimeout(responseTimer);
   const time = RESPONSE_TIMES[responseLevel];
   startResponseTimer(time);
-  resetTimerBar(time);
+  resetTimerBar();
 
   const expected = currentSequence[playerInput.length];
   const tileEl = document.querySelector(`[data-index="${idx}"]`);
@@ -1004,7 +1073,6 @@ function handleSecuenciaTap(idx) {
     tileEl.classList.add('selected');
     playerInput.push(idx);
     updateSequenceDots();
-
     if (playerInput.length === currentSequence.length) {
       isPlayerTurn = false;
       clearTimeout(responseTimer);
@@ -1026,23 +1094,16 @@ function handleSecuenciaTap(idx) {
 
 function handleRelampagoTap(idx) {
   const tileEl = document.querySelector(`[data-index="${idx}"]`);
-
-  // Already picked? Deselect
   if (playerInput.includes(idx)) {
     playerInput = playerInput.filter(i => i !== idx);
     tileEl.classList.remove('selected');
     updateSequenceDots();
     return;
   }
-
-  // Can't pick more than needed
   if (playerInput.length >= sequenceLength) return;
-
   playerInput.push(idx);
   tileEl.classList.add('selected');
   updateSequenceDots();
-
-  // Auto-check when picked enough
   if (playerInput.length === sequenceLength) {
     setTimeout(() => checkRelampagoAnswer(), 300);
   }
@@ -1056,21 +1117,17 @@ function checkRelampagoAnswer() {
 
   const correctSet = new Set(currentSequence);
   const playerSet = new Set(playerInput);
-
   let allCorrect = true;
+
   playerInput.forEach(idx => {
     const tileEl = document.querySelector(`[data-index="${idx}"]`);
     if (correctSet.has(idx)) {
-      tileEl.classList.remove('selected');
-      tileEl.classList.add('correct-tile');
+      tileEl.classList.remove('selected'); tileEl.classList.add('correct-tile');
     } else {
-      tileEl.classList.remove('selected');
-      tileEl.classList.add('wrong-tile');
+      tileEl.classList.remove('selected'); tileEl.classList.add('wrong-tile');
       allCorrect = false;
     }
   });
-
-  // Show missed tiles
   currentSequence.forEach(idx => {
     if (!playerSet.has(idx)) {
       document.querySelector(`[data-index="${idx}"]`).classList.add('flashing');
@@ -1078,9 +1135,26 @@ function checkRelampagoAnswer() {
     }
   });
 
-  if (allCorrect) {
+  if (allCorrect) handleSuccess();
+  else { setStatus('status-wrong'); handleFailure(); }
+}
+
+function handleTrampaTap(idx) {
+  isPlayerTurn = false;
+  clearTimeout(responseTimer);
+  setTilesDisabled(true);
+  hideTimerBar();
+
+  const tileEl = document.querySelector(`[data-index="${idx}"]`);
+
+  if (idx === trampaImpostor) {
+    // Correct! Show the impostor as correct
+    tileEl.classList.add('correct-tile');
     handleSuccess();
   } else {
+    // Wrong! Show what they picked as wrong, show the real impostor
+    tileEl.classList.add('wrong-tile');
+    document.querySelector(`[data-index="${trampaImpostor}"]`).classList.add('correct-tile');
     setStatus('status-wrong');
     handleFailure();
   }
@@ -1088,24 +1162,30 @@ function checkRelampagoAnswer() {
 
 // ═══ SUCCESS / FAILURE ═══
 function handleSuccess() {
+  const minLen = gameMode === 'trampa' ? 4 : 3;
   const maxLen = gameMode === 'relampago' ? 10 : 28;
 
   let multiplier, responseBonus;
   if (gameMode === 'secuencia') {
     multiplier = speed === 'fast' ? 3 : speed === 'medium' ? 2 : 1;
     responseBonus = responseLevel === 'pressure' ? 2 : responseLevel === 'normal' ? 1.5 : 1;
-  } else {
+  } else if (gameMode === 'relampago') {
     multiplier = relampagoLevel === 3 ? 3 : relampagoLevel === 2 ? 2 : 1;
     responseBonus = 1;
+  } else {
+    multiplier = trampaSpeed === 'fast' ? 3 : trampaSpeed === 'medium' ? 2 : 1;
+    responseBonus = 1.5; // Trampa is harder by nature
   }
   score += Math.round(sequenceLength * multiplier * responseBonus);
   consecutiveWins++;
 
-  currentSequence.forEach(idx => {
-    const el = document.querySelector(`[data-index="${idx}"]`);
-    el.classList.remove('selected', 'flashing');
-    el.classList.add('correct-tile');
-  });
+  if (gameMode === 'secuencia' || gameMode === 'relampago') {
+    currentSequence.forEach(idx => {
+      const el = document.querySelector(`[data-index="${idx}"]`);
+      el.classList.remove('selected', 'flashing');
+      el.classList.add('correct-tile');
+    });
+  }
 
   if (consecutiveWins >= 2 && sequenceLength < maxLen) {
     sequenceLength++;
@@ -1120,8 +1200,9 @@ function handleSuccess() {
 }
 
 function handleFailure() {
+  const minLen = gameMode === 'trampa' ? 4 : 3;
   consecutiveWins = 0;
-  if (sequenceLength > 3) sequenceLength--;
+  if (sequenceLength > minLen) sequenceLength--;
   updateUI();
   showNextButton();
 }
@@ -1136,16 +1217,13 @@ function showNextButton() {
 function resetGame() {
   clearTimeout(responseTimer);
   hideTimerBar();
-  isFlashing = false;
-  isPlayerTurn = false;
-  sequenceLength = 3;
-  consecutiveWins = 0;
-  score = 0;
-  bestSequence = 3;
-  playerInput = [];
-  currentSequence = [];
-  clearTileStates();
-  setTilesDisabled(true);
+  isFlashing = false; isPlayerTurn = false;
+  const minLen = gameMode === 'trampa' ? 4 : 3;
+  sequenceLength = minLen;
+  consecutiveWins = 0; score = 0; bestSequence = minLen;
+  playerInput = []; currentSequence = [];
+  trampaOriginal = []; trampaModified = []; trampaImpostor = -1;
+  clearTileStates(); setTilesDisabled(true);
   setStatus('status-ready');
   updateUI();
   const btn = document.getElementById('actionBtn');
