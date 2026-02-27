@@ -379,7 +379,7 @@
 <div class="game-container">
   <!-- TOP BAR -->
   <div class="top-bar">
-    <a href="/" class="back-btn">←</a>
+    <a href="#" class="back-btn" onclick="event.preventDefault(); backToWelcome();">←</a>
     <div class="title">La Marquesina</div>
     <button class="help-btn" onclick="toggleHelp()">?</button>
   </div>
@@ -1264,6 +1264,16 @@ function resetGame() {
 function toggleHelp() {
   document.getElementById('helpModal').classList.toggle('hidden');
   syncHelpContent();
+}
+
+function backToWelcome() {
+  clearTimeout(responseTimer);
+  hideTimerBar();
+  isFlashing = false;
+  isPlayerTurn = false;
+  clearTileStates();
+  document.getElementById('dominoBoard').style.pointerEvents = 'none';
+  document.getElementById('welcomeScreen').classList.remove('hidden');
 }
 
 // ═══ INIT ═══
