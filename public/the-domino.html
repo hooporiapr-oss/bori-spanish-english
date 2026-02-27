@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>La Marquesina — Hey Bori</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  :root {
+    --bori-bg: #1a1128;
+    --bori-surface: #251a38;
+    --bori-gold: #FFD700;
+    --bori-teal: #00D9A5;
+    --bori-coral: #FF6B6B;
+    --bori-purple: #9B59B6;
+    --bori-blue: #5DADE2;
+    --bori-text: #F0E6FF;
+    --bori-muted: #8B7FA8;
+    --tile-bg: #2D1F47;
+    --tile-border: #3D2D57;
+    --tile-flash: #FFD700;
+    --tile-selected: #00D9A5;
+    --tile-wrong: #FF6B6B;
+    --tile-correct: #00D9A5;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Fredoka', sans-serif;
+    background: var(--bori-bg);
+    color: var(--bori-text);
+    touch-action: manipulation;
+  }
+
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    max-width: 430px;
+    margin: 0 auto;
+    padding: 8px 6px 6px;
+    position: relative;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 4px 6px;
+    flex-shrink: 0;
+  }
+  .top-bar .back-btn {
+    font-size: 22px;
+    color: var(--bori-gold);
+    text-decoration: none;
+    padding: 4px 8px;
+    line-height: 1;
+  }
+  .top-bar .title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--bori-gold);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    text-align: center;
+    flex: 1;
+  }
+  .top-bar .help-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--bori-gold);
+    background: transparent;
+    color: var(--bori-gold);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fredoka', sans-serif;
+  }
+
+  /* ── INFO STRIP ── */
+  .info-strip {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 8px;
+    background: var(--bori-surface);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+  }
+  .info-item { text-align: center; flex: 1; }
+  .info-label {
+    font-size: 9px;
+    color: var(--bori-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .info-value { font-size: 16px; font-weight: 700; color: var(--bori-gold); }
+  .info-value.teal { color: var(--bori-teal); }
+
+  /* ── STATUS ── */
+  .status-bar {
+    text-align: center;
+    padding: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bori-muted);
+    flex-shrink: 0;
+    min-height: 24px;
+  }
+  .status-bar.watching { color: var(--bori-gold); }
+  .status-bar.your-turn { color: var(--bori-teal); }
+  .status-bar.correct { color: var(--bori-teal); }
+  .status-bar.wrong { color: var(--bori-coral); }
+
+  /* ── BOARD ── */
+  .board-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .domino-board {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    width: 100%;
+    max-width: 400px;
+    padding: 4px;
+  }
+
+  /* ── TILE ── */
+  .domino-tile {
+    aspect-ratio: 1 / 1.55;
+    background: var(--tile-bg);
+    border: 2px solid var(--tile-border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.2s, background 0.2s;
+    position: relative;
+    padding: 3px 2px;
+    user-select: none;
+  }
+  .domino-tile::after {
+    content: '';
+    position: absolute;
+    top: 48%;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: var(--tile-border);
+    border-radius: 1px;
+  }
+  .domino-tile.disabled { pointer-events: none; opacity: 0.6; }
+  .domino-tile.flashing {
+    border-color: var(--tile-flash);
+    background: rgba(255, 215, 0, 0.2);
+    transform: scale(1.08);
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+  }
+  .domino-tile.selected {
+    border-color: var(--tile-selected);
+    background: rgba(0, 217, 165, 0.15);
+  }
+  .domino-tile.correct-tile {
+    border-color: var(--tile-correct);
+    background: rgba(0, 217, 165, 0.25);
+  }
+  .domino-tile.wrong-tile {
+    border-color: var(--tile-wrong);
+    background: rgba(255, 107, 107, 0.25);
+    animation: shake 0.4s ease;
+  }
+  .domino-tile:active:not(.disabled) { transform: scale(0.95); }
+
+  /* ── DOTS ── */
+  .dot-half {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    height: 42%;
+    position: relative;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    background: var(--bori-text);
+    border-radius: 50%;
+    position: absolute;
+  }
+  .domino-tile.flashing .dot { background: var(--bori-gold); }
+  .domino-tile.selected .dot { background: var(--bori-teal); }
+
+  /* ── BOTTOM ── */
+  .bottom-controls {
+    flex-shrink: 0;
+    padding: 6px 4px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sequence-dots {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    min-height: 14px;
+    flex-wrap: wrap;
+  }
+  .seq-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--tile-border);
+    transition: background 0.2s;
+  }
+  .seq-dot.filled { background: var(--bori-teal); }
+  .seq-dot.current { background: var(--bori-gold); box-shadow: 0 0 6px var(--bori-gold); }
+  .btn-row { display: flex; gap: 8px; justify-content: center; }
+  .game-btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 25px;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .game-btn:active { transform: scale(0.95); }
+  .btn-primary { background: linear-gradient(135deg, var(--bori-gold), #FFA500); color: #1a1128; }
+  .btn-secondary { background: var(--bori-surface); color: var(--bori-text); border: 2px solid var(--tile-border); }
+
+  /* ── WELCOME ── */
+  .welcome-screen {
+    position: absolute;
+    inset: 0;
+    background: var(--bori-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 20px;
+    text-align: center;
+  }
+  .welcome-screen.hidden { display: none; }
+  .welcome-icon { font-size: 56px; margin-bottom: 12px; margin-top: 48px; }
+  .welcome-title { font-size: 26px; font-weight: 700; color: var(--bori-gold); margin-bottom: 2px; }
+  .welcome-subtitle { font-size: 14px; font-weight: 600; color: var(--bori-text); margin-bottom: 4px; letter-spacing: 0.5px; }
+  .welcome-sub { font-size: 13px; color: var(--bori-muted); margin-bottom: 24px; }
+  .setting-group { width: 100%; max-width: 300px; margin-bottom: 16px; }
+  .setting-label { font-size: 11px; color: var(--bori-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .setting-options { display: flex; gap: 6px; }
+  .setting-opt {
+    flex: 1;
+    padding: 10px 6px;
+    border-radius: 12px;
+    border: 2px solid var(--tile-border);
+    background: var(--bori-surface);
+    color: var(--bori-text);
+    font-family: 'Fredoka', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .setting-opt.active {
+    border-color: var(--bori-gold);
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--bori-gold);
+  }
+  .setting-opt .opt-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+  .start-btn {
+    margin-top: 12px;
+    padding: 14px 48px;
+    border-radius: 30px;
+    border: none;
+    background: linear-gradient(135deg, var(--bori-gold), #FFA500);
+    color: #1a1128;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .start-btn:active { transform: scale(0.95); }
+
+  /* ── WELCOME TOP BAR ── */
+  .welcome-top-bar {
+    position: absolute;
+    top: 12px; left: 12px; right: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+  }
+  .welcome-back-btn {
+    background: none; border: none;
+    color: var(--bori-gold);
+    font-family: 'Fredoka', sans-serif;
+    font-size: 16px; font-weight: 600;
+    text-decoration: none;
+    padding: 6px 10px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .welcome-top-right {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .welcome-lang-toggle {
+    display: flex; gap: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 20px; padding: 3px;
+  }
+  .wlang-btn {
+    padding: 4px 12px; border-radius: 16px; border: none;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    background: transparent; color: var(--bori-muted);
+    transition: all 0.2s;
+  }
+  .wlang-btn.active {
+    background: var(--bori-gold); color: #1a1128;
+  }
+  .welcome-help-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,215,0,0.12);
+    border: 1.5px solid var(--bori-gold);
+    color: var(--bori-gold);
+    font-family: 'Fredoka', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── HELP MODAL ── */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 6, 20, 0.92);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal-box {
+    background: var(--bori-surface);
+    border: 2px solid var(--tile-border);
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 360px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .modal-title { font-size: 18px; font-weight: 700; color: var(--bori-gold); }
+  .modal-close {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--bori-muted); background: transparent;
+    color: var(--bori-muted); font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lang-toggle { display: flex; gap: 4px; margin-bottom: 14px; }
+  .lang-btn {
+    padding: 5px 14px; border-radius: 20px; border: 2px solid var(--tile-border);
+    background: transparent; color: var(--bori-muted);
+    font-family: 'Fredoka', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .lang-btn.active { border-color: var(--bori-teal); color: var(--bori-teal); background: rgba(0, 217, 165, 0.1); }
+  .rules-content h3 { font-size: 14px; font-weight: 600; color: var(--bori-teal); margin: 10px 0 4px; }
+  .rules-content p { font-size: 12px; color: var(--bori-text); line-height: 1.5; margin-bottom: 6px; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+  }
+
+  /* ── TIMER BAR ── */
+  .timer-bar-container {
+    height: 4px;
+    background: var(--tile-border);
+    border-radius: 2px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .timer-bar-container.hidden { visibility: hidden; }
+  .timer-bar {
+    height: 100%;
+    background: var(--bori-teal);
+    border-radius: 2px;
+    transition: width 0.1s linear;
+    width: 100%;
+  }
+  .timer-bar.warning { background: var(--bori-coral); }
+
+  /* ── SMALL PHONES ── */
+  @media (max-height: 650px) {
+    .domino-tile { border-radius: 6px; }
+    .dot { width: 5px; height: 5px; }
+    .info-strip { padding: 4px 6px; margin-bottom: 4px; }
+    .info-value { font-size: 14px; }
+    .game-btn { padding: 8px 20px; font-size: 13px; }
+    .status-bar { font-size: 11px; min-height: 20px; padding: 2px; }
+    .bottom-controls { padding: 4px; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <a href="/" class="back-btn">←</a>
+    <div class="title">La Marquesina</div>
+    <button class="help-btn" onclick="toggleHelp()">?</button>
+  </div>
+
+  <!-- INFO STRIP -->
+  <div class="info-strip">
+    <div class="info-item">
+      <div class="info-label" data-i18n="label-seq">Secuencia</div>
+      <div class="info-value" id="seqDisplay">3</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label" data-i18n="label-streak">Racha</div>
+      <div class="info-value teal" id="streakDisplay">0/2</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label" data-i18n="label-best">Récord</div>
+      <div class="info-value" id="bestDisplay">3</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label" data-i18n="label-score">Puntos</div>
+      <div class="info-value teal" id="scoreDisplay">0</div>
+    </div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="status-bar" id="statusBar">¡Prepárate!</div>
+
+  <!-- TIMER BAR -->
+  <div class="timer-bar-container hidden" id="timerBarContainer">
+    <div class="timer-bar" id="timerBar"></div>
+  </div>
+
+  <!-- BOARD -->
+  <div class="board-area">
+    <div class="domino-board" id="dominoBoard"></div>
+  </div>
+
+  <!-- BOTTOM -->
+  <div class="bottom-controls">
+    <div class="sequence-dots" id="sequenceDots"></div>
+    <div class="btn-row">
+      <button class="game-btn btn-secondary" onclick="resetGame()" data-i18n="btn-reset">Reiniciar</button>
+      <button class="game-btn btn-primary" id="actionBtn" onclick="startRound()">Empezar</button>
+    </div>
+  </div>
+
+  <!-- WELCOME SCREEN -->
+  <div class="welcome-screen" id="welcomeScreen">
+    <div class="welcome-top-bar">
+      <a href="/" class="welcome-back-btn">← Bori</a>
+      <div class="welcome-top-right">
+        <div class="welcome-lang-toggle">
+          <button class="wlang-btn active" onclick="setLangWelcome('es')">ES</button>
+          <button class="wlang-btn" onclick="setLangWelcome('en')">EN</button>
+        </div>
+        <button class="welcome-help-btn" onclick="toggleHelp()">?</button>
+      </div>
+    </div>
+    <div class="welcome-icon">🁣</div>
+    <div class="welcome-title">La Marquesina</div>
+    <div class="welcome-subtitle">Dominó Secuencia</div>
+    <div class="welcome-sub" data-i18n="welcome-sub">Memoria · Secuencia · Dominó</div>
+
+    <div class="setting-group">
+      <div class="setting-label" data-i18n="setting-flash">Velocidad del Flash</div>
+      <div class="setting-options" id="speedOptions">
+        <div class="setting-opt" data-speed="slow" onclick="setSpeed('slow')">
+          <span class="opt-icon">🐢</span>
+          <span data-i18n="speed-slow">Lento</span>
+        </div>
+        <div class="setting-opt active" data-speed="medium" onclick="setSpeed('medium')">
+          <span class="opt-icon">🏃</span>
+          <span data-i18n="speed-medium">Medio</span>
+        </div>
+        <div class="setting-opt" data-speed="fast" onclick="setSpeed('fast')">
+          <span class="opt-icon">⚡</span>
+          <span data-i18n="speed-fast">Rápido</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <div class="setting-label" data-i18n="setting-response">Tiempo de Respuesta</div>
+      <div class="setting-options" id="responseOptions">
+        <div class="setting-opt" data-response="relaxed" onclick="setResponse('relaxed')">
+          <span class="opt-icon">😌</span>
+          <span data-i18n="resp-relaxed">Relajado</span>
+        </div>
+        <div class="setting-opt active" data-response="normal" onclick="setResponse('normal')">
+          <span class="opt-icon">😎</span>
+          <span data-i18n="resp-normal">Normal</span>
+        </div>
+        <div class="setting-opt" data-response="pressure" onclick="setResponse('pressure')">
+          <span class="opt-icon">🔥</span>
+          <span data-i18n="resp-pressure">Presión</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="start-btn" onclick="closeWelcome()" data-i18n="btn-play">JUGAR</button>
+  </div>
+
+  <!-- HELP MODAL -->
+  <div class="modal-overlay hidden" id="helpModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" data-i18n="help-title">Cómo Jugar</div>
+        <button class="modal-close" onclick="toggleHelp()">✕</button>
+      </div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+      <div class="rules-content" id="rulesES">
+        <h3>🎯 Objetivo</h3>
+        <p>Observa la secuencia de fichas de dominó que se iluminan y repítela tocándolas en el mismo orden.</p>
+        <h3>📈 Progresión</h3>
+        <p>Comienzas con 3 fichas. Aciertas 2 veces seguidas y la secuencia crece a 4, luego 5, y así hasta las 28 fichas.</p>
+        <h3>📉 Si fallas</h3>
+        <p>Bajas un nivel. Nunca menos de 3. Sin castigo extremo — siempre puedes escalar de vuelta.</p>
+        <h3>⚡ Velocidad del Flash</h3>
+        <p>Lento, Medio, o Rápido — controla qué tan rápido se iluminan las fichas.</p>
+        <h3>⏱️ Tiempo de Respuesta</h3>
+        <p>Relajado (sin límite), Normal (5s por ficha), o Presión (2.5s por ficha).</p>
+        <h3>⭐ Puntos</h3>
+        <p>Más secuencia + más velocidad = más puntos.</p>
+      </div>
+      <div class="rules-content hidden" id="rulesEN">
+        <h3>🎯 Goal</h3>
+        <p>Watch the domino tiles that light up and tap them back in the same order.</p>
+        <h3>📈 Progression</h3>
+        <p>Start with 3 tiles. Get it right 2 times in a row and the sequence grows to 4, then 5, up to 28.</p>
+        <h3>📉 If you fail</h3>
+        <p>Drop one level. Never below 3. No harsh penalties — climb back up.</p>
+        <h3>⚡ Flash Speed</h3>
+        <p>Slow, Medium, or Fast — how quickly tiles light up.</p>
+        <h3>⏱️ Response Time</h3>
+        <p>Relaxed (no limit), Normal (5s per tile), or Pressure (2.5s per tile).</p>
+        <h3>⭐ Points</h3>
+        <p>Longer sequences + faster speed = more points.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══ FULL DOMINO SET (28 tiles) ═══
+const FULL_SET = [];
+for (let a = 0; a <= 6; a++) {
+  for (let b = a; b <= 6; b++) {
+    FULL_SET.push([a, b]);
+  }
+}
+
+// ═══ CONFIG ═══
+const SPEEDS = { slow: 900, medium: 550, fast: 300 };
+const GAPS = { slow: 400, medium: 250, fast: 150 };
+const RESPONSE_TIMES = { relaxed: Infinity, normal: 5000, pressure: 2500 };
+
+// ═══ STATE ═══
+let speed = 'medium';
+let responseLevel = 'normal';
+let sequenceLength = 3;
+let currentSequence = [];
+let playerInput = [];
+let consecutiveWins = 0;
+let bestSequence = 3;
+let score = 0;
+let isFlashing = false;
+let isPlayerTurn = false;
+let responseTimer = null;
+let timerInterval = null;
+let timerStart = 0;
+let lang = 'es';
+
+// ═══ i18n ═══
+const STRINGS = {
+  es: {
+    'label-seq': 'Secuencia', 'label-streak': 'Racha', 'label-best': 'Récord', 'label-score': 'Puntos',
+    'status-ready': '¡Prepárate!', 'status-watching': '👀 ¡Observa la secuencia!',
+    'status-your-turn': '🎯 ¡Tu turno!', 'status-correct': '✅ ¡Correcto!',
+    'status-wrong': '❌ ¡Fallaste!', 'status-levelup': '🔥 ¡Nivel arriba! Secuencia de',
+    'status-timeout': '⏱️ ¡Tiempo!', 'btn-reset': 'Reiniciar', 'btn-start': 'Empezar',
+    'btn-next': 'Siguiente', 'welcome-sub': 'Memoria · Secuencia · Dominó',
+    'setting-flash': 'Velocidad del Flash', 'setting-response': 'Tiempo de Respuesta',
+    'speed-slow': 'Lento', 'speed-medium': 'Medio', 'speed-fast': 'Rápido',
+    'resp-relaxed': 'Relajado', 'resp-normal': 'Normal', 'resp-pressure': 'Presión',
+    'btn-play': 'JUGAR', 'help-title': 'Cómo Jugar',
+  },
+  en: {
+    'label-seq': 'Sequence', 'label-streak': 'Streak', 'label-best': 'Best', 'label-score': 'Score',
+    'status-ready': 'Get ready!', 'status-watching': '👀 Watch the sequence!',
+    'status-your-turn': '🎯 Your turn!', 'status-correct': '✅ Correct!',
+    'status-wrong': '❌ Wrong!', 'status-levelup': '🔥 Level up! Sequence of',
+    'status-timeout': '⏱️ Time\'s up!', 'btn-reset': 'Reset', 'btn-start': 'Start',
+    'btn-next': 'Next', 'welcome-sub': 'Memory · Sequence · Dominoes',
+    'setting-flash': 'Flash Speed', 'setting-response': 'Response Time',
+    'speed-slow': 'Slow', 'speed-medium': 'Medium', 'speed-fast': 'Fast',
+    'resp-relaxed': 'Relaxed', 'resp-normal': 'Normal', 'resp-pressure': 'Pressure',
+    'btn-play': 'PLAY', 'help-title': 'How to Play',
+  }
+};
+
+function t(key) { return STRINGS[lang][key] || key; }
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+}
+
+function setLang(l) {
+  lang = l;
+  // Sync help modal lang buttons
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  const helpBtn = document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`);
+  if (helpBtn) helpBtn.classList.add('active');
+  // Sync welcome lang buttons
+  document.querySelectorAll('.wlang-btn').forEach(b => b.classList.remove('active'));
+  const welcomeBtn = document.querySelector(`.wlang-btn[onclick="setLangWelcome('${l}')"]`);
+  if (welcomeBtn) welcomeBtn.classList.add('active');
+  document.getElementById('rulesES').classList.toggle('hidden', l !== 'es');
+  document.getElementById('rulesEN').classList.toggle('hidden', l !== 'en');
+  applyLang();
+  updateUI();
+}
+
+function setLangWelcome(l) {
+  setLang(l);
+}
+
+// ═══ DOT POSITIONS (relative % within half) ═══
+const DOT_POSITIONS = {
+  0: [],
+  1: [[50,50]],
+  2: [[25,25],[75,75]],
+  3: [[25,25],[50,50],[75,75]],
+  4: [[25,25],[75,25],[25,75],[75,75]],
+  5: [[25,25],[75,25],[50,50],[25,75],[75,75]],
+  6: [[25,20],[75,20],[25,50],[75,50],[25,80],[75,80]],
+};
+
+function dotsHTML(n) {
+  return DOT_POSITIONS[n].map(([x,y]) =>
+    `<div class="dot" style="left:${x}%;top:${y}%;transform:translate(-50%,-50%)"></div>`
+  ).join('');
+}
+
+// ═══ BUILD BOARD ═══
+function buildBoard() {
+  const board = document.getElementById('dominoBoard');
+  board.innerHTML = '';
+  FULL_SET.forEach((tile, idx) => {
+    const el = document.createElement('div');
+    el.className = 'domino-tile disabled';
+    el.dataset.index = idx;
+    el.innerHTML = `
+      <div class="dot-half">${dotsHTML(tile[0])}</div>
+      <div class="dot-half">${dotsHTML(tile[1])}</div>
+    `;
+    el.addEventListener('click', () => handleTap(idx));
+    board.appendChild(el);
+  });
+}
+
+// ═══ SETTINGS ═══
+function setSpeed(s) {
+  speed = s;
+  document.querySelectorAll('#speedOptions .setting-opt').forEach(el =>
+    el.classList.toggle('active', el.dataset.speed === s));
+}
+function setResponse(r) {
+  responseLevel = r;
+  document.querySelectorAll('#responseOptions .setting-opt').forEach(el =>
+    el.classList.toggle('active', el.dataset.response === r));
+}
+function closeWelcome() {
+  document.getElementById('welcomeScreen').classList.add('hidden');
+  startRound();
+}
+
+// ═══ GAME LOGIC ═══
+function generateSequence() {
+  const available = [...Array(28).keys()];
+  const indices = [];
+  for (let i = 0; i < sequenceLength; i++) {
+    const pick = Math.floor(Math.random() * available.length);
+    indices.push(available.splice(pick, 1)[0]);
+  }
+  return indices;
+}
+
+function updateUI() {
+  document.getElementById('seqDisplay').textContent = sequenceLength;
+  document.getElementById('streakDisplay').textContent = `${consecutiveWins}/2`;
+  document.getElementById('bestDisplay').textContent = bestSequence;
+  document.getElementById('scoreDisplay').textContent = score;
+  updateSequenceDots();
+}
+
+function updateSequenceDots() {
+  const c = document.getElementById('sequenceDots');
+  c.innerHTML = '';
+  for (let i = 0; i < sequenceLength; i++) {
+    const d = document.createElement('div');
+    d.className = 'seq-dot';
+    if (i < playerInput.length) d.classList.add('filled');
+    if (i === playerInput.length && isPlayerTurn) d.classList.add('current');
+    c.appendChild(d);
+  }
+}
+
+function setStatus(key, extra = '') {
+  const bar = document.getElementById('statusBar');
+  bar.textContent = t(key) + extra;
+  bar.className = 'status-bar';
+  if (key.includes('watching')) bar.classList.add('watching');
+  else if (key.includes('your-turn')) bar.classList.add('your-turn');
+  else if (key.includes('correct') || key.includes('levelup')) bar.classList.add('correct');
+  else if (key.includes('wrong') || key.includes('timeout')) bar.classList.add('wrong');
+}
+
+function setTilesDisabled(disabled) {
+  document.querySelectorAll('.domino-tile').forEach(el =>
+    el.classList.toggle('disabled', disabled));
+}
+
+function clearTileStates() {
+  document.querySelectorAll('.domino-tile').forEach(el =>
+    el.classList.remove('flashing', 'selected', 'correct-tile', 'wrong-tile'));
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ═══ TIMER BAR ═══
+function showTimerBar() {
+  const container = document.getElementById('timerBarContainer');
+  const bar = document.getElementById('timerBar');
+  if (RESPONSE_TIMES[responseLevel] === Infinity) {
+    container.classList.add('hidden');
+    return;
+  }
+  container.classList.remove('hidden');
+  bar.style.width = '100%';
+  bar.classList.remove('warning');
+  timerStart = Date.now();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const elapsed = Date.now() - timerStart;
+    const total = RESPONSE_TIMES[responseLevel];
+    const pct = Math.max(0, 1 - elapsed / total) * 100;
+    bar.style.width = pct + '%';
+    if (pct < 30) bar.classList.add('warning');
+    if (pct <= 0) clearInterval(timerInterval);
+  }, 50);
+}
+
+function hideTimerBar() {
+  clearInterval(timerInterval);
+  document.getElementById('timerBarContainer').classList.add('hidden');
+}
+
+function resetTimerBar() {
+  const bar = document.getElementById('timerBar');
+  bar.style.width = '100%';
+  bar.classList.remove('warning');
+  timerStart = Date.now();
+}
+
+// ═══ ROUND ═══
+async function startRound() {
+  if (isFlashing || isPlayerTurn) return;
+
+  const btn = document.getElementById('actionBtn');
+  btn.style.display = 'none';
+
+  clearTileStates();
+  playerInput = [];
+  currentSequence = generateSequence();
+  updateUI();
+  hideTimerBar();
+
+  // Flash
+  isFlashing = true;
+  setStatus('status-watching');
+  setTilesDisabled(true);
+  await sleep(500);
+
+  for (let i = 0; i < currentSequence.length; i++) {
+    const tileEl = document.querySelector(`[data-index="${currentSequence[i]}"]`);
+    tileEl.classList.add('flashing');
+    await sleep(SPEEDS[speed]);
+    tileEl.classList.remove('flashing');
+    if (i < currentSequence.length - 1) await sleep(GAPS[speed]);
+  }
+
+  isFlashing = false;
+  isPlayerTurn = true;
+  setStatus('status-your-turn');
+  setTilesDisabled(false);
+  updateSequenceDots();
+  startResponseTimer();
+  showTimerBar();
+}
+
+function startResponseTimer() {
+  clearTimeout(responseTimer);
+  const time = RESPONSE_TIMES[responseLevel];
+  if (time === Infinity) return;
+  responseTimer = setTimeout(() => {
+    if (isPlayerTurn) {
+      isPlayerTurn = false;
+      setTilesDisabled(true);
+      setStatus('status-timeout');
+      hideTimerBar();
+      handleFailure();
+    }
+  }, time);
+}
+
+function handleTap(idx) {
+  if (!isPlayerTurn) return;
+
+  // Reset timer per tap
+  clearTimeout(responseTimer);
+  startResponseTimer();
+  resetTimerBar();
+
+  const expected = currentSequence[playerInput.length];
+  const tileEl = document.querySelector(`[data-index="${idx}"]`);
+
+  if (idx === expected) {
+    tileEl.classList.add('selected');
+    playerInput.push(idx);
+    updateSequenceDots();
+
+    if (playerInput.length === currentSequence.length) {
+      isPlayerTurn = false;
+      clearTimeout(responseTimer);
+      setTilesDisabled(true);
+      hideTimerBar();
+      handleSuccess();
+    }
+  } else {
+    tileEl.classList.add('wrong-tile');
+    const correctEl = document.querySelector(`[data-index="${expected}"]`);
+    correctEl.classList.add('correct-tile');
+    isPlayerTurn = false;
+    clearTimeout(responseTimer);
+    setTilesDisabled(true);
+    hideTimerBar();
+    setStatus('status-wrong');
+    handleFailure();
+  }
+}
+
+function handleSuccess() {
+  const multiplier = speed === 'fast' ? 3 : speed === 'medium' ? 2 : 1;
+  const responseBonus = responseLevel === 'pressure' ? 2 : responseLevel === 'normal' ? 1.5 : 1;
+  score += Math.round(sequenceLength * multiplier * responseBonus);
+  consecutiveWins++;
+
+  currentSequence.forEach(idx => {
+    document.querySelector(`[data-index="${idx}"]`).classList.add('correct-tile');
+  });
+
+  if (consecutiveWins >= 2 && sequenceLength < 28) {
+    sequenceLength++;
+    consecutiveWins = 0;
+    if (sequenceLength > bestSequence) bestSequence = sequenceLength;
+    setStatus('status-levelup', ` ${sequenceLength}`);
+  } else {
+    setStatus('status-correct');
+  }
+  updateUI();
+  showNextButton();
+}
+
+function handleFailure() {
+  consecutiveWins = 0;
+  if (sequenceLength > 3) sequenceLength--;
+  updateUI();
+  showNextButton();
+}
+
+function showNextButton() {
+  const btn = document.getElementById('actionBtn');
+  btn.textContent = t('btn-next');
+  btn.style.display = '';
+  btn.onclick = () => { clearTileStates(); startRound(); };
+}
+
+function resetGame() {
+  clearTimeout(responseTimer);
+  hideTimerBar();
+  isFlashing = false;
+  isPlayerTurn = false;
+  sequenceLength = 3;
+  consecutiveWins = 0;
+  score = 0;
+  bestSequence = 3;
+  playerInput = [];
+  currentSequence = [];
+  clearTileStates();
+  setTilesDisabled(true);
+  setStatus('status-ready');
+  updateUI();
+  const btn = document.getElementById('actionBtn');
+  btn.textContent = t('btn-start');
+  btn.style.display = '';
+  btn.onclick = () => startRound();
+}
+
+function toggleHelp() {
+  document.getElementById('helpModal').classList.toggle('hidden');
+}
+
+// ═══ INIT ═══
+buildBoard();
+updateUI();
+</script>
+</body>
+</html>
